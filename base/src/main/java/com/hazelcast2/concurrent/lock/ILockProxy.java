@@ -1,8 +1,8 @@
-package com.hazelcast2.lock;
+package com.hazelcast2.concurrent.lock;
 
 import com.hazelcast2.core.ILock;
 
-import static com.hazelcast2.lock.LockUtil.getThreadId;
+import static com.hazelcast2.concurrent.lock.LockUtil.getThreadId;
 
 public class ILockProxy implements ILock {
 

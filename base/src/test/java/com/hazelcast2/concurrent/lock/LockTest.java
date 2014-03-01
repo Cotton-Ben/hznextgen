@@ -1,4 +1,4 @@
-package com.hazelcast2.lock;
+package com.hazelcast2.concurrent.lock;
 
 import com.hazelcast2.core.ILock;
 import com.hazelcast2.spi.PartitionSettings;

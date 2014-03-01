@@ -1,4 +1,4 @@
-package com.hazelcast2.atomiclong;
+package com.hazelcast2.concurrent.atomiclong;
 
 /**
  * The LongCell is an exclusive cell. So at any given moment only a single thread can

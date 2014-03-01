@@ -1,57 +1,58 @@
-package com.hazelcast2.atomiclong;
+package com.hazelcast2.concurrent.atomiclong;
 
-import com.hazelcast2.core.IAtomicLong;
 import com.hazelcast2.spi.PartitionSettings;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
 //very naive performance test
-public class AtomicLongPerformanceTest {
+public class LongPartitionPerformanceTest {
 
     @Test
     public void testSet() {
-        LongPartition partition = new GeneratedLongPartition(new PartitionSettings(1));
-        IAtomicLong atomicLong = new AtomicLongProxy(partition);
+        LongPartition longPartition = new GeneratedLongPartition(new PartitionSettings(1));
+        long id = longPartition.createCell();
         long startMs = System.currentTimeMillis();
         int iterations  = 1000 * 1000 * 100;
         for (int k = 0; k < iterations; k++) {
-            atomicLong.set(20);
+            longPartition.doSet(id, 20);
         }
         long durationMs = System.currentTimeMillis()-startMs;
         double performance = (iterations*1000d)/durationMs;
         System.out.println("Performance: "+performance);
-        long result = atomicLong.get();
+        long result = longPartition.doGet(id);
         assertEquals(20, result);
     }
 
     @Test
     public void testInc() {
-        LongPartition partition = new GeneratedLongPartition(new PartitionSettings(1));
-        IAtomicLong atomicLong = new AtomicLongProxy(partition);
+        LongPartition longPartition = new GeneratedLongPartition(new PartitionSettings(1));
+        long id = longPartition.createCell();
         int iterations  = 1000 * 1000 * 100;
         long startMs = System.currentTimeMillis();
         for (int k = 0; k < iterations ; k++) {
-            atomicLong.inc();
+            longPartition.doInc(id);
         }
         long durationMs = System.currentTimeMillis()-startMs;
         double performance = (iterations*1000d)/durationMs;
         System.out.println("Performance: "+performance);
-        long result = atomicLong.get();
+        long result = longPartition.doGet(id);
         assertEquals(iterations, result);
     }
 
     @Test
     public void testGet() {
-        LongPartition partition = new GeneratedLongPartition(new PartitionSettings(1));
-        IAtomicLong atomicLong = new AtomicLongProxy(partition);
+        LongPartition longPartition = new GeneratedLongPartition(new PartitionSettings(1));
+        long id = longPartition.createCell();
         int iterations  = 1000 * 1000 * 100;
         long startMs = System.currentTimeMillis();
         for (int k = 0; k < iterations ; k++) {
-            atomicLong.get();
+            longPartition.doGet(id);
         }
         long durationMs = System.currentTimeMillis()-startMs;
         double performance = (iterations*1000d)/durationMs;
         System.out.println("Performance: "+performance);
-     }
+        long result = longPartition.doGet(id);
+        assertEquals(iterations, result);
+    }
 }

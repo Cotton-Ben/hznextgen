@@ -1,11 +1,10 @@
-package com.hazelcast2.lock;
+package com.hazelcast2.concurrent.lock;
 
 import com.hazelcast2.spi.Partition;
 import com.hazelcast2.spi.OperationMethod;
 import com.hazelcast2.spi.PartitionAnnotation;
 import com.hazelcast2.spi.PartitionSettings;
 
-import javax.swing.text.Segment;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;

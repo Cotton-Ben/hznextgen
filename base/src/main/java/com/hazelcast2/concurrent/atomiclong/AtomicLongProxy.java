@@ -1,4 +1,4 @@
-package com.hazelcast2.atomiclong;
+package com.hazelcast2.concurrent.atomiclong;
 
 import com.hazelcast2.core.IAtomicLong;
 

@@ -1,6 +1,6 @@
 package com.hazelcast2.spi;
 
-import com.hazelcast2.atomiclong.GeneratedLongPartition;
+import com.hazelcast2.concurrent.atomiclong.GeneratedLongPartition;
 import org.junit.Test;
 
 

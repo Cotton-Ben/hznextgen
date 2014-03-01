@@ -4,13 +4,10 @@ import com.hazelcast2.core.IMap;
 
 public class MapProxy implements IMap {
 
-    private MapPartition[] partitions;
+    private final MapStore mapStore;
 
-    public MapProxy() {
-        partitions = new MapPartition[5];
-        for (int partitionId = 0; partitionId < partitions.length; partitionId++) {
-        //    partitions[partitionId] = new GeneratedMapPartition(partitionId);
-        }
+    public MapProxy(MapStore mapStore) {
+        this.mapStore = mapStore;
     }
 
     @Override
@@ -20,22 +17,30 @@ public class MapProxy implements IMap {
 
     @Override
     public String get(String key) {
+        if(key == null){
+            throw new NullPointerException("key can't be null");
+        }
         MapPartition partition = getPartition(key);
         return partition.doGet(key);
     }
 
     @Override
     public void set(String key, String value) {
+        if(key == null){
+            throw new NullPointerException("key can't be null");
+        }
+
         MapPartition partition = getPartition(key);
         partition.doSet(key, value);
     }
 
     public MapPartition getPartition(String key) {
-        int partitionid = getPartitionid(key);
-        return partitions[partitionid];
+        int partitionId = getPartitionId(key);
+        return mapStore.getPartition(partitionId);
     }
 
-    private int getPartitionid(String key) {
+    private int getPartitionId(String key) {
+        //todo: needs to be forwarded to another system instead of doing here.
         int hash = key.hashCode();
         if (hash == Integer.MIN_VALUE) {
             hash = Integer.MAX_VALUE;
@@ -43,6 +48,6 @@ public class MapProxy implements IMap {
             hash = -hash;
         }
 
-        return hash % partitions.length;
+        return hash % mapStore.getPartitionCount();
     }
 }

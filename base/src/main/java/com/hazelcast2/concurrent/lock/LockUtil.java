@@ -1,4 +1,4 @@
-package com.hazelcast2.lock;
+package com.hazelcast2.concurrent.lock;
 
 public class LockUtil {
 

@@ -1,4 +1,4 @@
-package com.hazelcast2.atomicboolean;
+package com.hazelcast2.concurrent.atomicboolean;
 
 import com.hazelcast2.core.IAtomicBoolean;
 
