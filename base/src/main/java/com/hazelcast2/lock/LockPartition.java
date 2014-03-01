@@ -1,6 +1,6 @@
 package com.hazelcast2.lock;
 
-import com.hazelcast2.spi.AbstractPartition;
+import com.hazelcast2.spi.Partition;
 import com.hazelcast2.spi.OperationMethod;
 import com.hazelcast2.spi.PartitionAnnotation;
 import com.hazelcast2.spi.PartitionSettings;
@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 @PartitionAnnotation
-public abstract class LockPartition extends AbstractPartition {
+public abstract class LockPartition extends Partition {
 
     private final AtomicLong idGenerator = new AtomicLong();
 

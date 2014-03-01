@@ -16,32 +16,32 @@ public class AbstractPartitionTest {
 
     @Test
     public void lock_whenNotLocked() throws ExecutionException, InterruptedException {
-        AbstractPartition partition = newPartition();
-        Future f = partition.lock();
+        Partition partition = newPartition();
+        Future f = partition.systemLock();
         assertNotNull(f);
         assertNull(f.get());
-        assertTrue(partition.isLocked());
+        assertTrue(partition.isSystemLocked());
 
         //for (int k = 0; k < partition.getSegmentLength(); k++) {
         //    Invocation invocation = partition.getInvocation(k);
         //    assertNotNull(invocation);
-        //    assertTrue(invocation instanceof AbstractPartition.LockedInvocation);
+        //    assertTrue(invocation instanceof Partition.LockedInvocation);
         //}
     }
 
     @Test
     public void lock_whenAlreadyLocked() throws ExecutionException, InterruptedException {
-        AbstractPartition partition = newPartition();
-        partition.lock().get();
+        Partition partition = newPartition();
+        partition.systemLock().get();
 
         try {
-            partition.lock().get();
+            partition.systemLock().get();
         } catch (ExecutionException e) {
             assertNotNull(e.getCause());
             assertTrue(e.getCause() instanceof IllegalStateException);
         }
 
-        assertTrue(partition.isLocked());
+        assertTrue(partition.isSystemLocked());
     }
 
     @Test
@@ -58,18 +58,18 @@ public class AbstractPartitionTest {
 
     @Test
     public void unlock_whenLocked() throws ExecutionException, InterruptedException {
-        AbstractPartition partition = newPartition();
-        partition.lock().get();
+        Partition partition = newPartition();
+        partition.systemLock().get();
 
-        partition.unlock();
-        assertFalse(partition.isLocked());
+        partition.systemUnlock();
+        assertFalse(partition.isSystemLocked());
 
         //for (int k = 0; k < partition.getSegmentLength(); k++) {
         //    assertNull(partition.getInvocation(k));
         //}
     }
 
-    private AbstractPartition newPartition() {
+    private Partition newPartition() {
         return new GeneratedLongPartition(new PartitionSettings(1,1));
     }
 }

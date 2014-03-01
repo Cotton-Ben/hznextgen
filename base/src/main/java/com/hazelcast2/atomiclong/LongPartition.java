@@ -1,6 +1,6 @@
 package com.hazelcast2.atomiclong;
 
-import com.hazelcast2.spi.AbstractPartition;
+import com.hazelcast2.spi.Partition;
 import com.hazelcast2.spi.PartitionSettings;
 import com.hazelcast2.spi.Segment;
 import com.hazelcast2.spi.OperationMethod;
@@ -12,7 +12,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLong;
 
 @PartitionAnnotation
-public abstract class LongPartition extends AbstractPartition {
+public abstract class LongPartition extends Partition {
 
     private final AtomicLong idGenerator = new AtomicLong();
 

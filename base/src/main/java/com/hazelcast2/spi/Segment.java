@@ -120,7 +120,7 @@ public class Segment {
      * @throws java.lang.IllegalStateException if the Segment isn't locked.
      */
     public void unlock() {
-        //todo: a loop should not be needed since only one thread will call unlock and no threads can update
+        //todo: a loop should not be needed since only one thread will call systemUnlock and no threads can update
         //the prod sequence while the lock is hold.
 
         for (; ; ) {

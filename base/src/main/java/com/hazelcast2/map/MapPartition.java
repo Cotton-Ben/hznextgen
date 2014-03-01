@@ -1,12 +1,12 @@
 package com.hazelcast2.map;
 
 import com.hazelcast2.spi.OperationMethod;
-import com.hazelcast2.spi.AbstractPartition;
+import com.hazelcast2.spi.Partition;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-public abstract class MapPartition extends AbstractPartition {
+public abstract class MapPartition extends Partition {
 
     private final ConcurrentMap<String, String> map = new ConcurrentHashMap<String, String>();
 
