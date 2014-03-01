@@ -83,7 +83,9 @@ public class InvocationFuture implements Future {
 
     @Override
     public Object get() throws InterruptedException, ExecutionException {
-        throw new UnsupportedOperationException();
+        //todo: this isn't the right call because we are not dealing correctly with exceptions
+        //but for the time being it is good enough.
+        return getSafely();
     }
 
     @Override

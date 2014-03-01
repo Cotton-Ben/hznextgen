@@ -5,6 +5,8 @@ import com.hazelcast2.spi.PartitionSettings;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.concurrent.ExecutionException;
+
 import static org.junit.Assert.assertEquals;
 
 public class IAtomicLongTest {
@@ -30,12 +32,24 @@ public class IAtomicLongTest {
     @Test
     public void set() {
         atomicLong.set(20);
-        assertEquals(20L, cell.value);
+        assertEquals(20L, atomicLong.get());
+    }
+
+    @Test
+    public void asyncSet() throws ExecutionException, InterruptedException {
+        atomicLong.asyncSet(20).get();
+        assertEquals(20L, atomicLong.get());
     }
 
     @Test
     public void inc() {
         atomicLong.inc();
-        assertEquals(1L, cell.value);
+        assertEquals(1L, atomicLong.get());
+    }
+
+    @Test
+    public void asyncInc() throws ExecutionException, InterruptedException {
+         atomicLong.asyncInc().get();
+         assertEquals(1L, atomicLong.get());
     }
 }

@@ -1,6 +1,5 @@
 package com.hazelcast2.atomicboolean;
 
-
 import com.hazelcast2.spi.Partition;
 import com.hazelcast2.spi.OperationMethod;
 import com.hazelcast2.spi.PartitionAnnotation;
@@ -12,6 +11,8 @@ import java.util.concurrent.atomic.AtomicLong;
 
 @PartitionAnnotation
 public abstract class BooleanPartition extends Partition {
+
+    //todo: very inefficent structure.
     private final HashMap<Long, BooleanCell> cells = new HashMap<>();
 
     private final AtomicLong idGenerator = new AtomicLong();

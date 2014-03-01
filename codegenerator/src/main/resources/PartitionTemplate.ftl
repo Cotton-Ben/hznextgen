@@ -37,34 +37,22 @@ public final class ${class.name} extends ${class.superName} {
 
      public Future<${method.returnTypeAsObject}> ${method.asyncName}(final long id${method.trailingComma}${method.formalArguments}) {
         final long x = doClaimSlot();
+        final boolean schedule = isScheduled(x);
 
-        if (!isScheduled(x)) {
-            final long prodSeq = x >> 2;
-            //we can't reuse a future instance, since we have no way of knowing when it isn't used anymore.
-            final InvocationFuture future = new InvocationFuture();
-            Invocation invocation = getSlot(prodSeq);
-            invocation.invocationFuture = future;
-            invocation.id = id;
-            invocation.functionId = ${method.functionConstantName};
-            ${method.mapArgsToInvocation}
-            invocation.commit(prodSeq);
-    <#if method.voidReturnType>
-            return future;
-    <#else>
-            return future;
-    </#if>
-        }
+        //we need to create a new instance because we are exposing this object to the outside world and can't
+        //pool it.
+        final InvocationFuture future = new InvocationFuture();
 
-        final ${class.cellName} cell = loadCell(id);
-    <#if method.voidReturnType>
-        ${method.targetMethod}(cell ${method.trailingComma}${method.actualArguments});
-        process();
-        return CompletedFuture.COMPLETED_VOID_FUTURE;
-    <#else>
-        ${method.returnType} result = ${method.targetMethod}(cell${method.trailingComma}${method.actualArguments});
-        process();
-        return new CompletedFuture(result);
-    </#if>
+        final long prodSeq = x >> 2;
+        final Invocation invocation = getSlot(prodSeq);
+        invocation.invocationFuture = future;
+        invocation.id = id;
+        invocation.functionId = ${method.functionConstantName};
+        ${method.mapArgsToInvocation}
+        invocation.commit(prodSeq);
+
+        if(schedule) scheduler.schedule(this);
+        return future;
     }
 
     public ${method.returnType} ${method.name}(final long id${method.trailingComma}${method.formalArguments}) {
@@ -74,13 +62,13 @@ public final class ${class.name} extends ${class.superName} {
             final long prodSeq = x >> 2;
             //todo: this sucks, we don't want to create new instances.
             final InvocationFuture future = new InvocationFuture();
-            Invocation invocation = getSlot(prodSeq);
+            final Invocation invocation = getSlot(prodSeq);
             invocation.invocationFuture = future;
             invocation.id = id;
             invocation.functionId = ${method.functionConstantName};
             ${method.mapArgsToInvocation}
             invocation.commit(prodSeq);
-            //instead of waiting, is it possible to help out other segments/subsystems?
+            //instead of waiting, is it possible to help out other partitions/subsystems?
             //the thing you need to be careful with is that you should not keep building up
             //stackframes, because eventually you will get a stackoverflow.
     <#if method.voidReturnType>
@@ -91,11 +79,8 @@ public final class ${class.name} extends ${class.superName} {
     </#if>
         }
 
-        //There is a bug here; when the method fails with an exception, the process is never called. This
-        //causes the pending calls are not executed, and that the segment remains locked.
-        //The way to fix it is to put a try catch around it and in case of failure, offload the segment
-        //to be executed by a different thread.
-
+        //we didn't actually use the slot since we are going to do a direct call.
+        conSeq++;
         boolean success = false;
         final ${class.cellName} cell = loadCell(id);
         try{
@@ -116,7 +101,6 @@ public final class ${class.name} extends ${class.superName} {
 </#list>
 
     public void process() {
-        conSeq++;
         long consumerSeq = this.conSeq;
         for (; ; ) {
             //todo: we need to checked the locked flag.

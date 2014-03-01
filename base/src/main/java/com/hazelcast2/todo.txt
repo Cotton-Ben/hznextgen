@@ -63,48 +63,4 @@ a single long field.
 
 DONE
 
-- argument to invocation mapping.
-
-- arg mapping now can deal with boolean
-
-- arg mapping can now deal with 3 primitives.
-
-- the pending invocations are processed in the wrong order
-
-- invocation.invocationFuture = future;
-
-- exception handling if an invocation fails
-
-- when processing a pending invocation, we need to wait till our invocation completes. Currently an exception is
-thrown.
-
-- the result of a partition method should be fed into the invocation since it is also the future.
-
-- return values for invocations
-
-- generate signature for async method
-
-- when processing pending invocations, we need to check if the segment is locked.
-
-- generating the GeneratedXXXSegment using an annotation processor.
-
-- currently it isn't possible to have multiple methods with the same name
-
-- invocation classname should not be DoXX
-
-- code generator constructor of invocation is no good
-
-- the partition code generator should analyze the source to build up the right methods.
-
-- for the AtomicLong there is no need to have a concurrent hashmap. Within a segment there will never be any
-multithreading, so no need for concurrency control.
-
-- better name for the stripe-cell
-
-- the 'stripecell' now only need to be accessed once.
-
-- rename address to something less confusing
-
-- long proxy
-
-- no duplication of the actual logic: currently repeated in invocation and
+- async method is implemented by immediately offloading to a scheduler.

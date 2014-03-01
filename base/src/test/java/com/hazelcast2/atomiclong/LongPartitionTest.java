@@ -15,7 +15,6 @@ public class LongPartitionTest {
         assertEquals(0, result);
     }
 
-
     @Test
     public void set() {
         LongPartition longPartition = new GeneratedLongPartition(new PartitionSettings(1));

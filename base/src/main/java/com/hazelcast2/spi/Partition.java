@@ -94,7 +94,7 @@ public abstract class Partition {
         throw new UnsupportedOperationException();
     }
 
-      public int size() {
+    public int size() {
         return (int) ((prodSeq >> 2) - conSeq);
     }
 
