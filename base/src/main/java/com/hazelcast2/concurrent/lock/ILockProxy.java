@@ -8,15 +8,22 @@ public class ILockProxy implements ILock {
 
     private final LockPartition partition;
     private final long id;
+    private final String name;
 
-    public ILockProxy(LockPartition partition) {
+    public ILockProxy(LockPartition partition, String name, long id) {
         this.partition = partition;
-        this.id = partition.createCell();
+        this.name = name;
+        this.id = id;
     }
 
-    public ILockProxy(LockPartition partition, long id) {
-        this.partition = partition;
-        this.id = id;
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public long getId() {
+        return id;
     }
 
     @Override
@@ -26,16 +33,19 @@ public class ILockProxy implements ILock {
 
     @Override
     public boolean isLocked() {
-        return partition.doIsLocked(id,getThreadId());
+        return partition.doIsLocked(id, getThreadId());
     }
 
     @Override
     public void unlock() {
-        partition.doUnlock(id,getThreadId());
+        partition.doUnlock(id, getThreadId());
     }
 
     @Override
-    public long getId() {
-        return id;
+    public String toString() {
+        return "ILock{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
     }
 }

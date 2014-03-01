@@ -1,7 +1,7 @@
 package com.hazelcast2.concurrent.atomicboolean;
 
-import com.hazelcast2.spi.Partition;
 import com.hazelcast2.spi.OperationMethod;
+import com.hazelcast2.spi.Partition;
 import com.hazelcast2.spi.PartitionAnnotation;
 import com.hazelcast2.spi.PartitionSettings;
 
@@ -64,7 +64,7 @@ public abstract class BooleanPartition extends Partition {
 
     @OperationMethod
     public boolean compareAndSet(BooleanCell cell, boolean old, boolean update) {
-        if(cell.value!=old){
+        if (cell.value != old) {
             return false;
         }
 

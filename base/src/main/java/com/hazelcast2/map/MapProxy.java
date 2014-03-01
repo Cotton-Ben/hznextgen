@@ -16,8 +16,13 @@ public class MapProxy implements IMap {
     }
 
     @Override
+    public String getName() {
+        return null;
+    }
+
+    @Override
     public String get(String key) {
-        if(key == null){
+        if (key == null) {
             throw new NullPointerException("key can't be null");
         }
         MapPartition partition = getPartition(key);
@@ -26,7 +31,7 @@ public class MapProxy implements IMap {
 
     @Override
     public void set(String key, String value) {
-        if(key == null){
+        if (key == null) {
             throw new NullPointerException("key can't be null");
         }
 

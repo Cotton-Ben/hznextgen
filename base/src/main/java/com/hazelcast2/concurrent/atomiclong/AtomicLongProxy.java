@@ -8,15 +8,17 @@ public class AtomicLongProxy implements IAtomicLong {
 
     private final LongPartition partition;
     private final long id;
+    private final String name;
 
-    public AtomicLongProxy(LongPartition partition) {
+    public AtomicLongProxy(LongPartition partition, String name, long id) {
         this.partition = partition;
-        this.id = partition.createCell();
+        this.name = name;
+        this.id = id;
     }
 
-    public AtomicLongProxy(LongPartition partition, long id) {
-        this.partition = partition;
-        this.id = id;
+    @Override
+    public String getName() {
+        return name;
     }
 
     @Override
@@ -52,5 +54,13 @@ public class AtomicLongProxy implements IAtomicLong {
     @Override
     public long getId() {
         return id;
+    }
+
+    @Override
+    public String toString() {
+        return "IAtomicLong{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
     }
 }

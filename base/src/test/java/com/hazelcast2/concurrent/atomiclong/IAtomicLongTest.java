@@ -1,7 +1,7 @@
 package com.hazelcast2.concurrent.atomiclong;
 
 import com.hazelcast2.core.IAtomicLong;
-import com.hazelcast2.spi.PartitionSettings;
+import com.hazelcast2.instance.HazelcastInstanceImpl;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -11,45 +11,50 @@ import static org.junit.Assert.assertEquals;
 
 public class IAtomicLongTest {
 
-    private LongPartition partition;
-    private LongCell cell;
-    private IAtomicLong atomicLong;
+    private HazelcastInstanceImpl hz;
 
     @Before
     public void setUp() {
-        partition = new GeneratedLongPartition(new PartitionSettings(1));
-        atomicLong = new AtomicLongProxy(partition);
-        cell = partition.loadCell(atomicLong.getId());
+        hz = new HazelcastInstanceImpl();
     }
 
     @Test
     public void get() {
-        cell.value = 10;
+        IAtomicLong atomicLong = hz.getAtomicLong("foo");
+
         long result = atomicLong.get();
-        assertEquals(10L, result);
+        assertEquals(0L, result);
     }
 
     @Test
     public void set() {
+        IAtomicLong atomicLong = hz.getAtomicLong("foo");
+
         atomicLong.set(20);
         assertEquals(20L, atomicLong.get());
     }
 
     @Test
     public void asyncSet() throws ExecutionException, InterruptedException {
+        IAtomicLong atomicLong = hz.getAtomicLong("foo");
+
         atomicLong.asyncSet(20).get();
         assertEquals(20L, atomicLong.get());
     }
 
     @Test
     public void inc() {
+        IAtomicLong atomicLong = hz.getAtomicLong("foo");
+
         atomicLong.inc();
         assertEquals(1L, atomicLong.get());
     }
 
     @Test
     public void asyncInc() throws ExecutionException, InterruptedException {
-         atomicLong.asyncInc().get();
-         assertEquals(1L, atomicLong.get());
+        IAtomicLong atomicLong = hz.getAtomicLong("foo");
+
+        atomicLong.asyncInc().get();
+        assertEquals(1L, atomicLong.get());
     }
 }

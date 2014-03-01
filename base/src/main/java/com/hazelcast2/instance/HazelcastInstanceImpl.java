@@ -2,39 +2,43 @@ package com.hazelcast2.instance;
 
 import com.hazelcast2.concurrent.atomicboolean.AtomicBooleanService;
 import com.hazelcast2.concurrent.atomiclong.AtomicLongService;
+import com.hazelcast2.concurrent.lock.LockService;
 import com.hazelcast2.core.HazelcastInstance;
 import com.hazelcast2.core.IAtomicBoolean;
 import com.hazelcast2.core.IAtomicLong;
 import com.hazelcast2.core.ILock;
 import com.hazelcast2.core.IMap;
-import com.hazelcast2.concurrent.lock.LockService;
+import com.hazelcast2.partition.PartitionService;
+import com.hazelcast2.partition.impl.PartitionServiceImpl;
 
 public class HazelcastInstanceImpl implements HazelcastInstance {
 
+    private final PartitionService partitionService;
     private final AtomicLongService atomicLongService;
     private final AtomicBooleanService atomicBooleanService;
     private final LockService lockService;
 
     public HazelcastInstanceImpl() {
         int partitionCount = 271;
-        this.atomicLongService = new AtomicLongService(partitionCount);
-        this.atomicBooleanService = new AtomicBooleanService(partitionCount);
-        this.lockService = new LockService(partitionCount);
+        this.partitionService = new PartitionServiceImpl(partitionCount);
+        this.atomicLongService = new AtomicLongService(partitionService);
+        this.atomicBooleanService = new AtomicBooleanService(partitionService);
+        this.lockService = new LockService(partitionService);
     }
 
     @Override
     public ILock getLock(String name) {
-        return null;
+        return lockService.getDistributedObject(name);
     }
 
     @Override
     public IAtomicBoolean getAtomicBoolean(String name) {
-        return null;
+        return atomicBooleanService.getDistributedObject(name);
     }
 
     @Override
     public IAtomicLong getAtomicLong(String name) {
-        return null;
+        return atomicLongService.getDistributedObject(name);
     }
 
     @Override

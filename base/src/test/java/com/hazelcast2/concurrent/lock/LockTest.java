@@ -1,6 +1,7 @@
 package com.hazelcast2.concurrent.lock;
 
 import com.hazelcast2.core.ILock;
+import com.hazelcast2.instance.HazelcastInstanceImpl;
 import com.hazelcast2.spi.PartitionSettings;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,19 +12,17 @@ import static org.junit.Assert.fail;
 
 public class LockTest {
 
-    private LockPartition partition;
-    private LockCell cell;
-    private ILock lock;
+    private HazelcastInstanceImpl hz;
 
     @Before
     public void setUp() {
-        partition = new GeneratedLockPartition(new PartitionSettings(1));
-        lock = new ILockProxy(partition);
-        cell = partition.loadCell(lock.getId());
+        hz = new HazelcastInstanceImpl();
     }
 
     @Test
     public void tryLock_whenFree() {
+        ILock lock = hz.getLock("foo");
+
         boolean result = lock.tryLock();
         assertTrue(result);
         assertTrue(lock.isLocked());
@@ -31,6 +30,7 @@ public class LockTest {
 
     @Test
     public void tryLock_whenLockedByOther() {
+        ILock lock = hz.getLock("foo");
         lockByOther(lock);
 
         boolean result = lock.tryLock();
@@ -40,11 +40,15 @@ public class LockTest {
 
     @Test(expected = IllegalMonitorStateException.class)
     public void unlock_whenUnlocked() {
+        ILock lock = hz.getLock("foo");
+
         lock.unlock();
     }
 
     @Test
     public void unlock_whenLockedBySelf() {
+        ILock lock = hz.getLock("foo");
+
         lock.tryLock();
 
         lock.unlock();
@@ -53,6 +57,8 @@ public class LockTest {
 
     @Test
     public void unlock_whenLockedByOther() {
+        ILock lock = hz.getLock("foo");
+
         lockByOther(lock);
 
         try {
