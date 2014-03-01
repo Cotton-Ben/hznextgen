@@ -70,6 +70,6 @@ public class AbstractPartitionTest {
     }
 
     private Partition newPartition() {
-        return new GeneratedLongPartition(new PartitionSettings(1,1));
+        return new GeneratedLongPartition(new PartitionSettings(1));
     }
 }

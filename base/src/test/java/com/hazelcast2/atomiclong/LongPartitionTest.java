@@ -9,7 +9,7 @@ public class LongPartitionTest {
 
     @Test
     public void get() {
-        LongPartition longPartition = new GeneratedLongPartition(new PartitionSettings(1,1));
+        LongPartition longPartition = new GeneratedLongPartition(new PartitionSettings(1));
         long id = longPartition.createCell();
         long result = longPartition.doGet(id);
         assertEquals(0, result);
@@ -18,7 +18,7 @@ public class LongPartitionTest {
 
     @Test
     public void set() {
-        LongPartition longPartition = new GeneratedLongPartition(new PartitionSettings(1,1));
+        LongPartition longPartition = new GeneratedLongPartition(new PartitionSettings(1));
         long id = longPartition.createCell();
         longPartition.doSet(id, 20);
         long result = longPartition.doGet(id);

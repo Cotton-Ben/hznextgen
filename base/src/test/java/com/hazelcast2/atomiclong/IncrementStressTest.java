@@ -9,7 +9,7 @@ public class IncrementStressTest {
 
     @Test
     public void testSingleThread() throws InterruptedException {
-        GeneratedLongPartition partition = new GeneratedLongPartition(new PartitionSettings(1,1));
+        GeneratedLongPartition partition = new GeneratedLongPartition(new PartitionSettings(1));
         long address = partition.createCell();
         int iterations = 100;
         IncThread thread = new IncThread(partition, address, iterations);
@@ -23,7 +23,7 @@ public class IncrementStressTest {
 
     @Test
     public void testMultipleThreads() throws InterruptedException {
-        GeneratedLongPartition partition = new GeneratedLongPartition(new PartitionSettings(1,1));
+        GeneratedLongPartition partition = new GeneratedLongPartition(new PartitionSettings(1));
         long address = partition.createCell();
         int iterations = 100000000;
         IncThread thread1 = new IncThread(partition, address, iterations);

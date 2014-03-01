@@ -16,7 +16,7 @@ public class LockTest {
 
     @Before
     public void setUp() {
-        partition = new GeneratedLockPartition(new PartitionSettings(1, 1));
+        partition = new GeneratedLockPartition(new PartitionSettings(1));
         lock = new ILockProxy(partition);
         cell = partition.loadCell(lock.getId());
     }

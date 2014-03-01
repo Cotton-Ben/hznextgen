@@ -9,7 +9,7 @@ public class LongPartitionPerformanceTest {
 
     @Test
     public void testSet() {
-        LongPartition longPartition = new GeneratedLongPartition(new PartitionSettings(1,1));
+        LongPartition longPartition = new GeneratedLongPartition(new PartitionSettings(1));
         long id = longPartition.createCell();
         long startMs = System.currentTimeMillis();
         int iterations  = 1000 * 1000 * 100;
@@ -25,7 +25,7 @@ public class LongPartitionPerformanceTest {
 
     @Test
     public void testInc() {
-        LongPartition longPartition = new GeneratedLongPartition(new PartitionSettings(1,1));
+        LongPartition longPartition = new GeneratedLongPartition(new PartitionSettings(1));
         long id = longPartition.createCell();
         int iterations  = 1000 * 1000 * 100;
         long startMs = System.currentTimeMillis();

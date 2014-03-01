@@ -15,7 +15,7 @@ public class IAtomicLongTest {
 
     @Before
     public void setUp() {
-        partition = new GeneratedLongPartition(new PartitionSettings(1,1));
+        partition = new GeneratedLongPartition(new PartitionSettings(1));
         atomicLong = new AtomicLongProxy(partition);
         cell = partition.loadCell(atomicLong.getId());
     }

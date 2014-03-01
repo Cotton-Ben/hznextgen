@@ -1,7 +1,6 @@
 package ${class.packageName};
 
 import com.hazelcast2.spi.Invocation;
-import com.hazelcast2.spi.Segment;
 import com.hazelcast2.spi.PartitionSettings;
 import com.hazelcast2.util.CompletedFuture;
 import com.hazelcast2.InvocationFuture;
@@ -20,14 +19,14 @@ public final class ${class.name} extends ${class.superName} {
         super(partitionSettings);
     }
 
-    private static long claimSlot(final Segment segment){
-        final long x = segment.claimSlot();
+    private long doClaimSlot(){
+        final long x = claimSlot();
 
-        if (x == Segment.CLAIM_SLOT_LOCKED) {
+        if (x == CLAIM_SLOT_LOCKED) {
             throw new UnsupportedOperationException();
         }
 
-        if (x == Segment.CLAIM_SLOT_NO_CAPACITY) {
+        if (x == CLAIM_SLOT_NO_CAPACITY) {
             throw new UnsupportedOperationException();
         }
 
@@ -35,25 +34,15 @@ public final class ${class.name} extends ${class.superName} {
     }
 
 <#list class.methods as method>
-    @Override
-    public ${method.returnType} ${method.name}(final long id${method.trailingComma}${method.formalArguments}) {
-        final Segment segment = getSegment(getSegmentIndex(id));
-    <#if method.voidReturnType>
-        ${method.name}(segment, id ${method.trailingComma}${method.actualArguments});
-    <#else>
-        return ${method.name}(segment, id ${method.trailingComma}${method.actualArguments});
-    </#if>
-    }
 
-    public Future<${method.returnTypeAsObject}> ${method.asyncName}(final long id${method.trailingComma}${method.formalArguments}) {
-        final Segment segment = getSegment(getSegmentIndex(id));
-        final long x = claimSlot(segment);
+     public Future<${method.returnTypeAsObject}> ${method.asyncName}(final long id${method.trailingComma}${method.formalArguments}) {
+        final long x = doClaimSlot();
 
-        if (!Segment.isScheduled(x)) {
+        if (!isScheduled(x)) {
             final long prodSeq = x >> 2;
             //we can't reuse a future instance, since we have no way of knowing when it isn't used anymore.
             final InvocationFuture future = new InvocationFuture();
-            Invocation invocation = segment.getSlot(prodSeq);
+            Invocation invocation = getSlot(prodSeq);
             invocation.invocationFuture = future;
             invocation.id = id;
             invocation.functionId = ${method.functionConstantName};
@@ -69,23 +58,23 @@ public final class ${class.name} extends ${class.superName} {
         final ${class.cellName} cell = loadCell(id);
     <#if method.voidReturnType>
         ${method.targetMethod}(cell ${method.trailingComma}${method.actualArguments});
-        process(segment);
+        process();
         return CompletedFuture.COMPLETED_VOID_FUTURE;
     <#else>
         ${method.returnType} result = ${method.targetMethod}(cell${method.trailingComma}${method.actualArguments});
-        process(segment);
+        process();
         return new CompletedFuture(result);
     </#if>
     }
 
-    public ${method.returnType} ${method.name}(final Segment segment, final long id${method.trailingComma}${method.formalArguments}) {
-        final long x = claimSlot(segment);
+    public ${method.returnType} ${method.name}(final long id${method.trailingComma}${method.formalArguments}) {
+        final long x = doClaimSlot();
 
-        if (!Segment.isScheduled(x)) {
+        if (!isScheduled(x)) {
             final long prodSeq = x >> 2;
             //todo: this sucks, we don't want to create new instances.
             final InvocationFuture future = new InvocationFuture();
-            Invocation invocation = segment.getSlot(prodSeq);
+            Invocation invocation = getSlot(prodSeq);
             invocation.invocationFuture = future;
             invocation.id = id;
             invocation.functionId = ${method.functionConstantName};
@@ -113,44 +102,44 @@ public final class ${class.name} extends ${class.superName} {
     <#if method.voidReturnType>
             ${method.targetMethod}(cell ${method.trailingComma}${method.actualArguments});
             success = true;
-            process(segment);
+            process();
     <#else>
             ${method.returnType} result = ${method.targetMethod}(cell ${method.trailingComma}${method.actualArguments});
             success = true;
-            process(segment);
+            process();
             return result;
     </#if>
         }finally{
-            if(!success) scheduler.schedule(this, segment);
+            if(!success) scheduler.schedule(this);
         }
     }
 </#list>
 
-    public void process(Segment segment) {
-        segment.conSeq++;
-        long consumerSeq = segment.conSeq;
+    public void process() {
+        conSeq++;
+        long consumerSeq = this.conSeq;
         for (; ; ) {
             //todo: we need to checked the locked flag.
             //there is batching that can be done, so instead of doing item by item, you know where the producer is.
 
-            final long prodSeq = segment.prodSeq >> 2;
+            final long prodSeq = this.prodSeq >> 2;
             final long capacity = prodSeq - consumerSeq;
             if (capacity == 0) {
-                if (segment.unschedule()) {
+                if (unschedule()) {
                     return;
                 }
             } else {
-                final Invocation invocation = segment.getSlot(consumerSeq);
+                final Invocation invocation = getSlot(consumerSeq);
                 invocation.waitCommit(consumerSeq);
-                dispatch(segment, invocation);
+                dispatch(invocation);
                 invocation.clear();
                 consumerSeq++;
-                segment.conSeq = consumerSeq;
+                this.conSeq = consumerSeq;
             }
         }
     }
 
-    public void dispatch(Segment segment, Invocation invocation) {
+    public void dispatch(Invocation invocation) {
 
         final ${class.cellName} cell = loadCell(invocation.id);
         try{

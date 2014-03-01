@@ -5,7 +5,6 @@ import com.hazelcast2.spi.Partition;
 import com.hazelcast2.spi.OperationMethod;
 import com.hazelcast2.spi.PartitionAnnotation;
 import com.hazelcast2.spi.PartitionSettings;
-import com.hazelcast2.spi.Segment;
 
 import java.util.HashMap;
 import java.util.concurrent.Future;
@@ -13,6 +12,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 @PartitionAnnotation
 public abstract class BooleanPartition extends Partition {
+    private final HashMap<Long, BooleanCell> cells = new HashMap<>();
 
     private final AtomicLong idGenerator = new AtomicLong();
 
@@ -20,24 +20,15 @@ public abstract class BooleanPartition extends Partition {
         super(partitionSettings);
     }
 
-    @Override
-    public Segment createSegment() {
-        return new BooleanSegment(64);
-    }
-
     public long createCell() {
         BooleanCell cell = new BooleanCell();
         long id = idGenerator.incrementAndGet();
-        int segmentIndex = getSegmentIndex(id);
-        BooleanSegment segment = (BooleanSegment) getSegment(segmentIndex);
-        segment.cells.put(id, cell);
+        cells.put(id, cell);
         return id;
     }
 
     public BooleanCell loadCell(long id) {
-        int segmentIndex = getSegmentIndex(id);
-        BooleanSegment segment = (BooleanSegment) getSegment(segmentIndex);
-        return segment.cells.get(id);
+        return cells.get(id);
     }
 
     // ================== set ============================================================
@@ -80,12 +71,4 @@ public abstract class BooleanPartition extends Partition {
         return true;
     }
 
-    private static class BooleanSegment extends Segment {
-
-        private final HashMap<Long, BooleanCell> cells = new HashMap<>();
-
-        private BooleanSegment(int length) {
-            super(length);
-        }
-    }
 }

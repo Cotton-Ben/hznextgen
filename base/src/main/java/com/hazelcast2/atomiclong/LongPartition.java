@@ -1,10 +1,9 @@
 package com.hazelcast2.atomiclong;
 
-import com.hazelcast2.spi.Partition;
-import com.hazelcast2.spi.PartitionSettings;
-import com.hazelcast2.spi.Segment;
 import com.hazelcast2.spi.OperationMethod;
+import com.hazelcast2.spi.Partition;
 import com.hazelcast2.spi.PartitionAnnotation;
+import com.hazelcast2.spi.PartitionSettings;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,28 +15,22 @@ public abstract class LongPartition extends Partition {
 
     private final AtomicLong idGenerator = new AtomicLong();
 
+    //very inefficient structure.
+    public final Map<Long, LongCell> cells = new HashMap<Long, LongCell>();
+
     public LongPartition(PartitionSettings partitionSettings) {
         super(partitionSettings);
-    }
-
-    @Override
-    public Segment createSegment() {
-        return new LongSegment(64);
     }
 
     public long createCell() {
         LongCell cell = new LongCell();
         long id = idGenerator.incrementAndGet();
-        int segmentIndex = getSegmentIndex(id);
-        LongSegment segment = (LongSegment) getSegment(segmentIndex);
-        segment.cells.put(id, cell);
+        cells.put(id, cell);
         return id;
     }
 
-     public LongCell loadCell(long id) {
-        int segmentIndex = getSegmentIndex(id);
-         LongSegment segment = (LongSegment)getSegment(segmentIndex);
-        return segment.cells.get(id);
+    public LongCell loadCell(long id) {
+        return cells.get(id);
     }
 
     public abstract void doSet(long id, long update);
@@ -65,14 +58,5 @@ public abstract class LongPartition extends Partition {
     @OperationMethod
     public void inc(LongCell cell) {
         cell.value++;
-    }
-
-    private static class LongSegment extends Segment {
-        //very inefficient structure.
-        public final Map<Long, LongCell> cells = new HashMap<Long, LongCell>();
-
-        private LongSegment(int length) {
-            super(length);
-        }
     }
 }
