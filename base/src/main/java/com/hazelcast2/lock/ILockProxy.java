@@ -1,5 +1,7 @@
 package com.hazelcast2.lock;
 
+import com.hazelcast2.core.ILock;
+
 import static com.hazelcast2.lock.LockUtil.getThreadId;
 
 public class ILockProxy implements ILock {

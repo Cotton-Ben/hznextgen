@@ -1,8 +1,8 @@
-package com.hazelcast2;
+package com.hazelcast2.core;
 
 import java.util.concurrent.Future;
 
-public interface IAtomicLong {
+public interface IAtomicLong extends DistributedObject {
 
     long get();
 
@@ -15,6 +15,4 @@ public interface IAtomicLong {
     void inc();
 
     Future<Void> asyncInc();
-
-    long getId();
 }

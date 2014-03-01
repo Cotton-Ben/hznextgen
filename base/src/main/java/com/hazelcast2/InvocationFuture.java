@@ -43,6 +43,7 @@ public class InvocationFuture implements Future {
 
             while (value == NO_RESPONSE) {
                 try {
+                    //todo: instead of waiting, try to see if there is work that can be done.
                     wait();
                 } catch (InterruptedException e) {
                     e.printStackTrace();

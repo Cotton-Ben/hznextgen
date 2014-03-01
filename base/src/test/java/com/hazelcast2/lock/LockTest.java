@@ -1,5 +1,6 @@
 package com.hazelcast2.lock;
 
+import com.hazelcast2.core.ILock;
 import com.hazelcast2.spi.PartitionSettings;
 import org.junit.Before;
 import org.junit.Test;

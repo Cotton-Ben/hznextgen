@@ -1,6 +1,6 @@
-package com.hazelcast2.lock;
+package com.hazelcast2.core;
 
-public interface ILock {
+public interface ILock extends DistributedObject {
 
     boolean tryLock();
 

@@ -1,5 +1,7 @@
 package com.hazelcast2.atomicboolean;
 
+import com.hazelcast2.core.IAtomicBoolean;
+
 import java.util.concurrent.Future;
 
 public class AtomicBooleanProxy implements IAtomicBoolean {
@@ -15,6 +17,11 @@ public class AtomicBooleanProxy implements IAtomicBoolean {
     public AtomicBooleanProxy(BooleanPartition partition, long id) {
         this.partition = partition;
         this.id = id;
+    }
+
+    @Override
+    public long getId() {
+        return id;
     }
 
     @Override

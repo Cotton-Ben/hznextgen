@@ -21,7 +21,7 @@ public abstract class Partition {
 
     private volatile boolean isLocked;
     private final int partitionId;
-    public final Scheduler scheduler;
+    public final PartitionScheduler scheduler;
 
     //this sucks because both of them will probably fall in the same cache line.
     public volatile long prodSeq = INITIAL_VALUE;

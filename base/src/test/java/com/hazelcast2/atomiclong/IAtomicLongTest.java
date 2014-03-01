@@ -1,6 +1,6 @@
 package com.hazelcast2.atomiclong;
 
-import com.hazelcast2.IAtomicLong;
+import com.hazelcast2.core.IAtomicLong;
 import com.hazelcast2.spi.PartitionSettings;
 import org.junit.Before;
 import org.junit.Test;

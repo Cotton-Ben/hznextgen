@@ -1,6 +1,6 @@
 package com.hazelcast2.map;
 
-import com.hazelcast2.IMap;
+import com.hazelcast2.core.IMap;
 
 public class MapProxy implements IMap {
 
@@ -11,6 +11,11 @@ public class MapProxy implements IMap {
         for (int partitionId = 0; partitionId < partitions.length; partitionId++) {
         //    partitions[partitionId] = new GeneratedMapPartition(partitionId);
         }
+    }
+
+    @Override
+    public long getId() {
+        return -1;
     }
 
     @Override

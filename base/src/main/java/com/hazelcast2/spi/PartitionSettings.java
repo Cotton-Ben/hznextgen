@@ -2,7 +2,7 @@ package com.hazelcast2.spi;
 
 public class PartitionSettings {
     public int partitionId;
-    public Scheduler scheduler = new Scheduler();
+    public PartitionScheduler scheduler = new PartitionScheduler();
     public int ringbufferSize = 64;
 
     public PartitionSettings(int partitionId) {

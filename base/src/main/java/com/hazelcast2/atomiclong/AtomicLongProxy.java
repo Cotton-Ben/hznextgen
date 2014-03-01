@@ -1,6 +1,6 @@
 package com.hazelcast2.atomiclong;
 
-import com.hazelcast2.IAtomicLong;
+import com.hazelcast2.core.IAtomicLong;
 
 import java.util.concurrent.Future;
 

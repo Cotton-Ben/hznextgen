@@ -1,8 +1,8 @@
-package com.hazelcast2.atomicboolean;
+package com.hazelcast2.core;
 
 import java.util.concurrent.Future;
 
-public interface IAtomicBoolean {
+public interface IAtomicBoolean extends DistributedObject {
 
     boolean get();
 

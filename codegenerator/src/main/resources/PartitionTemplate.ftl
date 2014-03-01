@@ -5,9 +5,7 @@ import com.hazelcast2.spi.PartitionSettings;
 import com.hazelcast2.util.CompletedFuture;
 import com.hazelcast2.InvocationFuture;
 
-
 import java.util.concurrent.Future;
-
 
 public final class ${class.name} extends ${class.superName} {
 

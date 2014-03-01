@@ -8,7 +8,7 @@ import java.util.concurrent.Executors;
  * Needs to be replaced with a ringbuffer and should be capable of letting threads
  * that can't do anything else than blocking, to help out so they don't need to block.
  */
-public class Scheduler {
+public class PartitionScheduler {
 
     private final Executor executor = Executors.newFixedThreadPool(8);
 
