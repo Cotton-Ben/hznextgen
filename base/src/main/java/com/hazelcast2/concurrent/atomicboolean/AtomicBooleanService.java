@@ -34,10 +34,6 @@ public final class AtomicBooleanService {
         }
     }
 
-    public BooleanPartition getPartition(final int partitionId) {
-        return partitions[partitionId];
-    }
-
     public IAtomicBoolean getDistributedObject(final String name) {
         if (name == null) {
             throw new NullPointerException("name can't be null");

@@ -34,12 +34,8 @@ public final class AtomicLongService {
         }
     }
 
-    public LongPartition getPartition(final int partitionId) {
-        return partitions[partitionId];
-    }
-
     public IAtomicLong getDistributedObject(final String name) {
-        if(name == null){
+        if (name == null) {
             throw new NullPointerException("name can't be null");
         }
 

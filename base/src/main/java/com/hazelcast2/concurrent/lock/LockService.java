@@ -33,10 +33,6 @@ public final class LockService {
         }
     }
 
-    public LockPartition getPartition(final int partitionId) {
-        return partitions[partitionId];
-    }
-
     public ILock getDistributedObject(final String name) {
         if (name == null) {
             throw new NullPointerException("name can't be null");

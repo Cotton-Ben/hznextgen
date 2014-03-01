@@ -14,7 +14,7 @@ public abstract class LockPartition extends Partition {
 
     private final AtomicLong idGenerator = new AtomicLong();
 
-    //very inefficient structure.
+    //todo: very inefficient structure.
     public final Map<Long, LockCell> cells = new HashMap<Long, LockCell>();
 
     public LockPartition(PartitionSettings partitionSettings) {

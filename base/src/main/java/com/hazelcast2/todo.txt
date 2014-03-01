@@ -59,7 +59,7 @@ a single long field.
 
 - actual implementation of the lock
 
-- lock
+- do we need to expose the cell
 
 DONE
 

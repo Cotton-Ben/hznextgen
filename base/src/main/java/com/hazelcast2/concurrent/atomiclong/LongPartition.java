@@ -15,8 +15,8 @@ public abstract class LongPartition extends Partition {
 
     private final AtomicLong idGenerator = new AtomicLong();
 
-    //very inefficient structure.
-    public final Map<Long, LongCell> cells = new HashMap<Long, LongCell>();
+    //todo: very inefficient structure.
+    private final Map<Long, LongCell> cells = new HashMap<Long, LongCell>();
 
     public LongPartition(PartitionSettings partitionSettings) {
         super(partitionSettings);

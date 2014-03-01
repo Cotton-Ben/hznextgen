@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicLong;
 @PartitionAnnotation
 public abstract class BooleanPartition extends Partition {
 
-    //todo: very inefficent structure.
+    //todo: very inefficient structure.
     private final HashMap<Long, BooleanCell> cells = new HashMap<>();
 
     private final AtomicLong idGenerator = new AtomicLong();
