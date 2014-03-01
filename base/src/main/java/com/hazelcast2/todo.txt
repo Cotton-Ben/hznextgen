@@ -1,0 +1,110 @@
+TODO
+
+- asynchronous call: immediately offload
+
+- currently the succeeding thread of an operation, will execute all pending operations. This could be problematic
+because a user thread would like to return 'asap'.
+
+- remote / local invocation
+
+- replicating the write.
+
+- padding on the segment.
+
+- padding on the invocation
+
+- each partition should generate long with the partition id included.
+
+- the invocationfuture relies on locking, which totally sucks.
+    - how can a thread that is waiting for an invocation help out?
+
+- dealing with overload in the generated partition
+
+- the lock completion is missing; so a lock can be started, but there is no way to know when the lock has been fully
+completed. Only the thread that is scheduling a segment will be able to indicate when the locking is done
+
+- dealing with locking in generated partition
+
+- when lock is acquired on a segment, there is currently no way to know when all threads have completed and
+the segment is exclusively owned
+
+- the dispatch method needs to be generated correctly
+
+- deadlock: we need to make sure that if an operation on a segment is executed while already executing from
+a different segment, they you are not going to deadlock (because the lock on the original segment is not released)
+
+- optimization with reading immutable data, volatile read would be enough. more thinking needed.
+
+- optimization for operations that don't return a response since there is no
+
+- we need to check during the execution of pending work if the segment is locked.
+
+- concurrent invocations on the same cell, caused new invocationfuture to be created. Would be nice if they could be pooled.
+
+- invocationfuture optimized for primitives instead of creating an object.
+
+- when an asynchronous call is done, instead of doing a notify, just drop the callback + result in some executor and
+have it processed. This way there is no blocking going on.
+
+- instead of exposing completable future (which we can do), also expose version where a callback interface is used.
+This prevents the need to create a completablefuture instance. Only the callback is needed, which can be recycled.
+
+- dealing with backpressure: currently a segment will reject the claiming of the slot by returning a Segment.CLAIM_SLOT_NO_CAPACITY
+but we are throwing an exception. At this point you want to deal with backing off.
+
+- arg mapping and reference
+
+- arg mapping an compacting primitives; each primitive arg now takes up one long field. But e.g. 64 booleans could be pushed into
+a single long field.
+
+- actual implementation of the lock
+
+- lock
+
+DONE
+
+- argument to invocation mapping.
+
+- arg mapping now can deal with boolean
+
+- arg mapping can now deal with 3 primitives.
+
+- the pending invocations are processed in the wrong order
+
+- invocation.invocationFuture = future;
+
+- exception handling if an invocation fails
+
+- when processing a pending invocation, we need to wait till our invocation completes. Currently an exception is
+thrown.
+
+- the result of a partition method should be fed into the invocation since it is also the future.
+
+- return values for invocations
+
+- generate signature for async method
+
+- when processing pending invocations, we need to check if the segment is locked.
+
+- generating the GeneratedXXXSegment using an annotation processor.
+
+- currently it isn't possible to have multiple methods with the same name
+
+- invocation classname should not be DoXX
+
+- code generator constructor of invocation is no good
+
+- the partition code generator should analyze the source to build up the right methods.
+
+- for the AtomicLong there is no need to have a concurrent hashmap. Within a segment there will never be any
+multithreading, so no need for concurrency control.
+
+- better name for the stripe-cell
+
+- the 'stripecell' now only need to be accessed once.
+
+- rename address to something less confusing
+
+- long proxy
+
+- no duplication of the actual logic: currently repeated in invocation and
