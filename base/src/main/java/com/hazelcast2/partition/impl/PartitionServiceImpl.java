@@ -1,11 +1,11 @@
 package com.hazelcast2.partition.impl;
 
 import com.hazelcast2.partition.PartitionService;
-import com.hazelcast2.spi.PartitionScheduler;
+import com.hazelcast2.spi.SectorScheduler;
 
 public class PartitionServiceImpl implements PartitionService {
     private final int partitionCount;
-    private final PartitionScheduler partitionScheduler;
+    private final SectorScheduler sectorScheduler;
 
     public PartitionServiceImpl(int partitionCount) {
         if (partitionCount < 1) {
@@ -13,7 +13,7 @@ public class PartitionServiceImpl implements PartitionService {
         }
         this.partitionCount = partitionCount;
         //todo: very small scheduler, needs to be made configurable.
-        this.partitionScheduler = new PartitionScheduler(1024);
+        this.sectorScheduler = new SectorScheduler(1024);
     }
 
     public int getPartitionCount() {
@@ -21,8 +21,8 @@ public class PartitionServiceImpl implements PartitionService {
     }
 
     @Override
-    public PartitionScheduler getScheduler() {
-        return partitionScheduler;
+    public SectorScheduler getScheduler() {
+        return sectorScheduler;
     }
 
     @Override

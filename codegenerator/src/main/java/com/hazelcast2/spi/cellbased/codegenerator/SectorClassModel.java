@@ -3,12 +3,12 @@ package com.hazelcast2.spi.cellbased.codegenerator;
 import java.util.LinkedList;
 import java.util.List;
 
-public class PartitionClassModel {
+public class SectorClassModel {
 
     public String name;
     public String superName;
     public String packageName;
-    public final List<PartitionMethodModel> methods = new LinkedList<>();
+    public final List<SectorMethodModel> methods = new LinkedList<>();
     public String cellName;
 
     public String getCellName() {
@@ -27,7 +27,7 @@ public class PartitionClassModel {
         return packageName;
     }
 
-    public List<PartitionMethodModel> getMethods() {
+    public List<SectorMethodModel> getMethods() {
         return methods;
     }
 }

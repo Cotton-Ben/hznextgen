@@ -1,7 +1,7 @@
 package com.hazelcast2.spi.cellbased.codegenerator;
 
-import com.hazelcast2.spi.cellbased.CellBasedPartition;
-import com.hazelcast2.spi.cellbased.CellPartitionOperation;
+import com.hazelcast2.spi.cellbased.CellBasedSector;
+import com.hazelcast2.spi.cellbased.CellSectorOperation;
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -27,9 +27,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-@SupportedAnnotationTypes("com.hazelcast2.spi.cellbased.CellBasedPartition")
+@SupportedAnnotationTypes("com.hazelcast2.spi.cellbased.CellBasedSector")
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
-public class PartitionCodeGenerator extends AbstractProcessor {
+public class SectorCodeGenerator extends AbstractProcessor {
 
     private Filer filer;
     private Messager messager;
@@ -43,7 +43,7 @@ public class PartitionCodeGenerator extends AbstractProcessor {
         Configuration cfg = new Configuration();
         cfg.setTemplateLoader(new ClassTemplateLoader(getClass(), "/"));
         try {
-            template = cfg.getTemplate("CellPartitionTemplate.ftl");
+            template = cfg.getTemplate("CellSectorTemplate.ftl");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -51,7 +51,7 @@ public class PartitionCodeGenerator extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> elements, RoundEnvironment env) {
-        for (Element element : env.getElementsAnnotatedWith(CellBasedPartition.class)) {
+        for (Element element : env.getElementsAnnotatedWith(CellBasedSector.class)) {
             generate((TypeElement) element);
         }
 
@@ -66,15 +66,15 @@ public class PartitionCodeGenerator extends AbstractProcessor {
         return qualifiedClassName.substring(0, qualifiedClassName.lastIndexOf("."));
     }
 
-    private PartitionClassModel generateClassModel(TypeElement classElement) {
-        final PartitionClassModel clazz = new PartitionClassModel();
+    private SectorClassModel generateClassModel(TypeElement classElement) {
+        final SectorClassModel clazz = new SectorClassModel();
         clazz.name = "Generated" + classElement.getSimpleName();
         clazz.superName = classElement.getSimpleName().toString();
         clazz.packageName = getPackageNameFromQualifiedName(classElement.getQualifiedName().toString());
 
         for (Element enclosedElement : classElement.getEnclosedElements()) {
             if (enclosedElement.getKind().equals(ElementKind.METHOD)) {
-                Annotation annotation = enclosedElement.getAnnotation(CellPartitionOperation.class);
+                Annotation annotation = enclosedElement.getAnnotation(CellSectorOperation.class);
                 ExecutableElement methodElement = (ExecutableElement) enclosedElement;
 
                 if (annotation != null) {
@@ -82,7 +82,7 @@ public class PartitionCodeGenerator extends AbstractProcessor {
 
                     int argCount = methodElement.getParameters().size();
 
-                    PartitionMethodModel method = new PartitionMethodModel();
+                    SectorMethodModel method = new SectorMethodModel();
                     method.name = "do" + capitalizeFirstLetter(methodName);
                     method.returnType = methodElement.getReturnType().toString();
                     method.invocationClassName = capitalizeFirstLetter(methodName) + argCount + "Invocation";
@@ -106,7 +106,7 @@ public class PartitionCodeGenerator extends AbstractProcessor {
     }
 
     public void generate(TypeElement classElement) {
-        PartitionClassModel clazz = generateClassModel(classElement);
+        SectorClassModel clazz = generateClassModel(classElement);
 
         String content = null;
         try {

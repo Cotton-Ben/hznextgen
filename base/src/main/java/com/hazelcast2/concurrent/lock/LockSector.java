@@ -1,23 +1,23 @@
 package com.hazelcast2.concurrent.lock;
 
-import com.hazelcast2.spi.cellbased.CellPartitionOperation;
-import com.hazelcast2.spi.Partition;
-import com.hazelcast2.spi.cellbased.CellBasedPartition;
+import com.hazelcast2.spi.cellbased.CellBasedSector;
+import com.hazelcast2.spi.cellbased.CellSectorOperation;
+import com.hazelcast2.spi.Sector;
 import com.hazelcast2.spi.PartitionSettings;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
-@CellBasedPartition
-public abstract class LockPartition extends Partition {
+@CellBasedSector
+public abstract class LockSector extends Sector {
 
     private final AtomicLong idGenerator = new AtomicLong();
 
     //todo: very inefficient structure.
     public final Map<Long, LockCell> cells = new HashMap<Long, LockCell>();
 
-    public LockPartition(PartitionSettings partitionSettings) {
+    public LockSector(PartitionSettings partitionSettings) {
         super(partitionSettings);
     }
 
@@ -34,14 +34,14 @@ public abstract class LockPartition extends Partition {
 
     public abstract boolean doIsLocked(long id, long threadId);
 
-    @CellPartitionOperation
+    @CellSectorOperation
     public boolean isLocked(LockCell cell, long threadId) {
         return cell.lockOwnerThreadId != -1;
     }
 
     public abstract boolean doTryLock(long id, long threadId);
 
-    @CellPartitionOperation
+    @CellSectorOperation
     public boolean tryLock(LockCell cell, long threadId) {
         if (cell.lockOwnerThreadId != -1) {
             return false;
@@ -53,7 +53,7 @@ public abstract class LockPartition extends Partition {
 
     public abstract void doUnlock(long id, long threadId);
 
-    @CellPartitionOperation
+    @CellSectorOperation
     public void unlock(LockCell cell, long threadId) {
         if (cell.lockOwnerThreadId == -1) {
             throw new IllegalMonitorStateException();

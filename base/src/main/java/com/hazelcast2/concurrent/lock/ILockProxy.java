@@ -6,11 +6,11 @@ import static com.hazelcast2.concurrent.lock.LockUtil.getThreadId;
 
 public class ILockProxy implements ILock {
 
-    private final LockPartition partition;
+    private final LockSector partition;
     private final long id;
     private final String name;
 
-    public ILockProxy(LockPartition partition, String name, long id) {
+    public ILockProxy(LockSector partition, String name, long id) {
         this.partition = partition;
         this.name = name;
         this.id = id;

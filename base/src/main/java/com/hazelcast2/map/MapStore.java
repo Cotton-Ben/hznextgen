@@ -2,13 +2,13 @@ package com.hazelcast2.map;
 
 public class MapStore {
 
-    private final MapPartition[] partitions;
+    private final MapSector[] partitions;
 
-    public MapStore(MapPartition[] partitions) {
+    public MapStore(MapSector[] partitions) {
         this.partitions = partitions;
     }
 
-    public MapPartition getPartition(int partitionId) {
+    public MapSector getPartition(int partitionId) {
         return partitions[partitionId];
     }
 

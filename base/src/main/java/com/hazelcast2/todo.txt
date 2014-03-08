@@ -13,17 +13,17 @@ because a user thread would like to return 'asap'.
 
 - padding on the invocation
 
-- each partition should generate long with the partition id included.
+- each sector should generate long with the sector id included.
 
 - the invocationfuture relies on locking, which totally sucks.
     - how can a thread that is waiting for an invocation help out?
 
-- dealing with overload in the generated partition
+- dealing with overload in the generated sector
 
 - the lock completion is missing; so a lock can be started, but there is no way to know when the lock has been fully
 completed. Only the thread that is scheduling a segment will be able to indicate when the locking is done
 
-- dealing with locking in generated partition
+- dealing with locking in generated sector
 
 - when lock is acquired on a segment, there is currently no way to know when all threads have completed and
 the segment is exclusively owned
@@ -62,6 +62,8 @@ a single long field.
 - do we need to expose the cell
 
 - calls to the HazelcastInstance.getFoo methods will always return a new instance.
+
+- rename the 'partitions' to sectors. Because the sectors together will form a single sector.
 
 DONE
 

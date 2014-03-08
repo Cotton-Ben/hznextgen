@@ -1,18 +1,18 @@
 package com.hazelcast2.map;
 
-import com.hazelcast2.spi.Partition;
+import com.hazelcast2.spi.Sector;
 import com.hazelcast2.spi.PartitionSettings;
-import com.hazelcast2.spi.foo2.Foo2PartitionAnnotation;
+import com.hazelcast2.spi.foo2.Foo2SectorAnnotation;
 
 import java.util.HashMap;
 import java.util.Map;
 
-@Foo2PartitionAnnotation
-public abstract class MapPartition extends Partition {
+@Foo2SectorAnnotation
+public abstract class MapSector extends Sector {
 
     private final Map<String, String> map = new HashMap<>();
 
-    protected MapPartition(PartitionSettings settings) {
+    protected MapSector(PartitionSettings settings) {
         super(settings);
     }
 

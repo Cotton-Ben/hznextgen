@@ -7,6 +7,6 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.CLASS)
 @Target(value = {ElementType.TYPE})
-public @interface CellBasedPartition {
+public @interface CellBasedSector {
 
 }

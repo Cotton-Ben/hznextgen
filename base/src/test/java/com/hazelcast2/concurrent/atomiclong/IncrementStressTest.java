@@ -1,6 +1,6 @@
 package com.hazelcast2.concurrent.atomiclong;
 
-import com.hazelcast2.spi.PartitionScheduler;
+import com.hazelcast2.spi.SectorScheduler;
 import com.hazelcast2.spi.PartitionSettings;
 import org.junit.Test;
 
@@ -10,7 +10,7 @@ public class IncrementStressTest {
 
     @Test
     public void testSingleThread() throws InterruptedException {
-        GeneratedLongPartition partition = newLongPartition();
+        GeneratedLongSector partition = newLongPartition();
         long address = partition.createCell();
         int iterations = 100;
         IncThread thread = new IncThread(partition, address, iterations);
@@ -22,14 +22,14 @@ public class IncrementStressTest {
         //assertNull(cell.invocation);
     }
 
-    private GeneratedLongPartition newLongPartition() {
-        PartitionScheduler partitionScheduler = new PartitionScheduler(1024);
-        return new GeneratedLongPartition(new PartitionSettings(1,partitionScheduler));
+    private GeneratedLongSector newLongPartition() {
+        SectorScheduler sectorScheduler = new SectorScheduler(1024);
+        return new GeneratedLongSector(new PartitionSettings(1, sectorScheduler));
     }
 
     @Test
     public void testMultipleThreads() throws InterruptedException {
-        GeneratedLongPartition partition = newLongPartition();
+        GeneratedLongSector partition = newLongPartition();
         long address = partition.createCell();
         int iterations = 100000000;
         IncThread thread1 = new IncThread(partition, address, iterations);
@@ -44,11 +44,11 @@ public class IncrementStressTest {
     }
 
     class IncThread extends Thread {
-        private final GeneratedLongPartition longPartition;
+        private final GeneratedLongSector longPartition;
         private final long address;
         private final int iterations;
 
-        IncThread(GeneratedLongPartition logic, long address, int iterations) {
+        IncThread(GeneratedLongSector logic, long address, int iterations) {
             this.longPartition = logic;
             this.address = address;
             this.iterations = iterations;

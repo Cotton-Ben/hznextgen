@@ -1,6 +1,6 @@
 package com.hazelcast2.spi;
 
-import com.hazelcast2.concurrent.atomiclong.GeneratedLongPartition;
+import com.hazelcast2.concurrent.atomiclong.GeneratedLongSector;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -13,36 +13,36 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 @Ignore
-public class AbstractPartitionTest {
+public class AbstractSectorTest {
 
     @Test
     public void lock_whenNotLocked() throws ExecutionException, InterruptedException {
-        Partition partition = newPartition();
-        Future f = partition.systemLock();
+        Sector sector = newPartition();
+        Future f = sector.systemLock();
         assertNotNull(f);
         assertNull(f.get());
-        assertTrue(partition.isSystemLocked());
+        assertTrue(sector.isSystemLocked());
 
-        //for (int k = 0; k < partition.getSegmentLength(); k++) {
-        //    Invocation invocation = partition.getInvocation(k);
+        //for (int k = 0; k < sector.getSegmentLength(); k++) {
+        //    Invocation invocation = sector.getInvocation(k);
         //    assertNotNull(invocation);
-        //    assertTrue(invocation instanceof Partition.LockedInvocation);
+        //    assertTrue(invocation instanceof Sector.LockedInvocation);
         //}
     }
 
     @Test
     public void lock_whenAlreadyLocked() throws ExecutionException, InterruptedException {
-        Partition partition = newPartition();
-        partition.systemLock().get();
+        Sector sector = newPartition();
+        sector.systemLock().get();
 
         try {
-            partition.systemLock().get();
+            sector.systemLock().get();
         } catch (ExecutionException e) {
             assertNotNull(e.getCause());
             assertTrue(e.getCause() instanceof IllegalStateException);
         }
 
-        assertTrue(partition.isSystemLocked());
+        assertTrue(sector.isSystemLocked());
     }
 
     @Test
@@ -59,19 +59,19 @@ public class AbstractPartitionTest {
 
     @Test
     public void unlock_whenLocked() throws ExecutionException, InterruptedException {
-        Partition partition = newPartition();
-        partition.systemLock().get();
+        Sector sector = newPartition();
+        sector.systemLock().get();
 
-        partition.systemUnlock();
-        assertFalse(partition.isSystemLocked());
+        sector.systemUnlock();
+        assertFalse(sector.isSystemLocked());
 
-        //for (int k = 0; k < partition.getSegmentLength(); k++) {
-        //    assertNull(partition.getInvocation(k));
+        //for (int k = 0; k < sector.getSegmentLength(); k++) {
+        //    assertNull(sector.getInvocation(k));
         //}
     }
 
-    private Partition newPartition() {
-        PartitionScheduler partitionScheduler = new PartitionScheduler(1024);
-        return new GeneratedLongPartition(new PartitionSettings(1,partitionScheduler));
+    private Sector newPartition() {
+        SectorScheduler sectorScheduler = new SectorScheduler(1024);
+        return new GeneratedLongSector(new PartitionSettings(1, sectorScheduler));
     }
 }

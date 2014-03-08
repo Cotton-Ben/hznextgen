@@ -1,9 +1,9 @@
-package com.hazelcast2.spi.foo2.codegenerator;
+package com.hazelcast2.spi.cellbased.codegenerator;
 
 import java.util.LinkedList;
 import java.util.List;
 
-public class PartitionMethodModel {
+public class SectorMethodModel {
     public String targetMethod;
     public String name;
     public String invocationClassName;
@@ -136,7 +136,7 @@ public class PartitionMethodModel {
     }
 
     public String getAsyncName() {
-        return "async" + PartitionCodeGenerator.capitalizeFirstLetter(getName());
+        return "async" + SectorCodeGenerator.capitalizeFirstLetter(getName());
     }
 
     public String getReturnTypeAsObject() {

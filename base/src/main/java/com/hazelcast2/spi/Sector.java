@@ -4,13 +4,13 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLongFieldUpdater;
 
 /**
- * In theory the Partition is not needed. Since we are going to generate Partition subclasses for the missing
+ * In theory the Sector is not needed. Since we are going to generate Sector subclasses for the missing
  * methods, we can easily add these methods as well.
  */
-public abstract class Partition {
+public abstract class Sector {
 
-    private static final AtomicLongFieldUpdater<Partition> PRODUCER_UPDATER
-            = AtomicLongFieldUpdater.newUpdater(Partition.class, "prodSeq");
+    private static final AtomicLongFieldUpdater<Sector> PRODUCER_UPDATER
+            = AtomicLongFieldUpdater.newUpdater(Sector.class, "prodSeq");
 
     public static final long CLAIM_SLOT_LOCKED = -2;
     public static final long CLAIM_SLOT_NO_CAPACITY = -3;
@@ -21,7 +21,7 @@ public abstract class Partition {
 
     private volatile boolean isLocked;
     private final int partitionId;
-    public final PartitionScheduler scheduler;
+    public final SectorScheduler scheduler;
 
     //this sucks because both of them will probably fall in the same cache line.
     public volatile long prodSeq = INITIAL_VALUE;
@@ -30,7 +30,7 @@ public abstract class Partition {
     public final Invocation[] ringbuffer;
     public final int ringbufferSize;
 
-    public Partition(PartitionSettings partitionSettings) {
+    public Sector(PartitionSettings partitionSettings) {
         if (partitionSettings == null) {
             throw new NullPointerException();
         }
@@ -61,7 +61,7 @@ public abstract class Partition {
     }
 
     /**
-     * Checks if this Partition currently is locked for system operations.
+     * Checks if this Sector currently is locked for system operations.
      *
      * @return true if is locked, false otherwise.
      */
@@ -70,7 +70,7 @@ public abstract class Partition {
     }
 
     /**
-     * Locks this Partition for system operations.
+     * Locks this Sector for system operations.
      * <p/>
      * This call is not thread-safe; only a single thread should call this method.
      * <p/>
@@ -85,7 +85,7 @@ public abstract class Partition {
     }
 
     /**
-     * Unlocks this Partition so that user operations can run on it.  The systemUnlock method should only be called
+     * Unlocks this Sector so that user operations can run on it.  The systemUnlock method should only be called
      * after the lock is complete (so after the future.get has returned successfully).
      * <p/>
      * This call is not thread-safe; only a single thread should call this method.

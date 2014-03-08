@@ -2,21 +2,19 @@ package com.hazelcast2.map;
 
 import com.hazelcast2.core.IMap;
 import com.hazelcast2.partition.PartitionService;
-import com.hazelcast2.spi.PartitionScheduler;
+import com.hazelcast2.spi.SectorScheduler;
 import com.hazelcast2.spi.PartitionSettings;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-import static com.hazelcast2.util.ReflectionUtils.getConstructor;
-
 public class MapService {
 
-    public static final String CLASS_NAME = "com.hazelcast2.concurrent.map.GeneratedMapPartition";
+    public static final String CLASS_NAME = "com.hazelcast2.concurrent.map.GeneratedMapSector";
 
     private final PartitionService partitionService;
-    private final Constructor<MapPartition> constructor = null;
-    private final PartitionScheduler scheduler;
+    private final Constructor<MapSector> constructor = null;
+    private final SectorScheduler scheduler;
 
     public MapService(PartitionService partitionService) {
         this.partitionService = partitionService;
@@ -29,7 +27,7 @@ public class MapService {
             return null;
         }
 
-        MapPartition[] partitions = new MapPartition[partitionService.getPartitionCount()];
+        MapSector[] partitions = new MapSector[partitionService.getPartitionCount()];
         for (int partitionId = 0; partitionId < partitions.length; partitionId++) {
             PartitionSettings partitionSettings = new PartitionSettings(partitionId,scheduler);
             partitionSettings.partitionService = partitionService;

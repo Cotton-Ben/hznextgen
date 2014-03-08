@@ -6,11 +6,11 @@ import java.util.concurrent.Future;
 
 public class AtomicLongProxy implements IAtomicLong {
 
-    private final LongPartition partition;
+    private final LongSector partition;
     private final long id;
     private final String name;
 
-    public AtomicLongProxy(LongPartition partition, String name, long id) {
+    public AtomicLongProxy(LongSector partition, String name, long id) {
         this.partition = partition;
         this.name = name;
         this.id = id;

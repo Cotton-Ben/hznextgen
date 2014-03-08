@@ -1,17 +1,17 @@
 package com.hazelcast2.concurrent.atomiclong;
 
-import com.hazelcast2.spi.PartitionScheduler;
+import com.hazelcast2.spi.SectorScheduler;
 import com.hazelcast2.spi.PartitionSettings;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
 //very naive performance test
-public class LongPartitionPerformanceTest {
+public class LongSectorPerformanceTest {
 
     @Test
     public void testSet() {
-        LongPartition longPartition = createLongPartition();
+        LongSector longPartition = createLongPartition();
         long id = longPartition.createCell();
         long startMs = System.currentTimeMillis();
         int iterations  = 1000 * 1000 * 100;
@@ -25,14 +25,14 @@ public class LongPartitionPerformanceTest {
         assertEquals(20, result);
     }
 
-    private LongPartition createLongPartition() {
-        PartitionScheduler partitionScheduler = new PartitionScheduler(1024);
-        return new GeneratedLongPartition(new PartitionSettings(1,partitionScheduler));
+    private LongSector createLongPartition() {
+        SectorScheduler sectorScheduler = new SectorScheduler(1024);
+        return new GeneratedLongSector(new PartitionSettings(1, sectorScheduler));
     }
 
     @Test
     public void testInc() {
-        LongPartition longPartition = createLongPartition();
+        LongSector longPartition = createLongPartition();
         long id = longPartition.createCell();
         int iterations  = 1000 * 1000 * 100;
         long startMs = System.currentTimeMillis();
@@ -48,7 +48,7 @@ public class LongPartitionPerformanceTest {
 
     @Test
     public void testGet() {
-        LongPartition longPartition = createLongPartition();
+        LongSector longPartition = createLongPartition();
         long id = longPartition.createCell();
         int iterations  = 1000 * 1000 * 100;
         long startMs = System.currentTimeMillis();

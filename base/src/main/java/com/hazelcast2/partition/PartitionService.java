@@ -1,6 +1,6 @@
 package com.hazelcast2.partition;
 
-import com.hazelcast2.spi.PartitionScheduler;
+import com.hazelcast2.spi.SectorScheduler;
 
 public interface PartitionService {
 
@@ -8,5 +8,5 @@ public interface PartitionService {
 
     int getPartitionCount();
 
-    PartitionScheduler getScheduler();
+    SectorScheduler getScheduler();
 }

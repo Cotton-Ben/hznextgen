@@ -10,25 +10,26 @@ import java.util.concurrent.Executors;
  *
  *
  */
-public class PartitionScheduler {
+public class SectorScheduler {
 
     private final Executor executor = Executors.newFixedThreadPool(8);
-    private final PartitionSlot[] ringbuffer;
+    private final SectorSlot[] ringbuffer;
+    //private final AtomicLong
 
-    public PartitionScheduler(int size) {
-        this.ringbuffer = new PartitionSlot[size];
+    public SectorScheduler(int size) {
+        this.ringbuffer = new SectorSlot[size];
 
         for (int k = 0; k < size; k++) {
-            ringbuffer[k] = new PartitionSlot();
+            ringbuffer[k] = new SectorSlot();
         }
     }
 
-    public void schedule(final Partition partition) {
+    public void schedule(final Sector sector) {
         executor.execute(new Runnable() {
             @Override
             public void run() {
                 try {
-                    partition.process();
+                    sector.process();
                 } catch (RuntimeException ex) {
                     ex.printStackTrace();
                 }
@@ -36,8 +37,8 @@ public class PartitionScheduler {
         });
     }
 
-    private static class PartitionSlot {
-        private Partition partition;
+    private static class SectorSlot {
+        private Sector sector;
         private int sequence = -1;
 
 

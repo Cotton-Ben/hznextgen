@@ -6,11 +6,11 @@ import java.util.concurrent.Future;
 
 public class AtomicBooleanProxy implements IAtomicBoolean {
 
-    private final BooleanPartition partition;
+    private final BooleanSector partition;
     private final long id;
     private final String name;
 
-    public AtomicBooleanProxy(BooleanPartition partition, String name, long id) {
+    public AtomicBooleanProxy(BooleanSector partition, String name, long id) {
         this.partition = partition;
         this.name = name;
         this.id = id;
