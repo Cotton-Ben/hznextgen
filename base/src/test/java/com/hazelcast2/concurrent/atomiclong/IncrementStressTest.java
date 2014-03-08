@@ -3,13 +3,22 @@ package com.hazelcast2.concurrent.atomiclong;
 import com.hazelcast2.core.Hazelcast;
 import com.hazelcast2.core.HazelcastInstance;
 import com.hazelcast2.core.IAtomicLong;
+import com.hazelcast2.test.HazelcastTestSupport;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.concurrent.ExecutionException;
+
 import static org.junit.Assert.assertEquals;
 
-public class IncrementStressTest {
+/**
+ * todo:
+ * this test can be improved by not immediately doing a future.get but overloading the system with
+ * asynchronous calls. But that will only work if we provide back-pressure.
+ *
+ */
+public class IncrementStressTest extends HazelcastTestSupport {
 
     private HazelcastInstance hz;
 
@@ -24,23 +33,40 @@ public class IncrementStressTest {
     }
 
     @Test
-    public void testSingleThread() throws InterruptedException {
-        IAtomicLong atomicLong = hz.getAtomicLong("counter");
-        int iterations = 100;
-        IncThread thread = new IncThread(atomicLong, iterations);
+    public void testSingleThreadAsync() throws InterruptedException {
+        testSingleThread(true);
+    }
+
+    @Test
+    public void testSingleThreadSync() throws InterruptedException {
+        testSingleThread(false);
+    }
+
+    public void testSingleThread(boolean async) throws InterruptedException {
+        IAtomicLong atomicLong = hz.getAtomicLong(randomString());
+        int iterations = 100000000;
+        IncThread thread = new IncThread(atomicLong, iterations, async);
         thread.start();
         thread.join();
 
         assertEquals(iterations, atomicLong.get());
-        //assertNull(cell.invocation);
     }
 
     @Test
-    public void testMultipleThreads() throws InterruptedException {
+    public void testMultipleThreadAsync() throws InterruptedException {
+        testMultipleThreads(true);
+    }
+
+    @Test
+    public void testMultipleThreadSync() throws InterruptedException {
+        testMultipleThreads(false);
+    }
+
+    public void testMultipleThreads(boolean async) throws InterruptedException {
         int iterations = 100000000;
-        IAtomicLong atomicLong = hz.getAtomicLong("counter");
-        IncThread thread1 = new IncThread(atomicLong, iterations);
-        IncThread thread2 = new IncThread(atomicLong, iterations);
+        IAtomicLong atomicLong = hz.getAtomicLong(randomString());
+        IncThread thread1 = new IncThread(atomicLong, iterations, async);
+        IncThread thread2 = new IncThread(atomicLong, iterations, async);
         thread1.start();
         thread2.start();
         thread1.join();
@@ -51,21 +77,27 @@ public class IncrementStressTest {
     class IncThread extends Thread {
         private final IAtomicLong atomicLong;
         private final int iterations;
+        private final boolean async;
 
-        IncThread(IAtomicLong atomicLong, int iterations) {
+        IncThread(IAtomicLong atomicLong, int iterations, boolean async) {
             this.atomicLong = atomicLong;
             this.iterations = iterations;
+            this.async = async;
         }
 
         public void run() {
             try {
                 for (int k = 0; k < iterations; k++) {
-                    atomicLong.inc();
-                    if (k % 10000000 == 0) {
+                    if (async) {
+                        atomicLong.asyncInc().get();
+                    } else {
+                        atomicLong.inc();
+                    }
+                    if (k % 100000 == 0) {
                         System.out.println(getName() + " is at: " + k);
                     }
                 }
-            } catch (RuntimeException e) {
+            } catch (RuntimeException | InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
         }

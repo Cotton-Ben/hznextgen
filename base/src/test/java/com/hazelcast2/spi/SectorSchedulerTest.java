@@ -6,7 +6,7 @@ public class SectorSchedulerTest {
 
     @Test
     public void test(){
-        SectorScheduler scheduler = new SectorScheduler(1024);
+        SectorScheduler scheduler = new SectorScheduler(1024,1);
         Sector sector = new DummySector(new PartitionSettings(1,scheduler));
         scheduler.schedule(sector);
 

@@ -26,7 +26,7 @@ public class LongSectorPerformanceTest {
     }
 
     private LongSector createLongPartition() {
-        SectorScheduler sectorScheduler = new SectorScheduler(1024);
+        SectorScheduler sectorScheduler = new SectorScheduler(1024,1);
         return new GeneratedLongSector(new PartitionSettings(1, sectorScheduler));
     }
 

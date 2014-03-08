@@ -30,27 +30,25 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public final class SectorScheduler {
 
-    private final SectorSlot[] ringbuffer;
-    private final int ringbufferSize;
-
-    //todo: padding.
-    private final AtomicLong prodSeq = new AtomicLong(0);
-    private final AtomicLong consSeq = new AtomicLong(0);
+    private final RingBuffer[] ringbuffers;
+    private final int threadCount;
     private volatile boolean shutdown;
 
-    public SectorScheduler(int size) {
+    public SectorScheduler(int size, int threadCount) {
         //todo: size needs to be a power of 2
-
-        this.ringbufferSize = size;
-        this.ringbuffer = new SectorSlot[size];
-
-        for (int k = 0; k < size; k++) {
-            ringbuffer[k] = new SectorSlot();
+        this.threadCount = threadCount;
+        ringbuffers = new RingBuffer[threadCount];
+        for (int k = 0; k < threadCount; k++) {
+            ringbuffers[k] = new RingBuffer(size);
         }
     }
 
-    public void start(){
-        new SectorThread().start();
+    public void start() {
+        for (int k = 0; k < threadCount; k++) {
+            RingBuffer ringBuffer = ringbuffers[k];
+            SectorThread thread = new SectorThread(ringBuffer);
+            thread.start();
+        }
     }
 
     public void shutdown() {
@@ -58,31 +56,17 @@ public final class SectorScheduler {
     }
 
     public void schedule(final Sector sector) {
-        final long seq = claim();
-        final int index = indexOf(seq);
-        final SectorSlot slot = ringbuffer[index];
+        final RingBuffer ringBuffer = randomRingBuffer();
+        final long seq = ringBuffer.claim();
+        final SectorSlot slot = ringBuffer.getSlot(seq);
         slot.sector = sector;
         slot.publish(seq);
     }
 
-    private long claim() {
-        for (; ; ) {
-            final long oldProdSeq = prodSeq.get();
-            final long newProdSeq = oldProdSeq + 1;
-
-            //todo: protection against overflow
-
-            if (prodSeq.compareAndSet(oldProdSeq, newProdSeq)) {
-                return oldProdSeq;
-            }
-        }
+    //todo: we need to come up with a better mechanism to find a ringbuffer.
+    private RingBuffer randomRingBuffer() {
+        return ringbuffers[0];
     }
-
-    private int indexOf(long sequence) {
-        //todo: bitmagic.
-        return (int) (sequence % ringbufferSize);
-    }
-
 
     //todo: does this need to be padded?
     private static class SectorSlot {
@@ -100,7 +84,51 @@ public final class SectorScheduler {
         }
     }
 
-    private class SectorThread extends Thread {
+    private final class RingBuffer {
+        private final AtomicLong prodSeq = new AtomicLong(0);
+        private final AtomicLong consSeq = new AtomicLong(0);
+        private final SectorSlot[] elements;
+        private final int ringbufferSize;
+
+        private RingBuffer(int ringBufferSize) {
+            this.ringbufferSize = ringBufferSize;
+            elements = new SectorSlot[ringBufferSize];
+
+            for (int k = 0; k < ringBufferSize; k++) {
+                elements[k] = new SectorSlot();
+            }
+        }
+
+        private SectorSlot getSlot(final long sequence) {
+            final int index = indexOf(sequence);
+            return elements[index];
+        }
+
+        private long claim() {
+            for (; ; ) {
+                final long oldProdSeq = prodSeq.get();
+                final long newProdSeq = oldProdSeq + 1;
+
+                //todo: protection against overflow
+
+                if (prodSeq.compareAndSet(oldProdSeq, newProdSeq)) {
+                    return oldProdSeq;
+                }
+            }
+        }
+
+        private int indexOf(long sequence) {
+            //todo: bitmagic.
+            return (int) (sequence % ringbufferSize);
+        }
+    }
+
+    private final class SectorThread extends Thread {
+        private final RingBuffer ringbuffer;
+
+        public SectorThread(RingBuffer ringBuffer) {
+            this.ringbuffer = ringBuffer;
+        }
 
         @Override
         public void run() {
@@ -116,31 +144,32 @@ public final class SectorScheduler {
         }
 
         private long claim() {
+            final RingBuffer ringbuffer = this.ringbuffer;
             for (; ; ) {
                 if (shutdown) {
                     throw new ShutdownException();
                 }
 
-                long p = prodSeq.get();
-                if (p == consSeq.get()) {
+                long c = ringbuffer.consSeq.get();
+                if (ringbuffer.prodSeq.get() == c) {
                     Thread.yield();
                 }
 
-                return p;
+                return c;
             }
         }
 
         private void doRun() {
             final long seq = claim();
-            final int indexOf = indexOf(seq);
-            SectorSlot slot = ringbuffer[indexOf];
+            final RingBuffer ringbuffer = this.ringbuffer;
+            final SectorSlot slot = ringbuffer.getSlot(seq);
             slot.awaitPublication(seq);
             slot.sector.process();
 
             //todo:
             //increment and get is currently not yet needed, but in the future we'll have multiple consumers:
             //the sector-thread + threads that are helping out.
-            consSeq.incrementAndGet();
+            ringbuffer.consSeq.incrementAndGet();
         }
     }
 
