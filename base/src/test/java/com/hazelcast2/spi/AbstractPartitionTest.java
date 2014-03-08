@@ -71,6 +71,7 @@ public class AbstractPartitionTest {
     }
 
     private Partition newPartition() {
-        return new GeneratedLongPartition(new PartitionSettings(1));
+        PartitionScheduler partitionScheduler = new PartitionScheduler(1024);
+        return new GeneratedLongPartition(new PartitionSettings(1,partitionScheduler));
     }
 }

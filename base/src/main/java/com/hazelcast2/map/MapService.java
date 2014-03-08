@@ -2,6 +2,7 @@ package com.hazelcast2.map;
 
 import com.hazelcast2.core.IMap;
 import com.hazelcast2.partition.PartitionService;
+import com.hazelcast2.spi.PartitionScheduler;
 import com.hazelcast2.spi.PartitionSettings;
 
 import java.lang.reflect.Constructor;
@@ -15,19 +16,22 @@ public class MapService {
 
     private final PartitionService partitionService;
     private final Constructor<MapPartition> constructor = null;
+    private final PartitionScheduler scheduler;
 
     public MapService(PartitionService partitionService) {
         this.partitionService = partitionService;
         //constructor = getConstructor(CLASS_NAME);
+        this.scheduler = partitionService.getScheduler();
     }
 
     public IMap getDistributedObject(String name) {
         if(true){
             return null;
         }
+
         MapPartition[] partitions = new MapPartition[partitionService.getPartitionCount()];
         for (int partitionId = 0; partitionId < partitions.length; partitionId++) {
-            PartitionSettings partitionSettings = new PartitionSettings(partitionId);
+            PartitionSettings partitionSettings = new PartitionSettings(partitionId,scheduler);
             partitionSettings.partitionService = partitionService;
             try {
                 partitions[partitionId] = constructor.newInstance(partitionSettings);

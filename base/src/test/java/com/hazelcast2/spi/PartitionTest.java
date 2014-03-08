@@ -3,11 +3,7 @@ package com.hazelcast2.spi;
 import com.hazelcast2.concurrent.atomiclong.GeneratedLongPartition;
 import org.junit.Test;
 
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 public class PartitionTest {
 
@@ -27,9 +23,10 @@ public class PartitionTest {
         }
     }
 
-    public Partition generatePartition(int ringBufferSize){
-        PartitionSettings settings =new PartitionSettings(1);
-        settings.ringbufferSize=ringBufferSize;
+    public Partition generatePartition(int ringBufferSize) {
+        PartitionScheduler partitionScheduler = new PartitionScheduler(1024);
+        PartitionSettings settings = new PartitionSettings(1,partitionScheduler);
+        settings.ringbufferSize = ringBufferSize;
         return new GeneratedLongPartition(settings);
     }
 

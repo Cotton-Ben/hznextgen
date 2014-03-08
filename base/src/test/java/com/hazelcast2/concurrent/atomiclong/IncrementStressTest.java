@@ -1,18 +1,16 @@
 package com.hazelcast2.concurrent.atomiclong;
 
-import com.hazelcast2.core.Hazelcast;
-import com.hazelcast2.core.HazelcastInstance;
+import com.hazelcast2.spi.PartitionScheduler;
 import com.hazelcast2.spi.PartitionSettings;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
 public class IncrementStressTest {
 
-     @Test
+    @Test
     public void testSingleThread() throws InterruptedException {
-        GeneratedLongPartition partition = new GeneratedLongPartition(new PartitionSettings(1));
+        GeneratedLongPartition partition = newLongPartition();
         long address = partition.createCell();
         int iterations = 100;
         IncThread thread = new IncThread(partition, address, iterations);
@@ -24,9 +22,14 @@ public class IncrementStressTest {
         //assertNull(cell.invocation);
     }
 
+    private GeneratedLongPartition newLongPartition() {
+        PartitionScheduler partitionScheduler = new PartitionScheduler(1024);
+        return new GeneratedLongPartition(new PartitionSettings(1,partitionScheduler));
+    }
+
     @Test
     public void testMultipleThreads() throws InterruptedException {
-        GeneratedLongPartition partition = new GeneratedLongPartition(new PartitionSettings(1));
+        GeneratedLongPartition partition = newLongPartition();
         long address = partition.createCell();
         int iterations = 100000000;
         IncThread thread1 = new IncThread(partition, address, iterations);
@@ -36,7 +39,7 @@ public class IncrementStressTest {
         thread1.join();
         thread2.join();
         LongCell cell = partition.loadCell(address);
-        assertEquals(2 * iterations,cell.value);
+        assertEquals(2 * iterations, cell.value);
         //assertNull(cell.invocation);
     }
 

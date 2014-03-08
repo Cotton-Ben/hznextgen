@@ -1,5 +1,6 @@
 package com.hazelcast2.concurrent.atomiclong;
 
+import com.hazelcast2.spi.PartitionScheduler;
 import com.hazelcast2.spi.PartitionSettings;
 import org.junit.Test;
 
@@ -10,7 +11,7 @@ public class LongPartitionPerformanceTest {
 
     @Test
     public void testSet() {
-        LongPartition longPartition = new GeneratedLongPartition(new PartitionSettings(1));
+        LongPartition longPartition = createLongPartition();
         long id = longPartition.createCell();
         long startMs = System.currentTimeMillis();
         int iterations  = 1000 * 1000 * 100;
@@ -24,9 +25,14 @@ public class LongPartitionPerformanceTest {
         assertEquals(20, result);
     }
 
+    private LongPartition createLongPartition() {
+        PartitionScheduler partitionScheduler = new PartitionScheduler(1024);
+        return new GeneratedLongPartition(new PartitionSettings(1,partitionScheduler));
+    }
+
     @Test
     public void testInc() {
-        LongPartition longPartition = new GeneratedLongPartition(new PartitionSettings(1));
+        LongPartition longPartition = createLongPartition();
         long id = longPartition.createCell();
         int iterations  = 1000 * 1000 * 100;
         long startMs = System.currentTimeMillis();
@@ -42,7 +48,7 @@ public class LongPartitionPerformanceTest {
 
     @Test
     public void testGet() {
-        LongPartition longPartition = new GeneratedLongPartition(new PartitionSettings(1));
+        LongPartition longPartition = createLongPartition();
         long id = longPartition.createCell();
         int iterations  = 1000 * 1000 * 100;
         long startMs = System.currentTimeMillis();

@@ -1,19 +1,28 @@
 package com.hazelcast2.partition.impl;
 
 import com.hazelcast2.partition.PartitionService;
+import com.hazelcast2.spi.PartitionScheduler;
 
 public class PartitionServiceImpl implements PartitionService {
     private final int partitionCount;
+    private final PartitionScheduler partitionScheduler;
 
     public PartitionServiceImpl(int partitionCount) {
         if (partitionCount < 1) {
             throw new IllegalArgumentException();
         }
         this.partitionCount = partitionCount;
+        //todo: very small scheduler, needs to be made configurable.
+        this.partitionScheduler = new PartitionScheduler(1024);
     }
 
     public int getPartitionCount() {
         return partitionCount;
+    }
+
+    @Override
+    public PartitionScheduler getScheduler() {
+        return partitionScheduler;
     }
 
     @Override

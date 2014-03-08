@@ -4,12 +4,13 @@ import com.hazelcast2.partition.PartitionService;
 
 public class PartitionSettings {
     public int partitionId;
-    public PartitionScheduler scheduler = new PartitionScheduler();
+    public PartitionScheduler scheduler;
     public int ringbufferSize = 64;
     public PartitionService partitionService;
 
-    public PartitionSettings(int partitionId) {
+    public PartitionSettings(int partitionId, PartitionScheduler scheduler) {
         this.partitionId = partitionId;
+        this.scheduler = scheduler;
     }
 
     public int getPartitionId() {

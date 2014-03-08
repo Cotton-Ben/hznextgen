@@ -2,6 +2,7 @@ package com.hazelcast2.concurrent.atomicboolean;
 
 import com.hazelcast2.core.IAtomicBoolean;
 import com.hazelcast2.partition.PartitionService;
+import com.hazelcast2.spi.PartitionScheduler;
 import com.hazelcast2.spi.PartitionSettings;
 
 import java.lang.reflect.Constructor;
@@ -23,8 +24,9 @@ public final class AtomicBooleanService {
 
         int partitionCount = partitionService.getPartitionCount();
         partitions = new BooleanPartition[partitionCount];
+        PartitionScheduler scheduler = partitionService.getScheduler();
         for (int partitionId = 0; partitionId < partitionCount; partitionId++) {
-            PartitionSettings settings = new PartitionSettings(partitionId);
+            PartitionSettings settings = new PartitionSettings(partitionId, scheduler);
             try {
                 BooleanPartition partition = constructor.newInstance(settings);
                 partitions[partitionId] = partition;
