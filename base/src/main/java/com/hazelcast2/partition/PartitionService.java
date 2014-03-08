@@ -9,4 +9,6 @@ public interface PartitionService {
     int getPartitionCount();
 
     SectorScheduler getScheduler();
+
+    void shutdown();
 }

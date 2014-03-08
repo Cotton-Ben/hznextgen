@@ -4,10 +4,12 @@ import com.hazelcast2.core.Hazelcast;
 import com.hazelcast2.core.HazelcastInstance;
 import com.hazelcast2.core.IAtomicLong;
 import com.hazelcast2.instance.HazelcastInstanceImpl;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import static org.junit.Assert.assertEquals;
 
@@ -18,6 +20,11 @@ public class IAtomicLongTest {
     @Before
     public void setUp() {
         hz = Hazelcast.newHazelcastInstance();
+    }
+
+    @After
+    public void tearDown(){
+        hz.shutdown();
     }
 
     @Test
@@ -42,7 +49,8 @@ public class IAtomicLongTest {
     public void asyncSet() throws ExecutionException, InterruptedException {
         IAtomicLong atomicLong = hz.getAtomicLong("foo");
 
-        atomicLong.asyncSet(20).get();
+        Future<Void> voidFuture = atomicLong.asyncSet(20);
+        voidFuture.get();
 
         assertEquals(20L, atomicLong.get());
     }

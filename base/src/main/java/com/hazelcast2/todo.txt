@@ -59,12 +59,10 @@ a single long field.
 
 - actual implementation of the lock
 
-- do we need to expose the cell
-
 - calls to the HazelcastInstance.getFoo methods will always return a new instance.
 
-- rename the 'partitions' to sectors. Because the sectors together will form a single sector.
-
 DONE
+
+- rename the 'partitions' to sectors. Because the sectors together will form a single sector.
 
 - async method is implemented by immediately offloading to a scheduler.

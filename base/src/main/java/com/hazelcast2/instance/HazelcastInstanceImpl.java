@@ -3,14 +3,12 @@ package com.hazelcast2.instance;
 import com.hazelcast2.concurrent.atomicboolean.AtomicBooleanService;
 import com.hazelcast2.concurrent.atomiclong.AtomicLongService;
 import com.hazelcast2.concurrent.lock.LockService;
-import com.hazelcast2.core.HazelcastInstance;
-import com.hazelcast2.core.IAtomicBoolean;
-import com.hazelcast2.core.IAtomicLong;
-import com.hazelcast2.core.ILock;
-import com.hazelcast2.core.IMap;
+import com.hazelcast2.core.*;
 import com.hazelcast2.map.MapService;
 import com.hazelcast2.partition.PartitionService;
 import com.hazelcast2.partition.impl.PartitionServiceImpl;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class HazelcastInstanceImpl implements HazelcastInstance {
 
@@ -19,6 +17,7 @@ public class HazelcastInstanceImpl implements HazelcastInstance {
     private final AtomicBooleanService atomicBooleanService;
     private final LockService lockService;
     private final MapService mapService;
+    private final AtomicBoolean shutdown = new AtomicBoolean();
 
     public HazelcastInstanceImpl() {
         int partitionCount = 271;
@@ -47,5 +46,16 @@ public class HazelcastInstanceImpl implements HazelcastInstance {
     @Override
     public IMap getMap(String name) {
         return mapService.getDistributedObject(name);
+    }
+
+    @Override
+    public void shutdown() {
+        //if it is already shutdown, we don't need to shut it down again
+        if (!shutdown.compareAndSet(false, true)) {
+            return;
+        }
+
+        partitionService.shutdown();
+        //todo: we need to shutdown the services.
     }
 }

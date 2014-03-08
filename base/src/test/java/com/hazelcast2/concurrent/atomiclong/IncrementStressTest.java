@@ -1,63 +1,66 @@
 package com.hazelcast2.concurrent.atomiclong;
 
-import com.hazelcast2.spi.SectorScheduler;
-import com.hazelcast2.spi.PartitionSettings;
+import com.hazelcast2.core.Hazelcast;
+import com.hazelcast2.core.HazelcastInstance;
+import com.hazelcast2.core.IAtomicLong;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
 public class IncrementStressTest {
 
+    private HazelcastInstance hz;
+
+    @Before
+    public void setUp() {
+        hz = Hazelcast.newHazelcastInstance();
+    }
+
+    @After
+    public void tearDown() {
+        hz.shutdown();
+    }
+
     @Test
     public void testSingleThread() throws InterruptedException {
-        GeneratedLongSector partition = newLongPartition();
-        long address = partition.createCell();
+        IAtomicLong atomicLong = hz.getAtomicLong("counter");
         int iterations = 100;
-        IncThread thread = new IncThread(partition, address, iterations);
+        IncThread thread = new IncThread(atomicLong, iterations);
         thread.start();
         thread.join();
 
-        LongCell cell = partition.loadCell(address);
-        assertEquals(cell.value, iterations);
+        assertEquals(iterations, atomicLong.get());
         //assertNull(cell.invocation);
-    }
-
-    private GeneratedLongSector newLongPartition() {
-        SectorScheduler sectorScheduler = new SectorScheduler(1024);
-        return new GeneratedLongSector(new PartitionSettings(1, sectorScheduler));
     }
 
     @Test
     public void testMultipleThreads() throws InterruptedException {
-        GeneratedLongSector partition = newLongPartition();
-        long address = partition.createCell();
         int iterations = 100000000;
-        IncThread thread1 = new IncThread(partition, address, iterations);
-        IncThread thread2 = new IncThread(partition, address, iterations);
+        IAtomicLong atomicLong = hz.getAtomicLong("counter");
+        IncThread thread1 = new IncThread(atomicLong, iterations);
+        IncThread thread2 = new IncThread(atomicLong, iterations);
         thread1.start();
         thread2.start();
         thread1.join();
         thread2.join();
-        LongCell cell = partition.loadCell(address);
-        assertEquals(2 * iterations, cell.value);
-        //assertNull(cell.invocation);
+        assertEquals(2 * iterations, atomicLong.get());
     }
 
     class IncThread extends Thread {
-        private final GeneratedLongSector longPartition;
-        private final long address;
+        private final IAtomicLong atomicLong;
         private final int iterations;
 
-        IncThread(GeneratedLongSector logic, long address, int iterations) {
-            this.longPartition = logic;
-            this.address = address;
+        IncThread(IAtomicLong atomicLong, int iterations) {
+            this.atomicLong = atomicLong;
             this.iterations = iterations;
         }
 
         public void run() {
             try {
                 for (int k = 0; k < iterations; k++) {
-                    longPartition.doInc(address);
+                    atomicLong.inc();
                     if (k % 10000000 == 0) {
                         System.out.println(getName() + " is at: " + k);
                     }

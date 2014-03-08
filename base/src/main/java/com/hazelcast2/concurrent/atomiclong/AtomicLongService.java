@@ -14,7 +14,7 @@ public final class AtomicLongService {
 
     public static final String CLASS_NAME = "com.hazelcast2.concurrent.atomiclong.GeneratedLongSector";
 
-    private final LongSector[] partitions;
+    private final LongSector[] sectors;
     private final PartitionService partitionService;
 
     public AtomicLongService(PartitionService partitionService) {
@@ -24,12 +24,12 @@ public final class AtomicLongService {
         SectorScheduler scheduler = partitionService.getScheduler();
 
         int partitionCount = partitionService.getPartitionCount();
-        partitions = new LongSector[partitionCount];
+        sectors = new LongSector[partitionCount];
         for (int partitionId = 0; partitionId < partitionCount; partitionId++) {
             PartitionSettings settings = new PartitionSettings(partitionId,scheduler);
             try {
                 LongSector partition = constructor.newInstance(settings);
-                partitions[partitionId] = partition;
+                sectors[partitionId] = partition;
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 throw new RuntimeException(e);
             }
@@ -42,7 +42,7 @@ public final class AtomicLongService {
         }
 
         final int partitionId = partitionService.getPartitionId(name);
-        final LongSector partition = partitions[partitionId];
+        final LongSector partition = sectors[partitionId];
         final long id = partition.createCell();
         return new AtomicLongProxy(partition, name, id);
     }

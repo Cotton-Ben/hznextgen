@@ -1,22 +1,47 @@
 package com.hazelcast2.spi;
 
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * Extremely inefficient implementation because lots of locking and object creation.
- * Needs to be replaced with a ringbuffer and should be capable of letting threads
- * that can't do anything else than blocking, to help out so they don't need to block.
- *
- *
+ * A SectorScheduler is responsible for scheduling sectors.
+ * <p/>
+ * The sector thread has a ringbuffer inside where sectors that need to be scheduled can be stored for scheduling.
+ * <p/>
+ * <p/>
+ * The idea is that a sector can only be processed by a single thread. In the ideal situation, a thread that wants
+ * to do a regular operation like a map.put or an atomiclong.get on a given sector, will try to to that himself to
+ * prevent all the overload associated with offloading the work to another thread.
+ * <p/>
+ * But if a thread can't run a sector, it first needs to try to set the scheduled bit. If that succeeded, then
+ * it can offload the sector to be scheduled by the sectorscheduler.
+ * <p/>
+ * The idea is that the sectorscheduler allows for workstealing. So if there is enough unprocessed work, and a
+ * regular thread has nothing else to do then waiting (e.g. waiting for a remote call response), then it should
+ * help out the sector scheduler. Should schedulers also help out each other? And should they be able to remove
+ * a batch of work?
+ * <p/>
+ * Perhaps that in the (near) future the sector scheduler will be a general purpose structure where all work
+ * can be processed, not only sectors.
+ * <p/>
+ * Another idea is to have multiple schedulers to reduce contention and each scheduler gets one dedicated thread.
+ * <p/>
+ * <p/>
+ * http://stackoverflow.com/questions/9146855/determine-if-num-is-a-power-of-two-in-java
  */
-public class SectorScheduler {
+public final class SectorScheduler {
 
-    private final Executor executor = Executors.newFixedThreadPool(8);
     private final SectorSlot[] ringbuffer;
-    //private final AtomicLong
+    private final int ringbufferSize;
+
+    //todo: padding.
+    private final AtomicLong prodSeq = new AtomicLong(0);
+    private final AtomicLong consSeq = new AtomicLong(0);
+    private volatile boolean shutdown;
 
     public SectorScheduler(int size) {
+        //todo: size needs to be a power of 2
+
+        this.ringbufferSize = size;
         this.ringbuffer = new SectorSlot[size];
 
         for (int k = 0; k < size; k++) {
@@ -24,23 +49,101 @@ public class SectorScheduler {
         }
     }
 
-    public void schedule(final Sector sector) {
-        executor.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    sector.process();
-                } catch (RuntimeException ex) {
-                    ex.printStackTrace();
-                }
-            }
-        });
+    public void start(){
+        new SectorThread().start();
     }
 
+    public void shutdown() {
+        shutdown = true;
+    }
+
+    public void schedule(final Sector sector) {
+        final long seq = claim();
+        final int index = indexOf(seq);
+        final SectorSlot slot = ringbuffer[index];
+        slot.sector = sector;
+        slot.publish(seq);
+    }
+
+    private long claim() {
+        for (; ; ) {
+            final long oldProdSeq = prodSeq.get();
+            final long newProdSeq = oldProdSeq + 1;
+
+            //todo: protection against overflow
+
+            if (prodSeq.compareAndSet(oldProdSeq, newProdSeq)) {
+                return oldProdSeq;
+            }
+        }
+    }
+
+    private int indexOf(long sequence) {
+        //todo: bitmagic.
+        return (int) (sequence % ringbufferSize);
+    }
+
+
+    //todo: does this need to be padded?
     private static class SectorSlot {
         private Sector sector;
-        private int sequence = -1;
+        private volatile long sequence = -1;
 
+        public void publish(long sequence) {
+            this.sequence = sequence;
+        }
 
+        public void awaitPublication(long seq) {
+            while (sequence < seq) {
+                Thread.yield();
+            }
+        }
+    }
+
+    private class SectorThread extends Thread {
+
+        @Override
+        public void run() {
+            try {
+                for (; ; ) {
+                    doRun();
+                }
+            } catch (ShutdownException ignore) {
+
+            } catch (Throwable t) {
+                t.printStackTrace();
+            }
+        }
+
+        private long claim() {
+            for (; ; ) {
+                if (shutdown) {
+                    throw new ShutdownException();
+                }
+
+                long p = prodSeq.get();
+                if (p == consSeq.get()) {
+                    Thread.yield();
+                }
+
+                return p;
+            }
+        }
+
+        private void doRun() {
+            final long seq = claim();
+            final int indexOf = indexOf(seq);
+            SectorSlot slot = ringbuffer[indexOf];
+            slot.awaitPublication(seq);
+            slot.sector.process();
+
+            //todo:
+            //increment and get is currently not yet needed, but in the future we'll have multiple consumers:
+            //the sector-thread + threads that are helping out.
+            consSeq.incrementAndGet();
+        }
+    }
+
+    private class ShutdownException extends RuntimeException {
     }
 }

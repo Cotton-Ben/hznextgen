@@ -14,7 +14,7 @@ public final class LockService {
 
     public static final String CLASS_NAME = "com.hazelcast2.concurrent.lock.GeneratedLockSector";
 
-    private final LockSector[] partitions;
+    private final LockSector[] sectors;
     private final PartitionService partitionService;
 
     public LockService(PartitionService partitionService) {
@@ -24,12 +24,12 @@ public final class LockService {
         SectorScheduler scheduler = partitionService.getScheduler();
 
         int partitionCount = partitionService.getPartitionCount();
-        partitions = new LockSector[partitionCount];
+        sectors = new LockSector[partitionCount];
         for (int partitionId = 0; partitionId < partitionCount; partitionId++) {
             PartitionSettings settings = new PartitionSettings(partitionId,scheduler);
             try {
                 LockSector partition = constructor.newInstance(settings);
-                partitions[partitionId] = partition;
+                sectors[partitionId] = partition;
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 throw new RuntimeException(e);
             }
@@ -42,7 +42,7 @@ public final class LockService {
         }
 
         final int partitionId = partitionService.getPartitionId(name);
-        final LockSector partition = partitions[partitionId];
+        final LockSector partition = sectors[partitionId];
         final long id = partition.createCell();
         return new ILockProxy(partition, name, id);
     }

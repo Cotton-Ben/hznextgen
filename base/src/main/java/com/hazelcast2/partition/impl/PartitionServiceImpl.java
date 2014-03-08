@@ -14,8 +14,10 @@ public class PartitionServiceImpl implements PartitionService {
         this.partitionCount = partitionCount;
         //todo: very small scheduler, needs to be made configurable.
         this.sectorScheduler = new SectorScheduler(1024);
+        this.sectorScheduler.start();
     }
 
+    @Override
     public int getPartitionCount() {
         return partitionCount;
     }
@@ -23,6 +25,11 @@ public class PartitionServiceImpl implements PartitionService {
     @Override
     public SectorScheduler getScheduler() {
         return sectorScheduler;
+    }
+
+    @Override
+    public void shutdown() {
+        sectorScheduler.shutdown();
     }
 
     @Override

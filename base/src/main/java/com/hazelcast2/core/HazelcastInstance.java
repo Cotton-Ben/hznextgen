@@ -9,4 +9,6 @@ public interface HazelcastInstance {
     IAtomicLong getAtomicLong(String name);
 
     IMap getMap(String name);
+
+    void shutdown();
 }

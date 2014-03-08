@@ -4,8 +4,13 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLongFieldUpdater;
 
 /**
- * In theory the Sector is not needed. Since we are going to generate Sector subclasses for the missing
- * methods, we can easily add these methods as well.
+ * A partition is composed of sectors. And there are specialized sectors like a sector for AtomicLongs or a sector
+ * for MapEntries.
+ *
+ * A sector has a build in pending invocations queue to deal with concurrent operations. Within a sector only
+ * 1 thread will be active. But within different sectors of the same partition, different threads can be active.
+ * This is a fundamental difference compared to Hazelcast 3.
+ *
  */
 public abstract class Sector {
 
@@ -47,12 +52,12 @@ public abstract class Sector {
     }
 
     /**
-     * Processes all pending requests for this partition.
+     * Processes all pending requests for this sector.
      */
     public abstract void process();
 
     /**
-     * Returns the id of the partition this segment belongs to.
+     * Returns the id of the partition this sector belongs to.
      *
      * @return the partition id.
      */
@@ -106,6 +111,7 @@ public abstract class Sector {
                 return CLAIM_SLOT_LOCKED;
             }
 
+            //todo: shitty name p.
             long p = oldProdSeq >> 2;
             if (conSeq + ringbufferSize == p) {
                 return CLAIM_SLOT_NO_CAPACITY;
