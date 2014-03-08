@@ -61,6 +61,8 @@ a single long field.
 
 - do we need to expose the cell
 
+- calls to the HazelcastInstance.getFoo methods will always return a new instance.
+
 DONE
 
 - async method is implemented by immediately offloading to a scheduler.

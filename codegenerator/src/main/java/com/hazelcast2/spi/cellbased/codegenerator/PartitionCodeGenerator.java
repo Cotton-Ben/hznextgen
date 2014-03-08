@@ -1,7 +1,7 @@
-package com.hazelcast2.spi.codegenerator;
+package com.hazelcast2.spi.cellbased.codegenerator;
 
-import com.hazelcast2.spi.OperationMethod;
-import com.hazelcast2.spi.PartitionAnnotation;
+import com.hazelcast2.spi.cellbased.CellBasedPartition;
+import com.hazelcast2.spi.cellbased.CellPartitionOperation;
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -27,7 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-@SupportedAnnotationTypes("com.hazelcast2.spi.PartitionAnnotation")
+@SupportedAnnotationTypes("com.hazelcast2.spi.cellbased.CellBasedPartition")
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
 public class PartitionCodeGenerator extends AbstractProcessor {
 
@@ -43,7 +43,7 @@ public class PartitionCodeGenerator extends AbstractProcessor {
         Configuration cfg = new Configuration();
         cfg.setTemplateLoader(new ClassTemplateLoader(getClass(), "/"));
         try {
-            template = cfg.getTemplate("PartitionTemplate.ftl");
+            template = cfg.getTemplate("CellPartitionTemplate.ftl");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -51,7 +51,7 @@ public class PartitionCodeGenerator extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> elements, RoundEnvironment env) {
-        for (Element element : env.getElementsAnnotatedWith(PartitionAnnotation.class)) {
+        for (Element element : env.getElementsAnnotatedWith(CellBasedPartition.class)) {
             generate((TypeElement) element);
         }
 
@@ -74,7 +74,7 @@ public class PartitionCodeGenerator extends AbstractProcessor {
 
         for (Element enclosedElement : classElement.getEnclosedElements()) {
             if (enclosedElement.getKind().equals(ElementKind.METHOD)) {
-                Annotation annotation = enclosedElement.getAnnotation(OperationMethod.class);
+                Annotation annotation = enclosedElement.getAnnotation(CellPartitionOperation.class);
                 ExecutableElement methodElement = (ExecutableElement) enclosedElement;
 
                 if (annotation != null) {

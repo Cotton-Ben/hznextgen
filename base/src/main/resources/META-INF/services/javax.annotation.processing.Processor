@@ -1,1 +1,2 @@
-com.hazelcast2.spi.codegenerator.PartitionCodeGenerator
+com.hazelcast2.spi.cellbased.codegenerator.PartitionCodeGenerator
+com.hazelcast2.spi.foo2.codegenerator.PartitionCodeGenerator

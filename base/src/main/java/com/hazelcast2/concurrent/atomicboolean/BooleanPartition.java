@@ -1,15 +1,15 @@
 package com.hazelcast2.concurrent.atomicboolean;
 
-import com.hazelcast2.spi.OperationMethod;
+import com.hazelcast2.spi.cellbased.CellBasedPartition;
+import com.hazelcast2.spi.cellbased.CellPartitionOperation;
 import com.hazelcast2.spi.Partition;
-import com.hazelcast2.spi.PartitionAnnotation;
 import com.hazelcast2.spi.PartitionSettings;
 
 import java.util.HashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLong;
 
-@PartitionAnnotation
+@CellBasedPartition
 public abstract class BooleanPartition extends Partition {
 
     //todo: very inefficient structure.
@@ -38,7 +38,7 @@ public abstract class BooleanPartition extends Partition {
 
     public abstract Future<Boolean> asyncDoSet(long id, boolean update);
 
-    @OperationMethod
+    @CellPartitionOperation
     public boolean set(BooleanCell cell, boolean update) {
         boolean oldValue = cell.value;
         cell.value = update;
@@ -51,7 +51,7 @@ public abstract class BooleanPartition extends Partition {
 
     public abstract Future<Boolean> asyncDoGet(long id);
 
-    @OperationMethod
+    @CellPartitionOperation
     public boolean get(BooleanCell cell) {
         return cell.value;
     }
@@ -62,7 +62,7 @@ public abstract class BooleanPartition extends Partition {
 
     public abstract Future<Boolean> asyncDoCompareAndSet(long id, boolean old, boolean update);
 
-    @OperationMethod
+    @CellPartitionOperation
     public boolean compareAndSet(BooleanCell cell, boolean old, boolean update) {
         if (cell.value != old) {
             return false;

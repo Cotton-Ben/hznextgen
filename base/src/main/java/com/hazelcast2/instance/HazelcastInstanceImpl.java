@@ -8,6 +8,7 @@ import com.hazelcast2.core.IAtomicBoolean;
 import com.hazelcast2.core.IAtomicLong;
 import com.hazelcast2.core.ILock;
 import com.hazelcast2.core.IMap;
+import com.hazelcast2.map.MapService;
 import com.hazelcast2.partition.PartitionService;
 import com.hazelcast2.partition.impl.PartitionServiceImpl;
 
@@ -17,6 +18,7 @@ public class HazelcastInstanceImpl implements HazelcastInstance {
     private final AtomicLongService atomicLongService;
     private final AtomicBooleanService atomicBooleanService;
     private final LockService lockService;
+    private final MapService mapService;
 
     public HazelcastInstanceImpl() {
         int partitionCount = 271;
@@ -24,6 +26,7 @@ public class HazelcastInstanceImpl implements HazelcastInstance {
         this.atomicLongService = new AtomicLongService(partitionService);
         this.atomicBooleanService = new AtomicBooleanService(partitionService);
         this.lockService = new LockService(partitionService);
+        this.mapService = new MapService(partitionService);
     }
 
     @Override
@@ -43,6 +46,6 @@ public class HazelcastInstanceImpl implements HazelcastInstance {
 
     @Override
     public IMap getMap(String name) {
-        return null;
+        return mapService.getDistributedObject(name);
     }
 }

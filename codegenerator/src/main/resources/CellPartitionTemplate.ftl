@@ -2,8 +2,7 @@ package ${class.packageName};
 
 import com.hazelcast2.spi.Invocation;
 import com.hazelcast2.spi.PartitionSettings;
-import com.hazelcast2.util.CompletedFuture;
-import com.hazelcast2.InvocationFuture;
+import com.hazelcast2.util.InvocationFuture;
 
 import java.util.concurrent.Future;
 

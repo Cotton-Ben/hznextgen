@@ -1,16 +1,16 @@
 package com.hazelcast2.concurrent.atomiclong;
 
-import com.hazelcast2.spi.OperationMethod;
 import com.hazelcast2.spi.Partition;
-import com.hazelcast2.spi.PartitionAnnotation;
 import com.hazelcast2.spi.PartitionSettings;
+import com.hazelcast2.spi.cellbased.CellPartitionOperation;
+import com.hazelcast2.spi.cellbased.CellBasedPartition;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLong;
 
-@PartitionAnnotation
+@CellBasedPartition
 public abstract class LongPartition extends Partition {
 
     private final AtomicLong idGenerator = new AtomicLong();
@@ -37,7 +37,7 @@ public abstract class LongPartition extends Partition {
 
     public abstract Future<Void> asyncDoSet(long id, long update);
 
-    @OperationMethod
+    @CellPartitionOperation
     public void set(LongCell cell, long update) {
         cell.value = update;
     }
@@ -46,7 +46,7 @@ public abstract class LongPartition extends Partition {
 
     public abstract Future<Long> asyncDoGet(long id);
 
-    @OperationMethod
+    @CellPartitionOperation
     public long get(LongCell cell) {
         return cell.value;
     }
@@ -55,7 +55,7 @@ public abstract class LongPartition extends Partition {
 
     public abstract Future<Void> asyncDoInc(long id);
 
-    @OperationMethod
+    @CellPartitionOperation
     public void inc(LongCell cell) {
         cell.value++;
     }

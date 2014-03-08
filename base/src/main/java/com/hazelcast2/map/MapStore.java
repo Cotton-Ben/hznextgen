@@ -4,9 +4,8 @@ public class MapStore {
 
     private final MapPartition[] partitions;
 
-    public MapStore(int partitionCount) {
-        this.partitions = new MapPartition[partitionCount];
-        //todo: partitions need to be made
+    public MapStore(MapPartition[] partitions) {
+        this.partitions = partitions;
     }
 
     public MapPartition getPartition(int partitionId) {

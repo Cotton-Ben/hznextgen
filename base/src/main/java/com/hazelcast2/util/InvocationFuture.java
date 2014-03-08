@@ -1,4 +1,4 @@
-package com.hazelcast2;
+package com.hazelcast2.util;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;

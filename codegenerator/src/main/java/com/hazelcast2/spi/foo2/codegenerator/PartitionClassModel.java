@@ -1,4 +1,4 @@
-package com.hazelcast2.spi.codegenerator;
+package com.hazelcast2.spi.foo2.codegenerator;
 
 import java.util.LinkedList;
 import java.util.List;

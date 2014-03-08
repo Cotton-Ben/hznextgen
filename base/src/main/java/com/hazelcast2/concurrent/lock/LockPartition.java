@@ -1,15 +1,15 @@
 package com.hazelcast2.concurrent.lock;
 
-import com.hazelcast2.spi.OperationMethod;
+import com.hazelcast2.spi.cellbased.CellPartitionOperation;
 import com.hazelcast2.spi.Partition;
-import com.hazelcast2.spi.PartitionAnnotation;
+import com.hazelcast2.spi.cellbased.CellBasedPartition;
 import com.hazelcast2.spi.PartitionSettings;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
-@PartitionAnnotation
+@CellBasedPartition
 public abstract class LockPartition extends Partition {
 
     private final AtomicLong idGenerator = new AtomicLong();
@@ -34,14 +34,14 @@ public abstract class LockPartition extends Partition {
 
     public abstract boolean doIsLocked(long id, long threadId);
 
-    @OperationMethod
+    @CellPartitionOperation
     public boolean isLocked(LockCell cell, long threadId) {
         return cell.lockOwnerThreadId != -1;
     }
 
     public abstract boolean doTryLock(long id, long threadId);
 
-    @OperationMethod
+    @CellPartitionOperation
     public boolean tryLock(LockCell cell, long threadId) {
         if (cell.lockOwnerThreadId != -1) {
             return false;
@@ -53,7 +53,7 @@ public abstract class LockPartition extends Partition {
 
     public abstract void doUnlock(long id, long threadId);
 
-    @OperationMethod
+    @CellPartitionOperation
     public void unlock(LockCell cell, long threadId) {
         if (cell.lockOwnerThreadId == -1) {
             throw new IllegalMonitorStateException();

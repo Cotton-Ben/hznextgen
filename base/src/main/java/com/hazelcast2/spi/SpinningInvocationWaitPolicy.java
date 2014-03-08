@@ -1,6 +1,6 @@
 package com.hazelcast2.spi;
 
-import com.hazelcast2.InvocationFuture;
+import com.hazelcast2.util.InvocationFuture;
 
 public class SpinningInvocationWaitPolicy implements InvocationWaitPolicy {
 

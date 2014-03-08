@@ -1,5 +1,6 @@
 package com.hazelcast2;
 
+import com.hazelcast2.util.InvocationFuture;
 import org.junit.Test;
 
 import java.util.concurrent.ExecutionException;
