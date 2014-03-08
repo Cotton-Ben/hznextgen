@@ -77,7 +77,7 @@ public final class ${class.name} extends ${class.superName} {
         }
 
         //we didn't actually use the slot since we are going to do a direct call.
-        conSeq++;
+        conSeq.inc();
         boolean success = false;
         final ${class.cellName} cell = loadCell(id);
         try{
@@ -98,12 +98,12 @@ public final class ${class.name} extends ${class.superName} {
 </#list>
 
     public void process() {
-        long consumerSeq = this.conSeq;
+        long consumerSeq = conSeq.get();
         for (; ; ) {
             //todo: we need to checked the locked flag.
             //there is batching that can be done, so instead of doing item by item, you know where the producer is.
 
-            final long prodSeq = this.prodSeq >> 2;
+            final long prodSeq = this.prodSeq.get() >> 2;
             final long capacity = prodSeq - consumerSeq;
             if (capacity == 0) {
                 if (unschedule()) {
@@ -115,7 +115,7 @@ public final class ${class.name} extends ${class.superName} {
                 dispatch(invocation);
                 invocation.clear();
                 consumerSeq++;
-                this.conSeq = consumerSeq;
+                this.conSeq.set(consumerSeq);
             }
         }
     }

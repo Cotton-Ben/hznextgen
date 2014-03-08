@@ -1,6 +1,6 @@
 package com.hazelcast2.spi;
 
-import java.util.concurrent.atomic.AtomicLong;
+import com.hazelcast2.util.Sequence;
 
 /**
  * A SectorScheduler is responsible for scheduling sectors.
@@ -30,23 +30,23 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public final class SectorScheduler {
 
-    private final RingBuffer[] ringbuffers;
+    private final Ringbuffer[] ringbuffers;
     private final int threadCount;
     private volatile boolean shutdown;
 
     public SectorScheduler(int size, int threadCount) {
         //todo: size needs to be a power of 2
         this.threadCount = threadCount;
-        ringbuffers = new RingBuffer[threadCount];
+        ringbuffers = new Ringbuffer[threadCount];
         for (int k = 0; k < threadCount; k++) {
-            ringbuffers[k] = new RingBuffer(size);
+            ringbuffers[k] = new Ringbuffer(size);
         }
     }
 
     public void start() {
         for (int k = 0; k < threadCount; k++) {
-            RingBuffer ringBuffer = ringbuffers[k];
-            SectorThread thread = new SectorThread(ringBuffer);
+            Ringbuffer ringbuffer = ringbuffers[k];
+            SectorThread thread = new SectorThread(ringbuffer);
             thread.start();
         }
     }
@@ -56,15 +56,12 @@ public final class SectorScheduler {
     }
 
     public void schedule(final Sector sector) {
-        final RingBuffer ringBuffer = randomRingBuffer();
-        final long seq = ringBuffer.claim();
-        final SectorSlot slot = ringBuffer.getSlot(seq);
-        slot.sector = sector;
-        slot.publish(seq);
+        final Ringbuffer ringbuffer = randomRingbuffer();
+        ringbuffer.put(sector);
     }
 
     //todo: we need to come up with a better mechanism to find a ringbuffer.
-    private RingBuffer randomRingBuffer() {
+    private Ringbuffer randomRingbuffer() {
         return ringbuffers[0];
     }
 
@@ -84,15 +81,15 @@ public final class SectorScheduler {
         }
     }
 
-    private final class RingBuffer {
-        private final AtomicLong prodSeq = new AtomicLong(0);
-        private final AtomicLong consSeq = new AtomicLong(0);
+    private final class Ringbuffer {
+        private final Sequence prodSeq = new Sequence(0);
+        private final Sequence consSeq = new Sequence(0);
         private final SectorSlot[] elements;
         private final int ringbufferSize;
 
-        private RingBuffer(int ringBufferSize) {
+        private Ringbuffer(int ringBufferSize) {
             this.ringbufferSize = ringBufferSize;
-            elements = new SectorSlot[ringBufferSize];
+            this.elements = new SectorSlot[ringBufferSize];
 
             for (int k = 0; k < ringBufferSize; k++) {
                 elements[k] = new SectorSlot();
@@ -121,13 +118,20 @@ public final class SectorScheduler {
             //todo: bitmagic.
             return (int) (sequence % ringbufferSize);
         }
+
+        public void put(final Sector sector) {
+            final long seq = claim();
+            final SectorSlot slot = getSlot(seq);
+            slot.sector = sector;
+            slot.publish(seq);
+        }
     }
 
     private final class SectorThread extends Thread {
-        private final RingBuffer ringbuffer;
+        private final Ringbuffer ringbuffer;
 
-        public SectorThread(RingBuffer ringBuffer) {
-            this.ringbuffer = ringBuffer;
+        public SectorThread(Ringbuffer ringbuffer) {
+            this.ringbuffer = ringbuffer;
         }
 
         @Override
@@ -144,7 +148,7 @@ public final class SectorScheduler {
         }
 
         private long claim() {
-            final RingBuffer ringbuffer = this.ringbuffer;
+            final Ringbuffer ringbuffer = this.ringbuffer;
             for (; ; ) {
                 if (shutdown) {
                     throw new ShutdownException();
@@ -161,7 +165,7 @@ public final class SectorScheduler {
 
         private void doRun() {
             final long seq = claim();
-            final RingBuffer ringbuffer = this.ringbuffer;
+            final Ringbuffer ringbuffer = this.ringbuffer;
             final SectorSlot slot = ringbuffer.getSlot(seq);
             slot.awaitPublication(seq);
             slot.sector.process();
@@ -169,7 +173,7 @@ public final class SectorScheduler {
             //todo:
             //increment and get is currently not yet needed, but in the future we'll have multiple consumers:
             //the sector-thread + threads that are helping out.
-            ringbuffer.consSeq.incrementAndGet();
+            ringbuffer.consSeq.inc();
         }
     }
 

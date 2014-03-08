@@ -1,5 +1,7 @@
 package com.hazelcast2.spi;
 
+import com.hazelcast2.util.Sequence;
+
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLongFieldUpdater;
 
@@ -14,9 +16,6 @@ import java.util.concurrent.atomic.AtomicLongFieldUpdater;
  */
 public abstract class Sector {
 
-    private static final AtomicLongFieldUpdater<Sector> PRODUCER_UPDATER
-            = AtomicLongFieldUpdater.newUpdater(Sector.class, "prodSeq");
-
     public static final long CLAIM_SLOT_LOCKED = -2;
     public static final long CLAIM_SLOT_NO_CAPACITY = -3;
     public static final int DELTA = 4;
@@ -28,9 +27,8 @@ public abstract class Sector {
     private final int partitionId;
     public final SectorScheduler scheduler;
 
-    //this sucks because both of them will probably fall in the same cache line.
-    public volatile long prodSeq = INITIAL_VALUE;
-    public volatile long conSeq = INITIAL_VALUE;
+    public final Sequence prodSeq = new Sequence(INITIAL_VALUE);
+    public final Sequence conSeq = new Sequence(INITIAL_VALUE);
 
     public final Invocation[] ringbuffer;
     public final int ringbufferSize;
@@ -100,12 +98,12 @@ public abstract class Sector {
     }
 
     public int size() {
-        return (int) ((prodSeq >> 2) - conSeq);
+        return (int) ((prodSeq.get() >> 2) - conSeq.get());
     }
 
     public final long claimSlot() {
         for (; ; ) {
-            final long oldProdSeq = prodSeq;
+            final long oldProdSeq = prodSeq.get();
 
             if ((oldProdSeq & MASK_LOCKED) != 0) {
                 return CLAIM_SLOT_LOCKED;
@@ -113,20 +111,20 @@ public abstract class Sector {
 
             //todo: shitty name p.
             long p = oldProdSeq >> 2;
-            if (conSeq + ringbufferSize == p) {
+            if (conSeq.get() + ringbufferSize == p) {
                 return CLAIM_SLOT_NO_CAPACITY;
             }
 
             if ((oldProdSeq & MASK_SCHEDULED) != 0) {
                 //it is already scheduled.
-                if (PRODUCER_UPDATER.compareAndSet(this, oldProdSeq, oldProdSeq + DELTA)) {
+                if (prodSeq.compareAndSet(oldProdSeq, oldProdSeq + DELTA)) {
                     //we need to unset the scheduled bit to indicate the caller that he was not
                     //the one that managed the schedule this segment.
                     return oldProdSeq - MASK_SCHEDULED;
                 }
             } else {
                 //it isn't scheduled. So we are going to try to schedule it.
-                if (PRODUCER_UPDATER.compareAndSet(this, oldProdSeq, oldProdSeq + DELTA + MASK_SCHEDULED)) {
+                if (prodSeq.compareAndSet(oldProdSeq, oldProdSeq + DELTA + MASK_SCHEDULED)) {
                     return oldProdSeq + MASK_SCHEDULED;
                 }
             }
@@ -134,19 +132,19 @@ public abstract class Sector {
     }
 
     public boolean unschedule() {
-        final long currentConSeq = conSeq;
+        final long currentConSeq = conSeq.get();
         for (; ; ) {
-            final long oldProdSeq = prodSeq;
+            final long oldProdSeq = prodSeq.get();
 
             if ((oldProdSeq & MASK_SCHEDULED) == 0) {
                 throw new IllegalStateException();
             }
 
-            if ((prodSeq >> 2) > currentConSeq) {
+            if ((prodSeq.get() >> 2) > currentConSeq) {
                 return false;
             }
 
-            if (PRODUCER_UPDATER.compareAndSet(this, oldProdSeq, oldProdSeq - MASK_SCHEDULED)) {
+            if (prodSeq.compareAndSet(oldProdSeq, oldProdSeq - MASK_SCHEDULED)) {
                 return true;
             }
         }
@@ -171,13 +169,13 @@ public abstract class Sector {
      */
     public final void lock() {
         for (; ; ) {
-            final long oldProdSeq = prodSeq;
+            final long oldProdSeq = prodSeq.get();
 
             if ((oldProdSeq & MASK_LOCKED) != 0) {
                 throw new IllegalStateException("Already locked");
             }
 
-            if (PRODUCER_UPDATER.compareAndSet(this, oldProdSeq, oldProdSeq + MASK_LOCKED)) {
+            if (prodSeq.compareAndSet(oldProdSeq, oldProdSeq + MASK_LOCKED)) {
                 return;
             }
         }
@@ -195,24 +193,24 @@ public abstract class Sector {
         //the prod sequence while the lock is hold.
 
         for (; ; ) {
-            final long oldProdSeq = prodSeq;
+            final long oldProdSeq = prodSeq.get();
 
             if ((oldProdSeq & MASK_LOCKED) == 0) {
                 throw new IllegalStateException();
             }
 
-            if (PRODUCER_UPDATER.compareAndSet(this, oldProdSeq, oldProdSeq - MASK_LOCKED)) {
+            if (prodSeq.compareAndSet(oldProdSeq, oldProdSeq - MASK_LOCKED)) {
                 return;
             }
         }
     }
 
     public final boolean isLocked() {
-        return isLocked(prodSeq);
+        return isLocked(prodSeq.get());
     }
 
     public final boolean isScheduled() {
-        return isScheduled(prodSeq);
+        return isScheduled(prodSeq.get());
     }
 
     public static boolean isLocked(final long seq) {
@@ -222,5 +220,4 @@ public abstract class Sector {
     public static boolean isScheduled(final long seq) {
         return (seq & MASK_SCHEDULED) != 0;
     }
-
 }

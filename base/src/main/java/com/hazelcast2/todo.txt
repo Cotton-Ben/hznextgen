@@ -1,7 +1,5 @@
 TODO
 
-- asynchronous call: immediately offload
-
 - currently the succeeding thread of an operation, will execute all pending operations. This could be problematic
 because a user thread would like to return 'asap'.
 
@@ -9,14 +7,9 @@ because a user thread would like to return 'asap'.
 
 - replicating the write.
 
-- padding on the segment.
-
 - padding on the invocation
 
 - each sector should generate long with the sector id included.
-
-- the invocationfuture relies on locking, which totally sucks.
-    - how can a thread that is waiting for an invocation help out?
 
 - dealing with overload in the generated sector
 
@@ -62,6 +55,10 @@ a single long field.
 - calls to the HazelcastInstance.getFoo methods will always return a new instance.
 
 DONE
+
+- padding on the segment.
+
+- asynchronous call: immediately offload
 
 - rename the 'partitions' to sectors. Because the sectors together will form a single sector.
 
