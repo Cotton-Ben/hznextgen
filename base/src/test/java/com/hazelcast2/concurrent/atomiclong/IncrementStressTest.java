@@ -1,13 +1,16 @@
 package com.hazelcast2.concurrent.atomiclong;
 
+import com.hazelcast2.core.Hazelcast;
+import com.hazelcast2.core.HazelcastInstance;
 import com.hazelcast2.spi.PartitionSettings;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
 public class IncrementStressTest {
 
-    @Test
+     @Test
     public void testSingleThread() throws InterruptedException {
         GeneratedLongPartition partition = new GeneratedLongPartition(new PartitionSettings(1));
         long address = partition.createCell();

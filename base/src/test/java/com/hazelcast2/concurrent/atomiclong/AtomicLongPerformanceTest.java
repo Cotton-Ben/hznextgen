@@ -1,7 +1,9 @@
 package com.hazelcast2.concurrent.atomiclong;
 
+import com.hazelcast2.core.Hazelcast;
+import com.hazelcast2.core.HazelcastInstance;
 import com.hazelcast2.core.IAtomicLong;
-import com.hazelcast2.spi.PartitionSettings;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -9,10 +11,16 @@ import static org.junit.Assert.assertEquals;
 //very naive performance test
 public class AtomicLongPerformanceTest {
 
+    private HazelcastInstance hz;
+
+    @Before
+    public void setUp() {
+        hz = Hazelcast.newHazelcastInstance();
+    }
+
     @Test
     public void testSet() {
-        LongPartition partition = new GeneratedLongPartition(new PartitionSettings(1));
-        IAtomicLong atomicLong = new AtomicLongProxy(partition, "foo", 1);
+        IAtomicLong atomicLong = hz.getAtomicLong("foo");
         long startMs = System.currentTimeMillis();
         int iterations = 1000 * 1000 * 100;
         for (int k = 0; k < iterations; k++) {
@@ -27,8 +35,7 @@ public class AtomicLongPerformanceTest {
 
     @Test
     public void testInc() {
-        LongPartition partition = new GeneratedLongPartition(new PartitionSettings(1));
-        IAtomicLong atomicLong = new AtomicLongProxy(partition, "foo", 1);
+        IAtomicLong atomicLong = hz.getAtomicLong("foo");
         int iterations = 1000 * 1000 * 100;
         long startMs = System.currentTimeMillis();
         for (int k = 0; k < iterations; k++) {
@@ -43,8 +50,7 @@ public class AtomicLongPerformanceTest {
 
     @Test
     public void testGet() {
-        LongPartition partition = new GeneratedLongPartition(new PartitionSettings(1));
-        IAtomicLong atomicLong = new AtomicLongProxy(partition, "foo", 1);
+        IAtomicLong atomicLong = hz.getAtomicLong("foo");
         int iterations = 1000 * 1000 * 100;
         long startMs = System.currentTimeMillis();
         for (int k = 0; k < iterations; k++) {

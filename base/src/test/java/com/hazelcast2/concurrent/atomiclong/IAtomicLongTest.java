@@ -1,5 +1,7 @@
 package com.hazelcast2.concurrent.atomiclong;
 
+import com.hazelcast2.core.Hazelcast;
+import com.hazelcast2.core.HazelcastInstance;
 import com.hazelcast2.core.IAtomicLong;
 import com.hazelcast2.instance.HazelcastInstanceImpl;
 import org.junit.Before;
@@ -11,11 +13,11 @@ import static org.junit.Assert.assertEquals;
 
 public class IAtomicLongTest {
 
-    private HazelcastInstanceImpl hz;
+    private HazelcastInstance hz;
 
     @Before
     public void setUp() {
-        hz = new HazelcastInstanceImpl();
+        hz = Hazelcast.newHazelcastInstance();
     }
 
     @Test
@@ -23,6 +25,7 @@ public class IAtomicLongTest {
         IAtomicLong atomicLong = hz.getAtomicLong("foo");
 
         long result = atomicLong.get();
+
         assertEquals(0L, result);
     }
 
@@ -31,6 +34,7 @@ public class IAtomicLongTest {
         IAtomicLong atomicLong = hz.getAtomicLong("foo");
 
         atomicLong.set(20);
+
         assertEquals(20L, atomicLong.get());
     }
 
@@ -39,6 +43,7 @@ public class IAtomicLongTest {
         IAtomicLong atomicLong = hz.getAtomicLong("foo");
 
         atomicLong.asyncSet(20).get();
+
         assertEquals(20L, atomicLong.get());
     }
 
@@ -47,6 +52,7 @@ public class IAtomicLongTest {
         IAtomicLong atomicLong = hz.getAtomicLong("foo");
 
         atomicLong.inc();
+
         assertEquals(1L, atomicLong.get());
     }
 
@@ -55,6 +61,7 @@ public class IAtomicLongTest {
         IAtomicLong atomicLong = hz.getAtomicLong("foo");
 
         atomicLong.asyncInc().get();
+
         assertEquals(1L, atomicLong.get());
     }
 }

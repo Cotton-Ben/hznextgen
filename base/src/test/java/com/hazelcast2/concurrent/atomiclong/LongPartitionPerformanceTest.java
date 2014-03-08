@@ -53,6 +53,6 @@ public class LongPartitionPerformanceTest {
         double performance = (iterations*1000d)/durationMs;
         System.out.println("Performance: "+performance);
         long result = longPartition.doGet(id);
-        assertEquals(iterations, result);
+        assertEquals(0, result);
     }
 }

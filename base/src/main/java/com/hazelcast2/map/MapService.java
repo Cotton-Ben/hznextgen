@@ -14,14 +14,17 @@ public class MapService {
     public static final String CLASS_NAME = "com.hazelcast2.concurrent.map.GeneratedMapPartition";
 
     private final PartitionService partitionService;
-    private final Constructor<MapPartition> constructor;
+    private final Constructor<MapPartition> constructor = null;
 
     public MapService(PartitionService partitionService) {
         this.partitionService = partitionService;
-        constructor = getConstructor(CLASS_NAME);
+        //constructor = getConstructor(CLASS_NAME);
     }
 
     public IMap getDistributedObject(String name) {
+        if(true){
+            return null;
+        }
         MapPartition[] partitions = new MapPartition[partitionService.getPartitionCount()];
         for (int partitionId = 0; partitionId < partitions.length; partitionId++) {
             PartitionSettings partitionSettings = new PartitionSettings(partitionId);

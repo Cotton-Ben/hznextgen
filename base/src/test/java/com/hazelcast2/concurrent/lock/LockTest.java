@@ -1,22 +1,20 @@
 package com.hazelcast2.concurrent.lock;
 
+import com.hazelcast2.core.Hazelcast;
+import com.hazelcast2.core.HazelcastInstance;
 import com.hazelcast2.core.ILock;
-import com.hazelcast2.instance.HazelcastInstanceImpl;
-import com.hazelcast2.spi.PartitionSettings;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 public class LockTest {
 
-    private HazelcastInstanceImpl hz;
+    private HazelcastInstance hz;
 
     @Before
     public void setUp() {
-        hz = new HazelcastInstanceImpl();
+        hz = Hazelcast.newHazelcastInstance();
     }
 
     @Test
