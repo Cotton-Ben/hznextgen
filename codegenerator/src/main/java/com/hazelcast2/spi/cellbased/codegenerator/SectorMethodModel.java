@@ -31,27 +31,6 @@ public class SectorMethodModel {
                 sb.append("invocation.reference").append(referenceIndex).append(" = arg").append(argIndex).append(";\n");
                 referenceIndex++;
             }
-
-
-//            if ("long".equals(arg)) {
-//                sb.append("invocation.long").append(argIndex+1).append(" = arg").append(argIndex).append(";\n");
-//            } else if ("boolean".equals(arg)) {
-//                sb.append("invocation.long").append(argIndex+1).append(" = arg").append(argIndex).append(" ? 1 : 0;\n");
-//            } else if ("int".equals(arg)) {
-//                sb.append("invocation.long").append(argIndex+1).append(" = arg0").append(argIndex).append(";\n");
-//            } else if ("byte".equals(arg)) {
-//                sb.append("invocation.long").append(argIndex+1).append(" = arg0").append(argIndex).append(";\n");
-//            } else if ("float".equals(arg)) {
-//                sb.append("invocation.long").append(argIndex+1).append(" = arg0").append(argIndex).append(";\n");
-//            } else if ("double".equals(arg)) {
-//                sb.append("invocation.long").append(argIndex+1).append(" = arg0").append(argIndex).append(";\n");;
-//            } else if ("char".equals(arg)) {
-//                sb.append("invocation.long").append(argIndex+1).append(" = arg0").append(argIndex).append(";\n");
-//            } else if ("short".equals(arg)) {
-//                sb.append("invocation.long").append(argIndex+1).append(" = arg0").append(argIndex).append(";\n");
-//            } else {
-//                throw new RuntimeException();
-//            }
         }
 
         return sb.toString();
@@ -75,29 +54,12 @@ public class SectorMethodModel {
                 }
                 primitiveIndex++;
             }else{
+                if(!"java.lang.Object".equals(arg)){
+                    sb.append("(").append(arg).append(")");
+                }
                 sb.append("invocation.reference").append(referenceIndex);
                 referenceIndex++;
             }
-
-            //if ("long".equals(arg)) {
-            //    sb.append("invocation.long").append(k);
-            //} else if ("boolean".equals(arg)) {
-            //    sb.append("invocation.long").append(k).append("==1");
-            //} else if ("int".equals(arg)) {
-            //    sb.append("invocation.long").append(k);
-            //} else if ("byte".equals(arg)) {
-            //    sb.append("invocation.long").append(k);
-            //} else if ("float".equals(arg)) {
-            //    sb.append("invocation.long").append(k);
-            //} else if ("double".equals(arg)) {
-            //    sb.append("invocation.long").append(k);
-            //} else if ("char".equals(arg)) {
-            //    sb.append("invocation.long").append(k);
-            //} else if ("short".equals(arg)) {
-            //    sb.append("invocation.long").append(k);
-            //} else {
-            //    throw new RuntimeException();
-            //}
 
             if(k<args.size()) {
                 sb.append(", ");

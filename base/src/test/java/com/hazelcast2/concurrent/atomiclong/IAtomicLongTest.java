@@ -3,6 +3,7 @@ package com.hazelcast2.concurrent.atomiclong;
 import com.hazelcast2.core.Hazelcast;
 import com.hazelcast2.core.HazelcastInstance;
 import com.hazelcast2.core.IAtomicLong;
+import com.hazelcast2.core.LongFunction;
 import com.hazelcast2.instance.HazelcastInstanceImpl;
 import org.junit.After;
 import org.junit.Before;
@@ -71,5 +72,19 @@ public class IAtomicLongTest {
         atomicLong.asyncInc().get();
 
         assertEquals(1L, atomicLong.get());
+    }
+
+    @Test
+    public void apply() {
+        IAtomicLong atomicLong = hz.getAtomicLong("foo");
+        long result = atomicLong.apply(new LongFunction() {
+            @Override
+            public long apply(long arg) {
+                return arg+1;
+            }
+        });
+
+        assertEquals(0l, atomicLong.get());
+        assertEquals(1L, result);
     }
 }
