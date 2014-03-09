@@ -2,6 +2,8 @@ package com.hazelcast2.spi;
 
 import com.hazelcast2.util.Sequence;
 
+import java.util.concurrent.locks.LockSupport;
+
 /**
  * A SectorScheduler is responsible for scheduling sectors.
  * <p/>
@@ -39,15 +41,14 @@ public final class SectorScheduler {
         this.threadCount = threadCount;
         ringbuffers = new Ringbuffer[threadCount];
         for (int k = 0; k < threadCount; k++) {
-            ringbuffers[k] = new Ringbuffer(size);
+            ringbuffers[k] = new Ringbuffer(size, k);
         }
     }
 
     public void start() {
         for (int k = 0; k < threadCount; k++) {
             Ringbuffer ringbuffer = ringbuffers[k];
-            SectorThread thread = new SectorThread(ringbuffer);
-            thread.start();
+            ringbuffer.sectorThread.start();
         }
     }
 
@@ -86,14 +87,18 @@ public final class SectorScheduler {
         private final Sequence consSeq = new Sequence(0);
         private final SectorSlot[] elements;
         private final int ringbufferSize;
+        private volatile boolean waitingThread = false;
+        private final SectorThread sectorThread;
 
-        private Ringbuffer(int ringBufferSize) {
+        private Ringbuffer(int ringBufferSize, int id) {
             this.ringbufferSize = ringBufferSize;
             this.elements = new SectorSlot[ringBufferSize];
 
             for (int k = 0; k < ringBufferSize; k++) {
                 elements[k] = new SectorSlot();
             }
+
+            this.sectorThread = new SectorThread(this, id);
         }
 
         private SectorSlot getSlot(final long sequence) {
@@ -124,13 +129,38 @@ public final class SectorScheduler {
             final SectorSlot slot = getSlot(seq);
             slot.sector = sector;
             slot.publish(seq);
+            //todo: should we do notification in case of a real blocking thread.
+        }
+
+        private long consume() {
+            long iteration = 0;
+            for (; ; ) {
+                if (shutdown) {
+                    throw new ShutdownException();
+                }
+
+                long c = consSeq.get();
+                if (prodSeq.get() == c) {
+                    if (iteration < 1000) {
+                        Thread.yield();
+                    } else {//if (iteration < 1100) {
+                        LockSupport.parkNanos(1000);
+                    }
+
+                    iteration++;
+                    continue;
+                }
+
+                return c;
+            }
         }
     }
 
     private final class SectorThread extends Thread {
         private final Ringbuffer ringbuffer;
 
-        public SectorThread(Ringbuffer ringbuffer) {
+        public SectorThread(Ringbuffer ringbuffer, int id) {
+            super("SectorThread-" + id);
             this.ringbuffer = ringbuffer;
         }
 
@@ -147,24 +177,9 @@ public final class SectorScheduler {
             }
         }
 
-        private long claim() {
-            final Ringbuffer ringbuffer = this.ringbuffer;
-            for (; ; ) {
-                if (shutdown) {
-                    throw new ShutdownException();
-                }
-
-                long c = ringbuffer.consSeq.get();
-                if (ringbuffer.prodSeq.get() == c) {
-                    Thread.yield();
-                }
-
-                return c;
-            }
-        }
 
         private void doRun() {
-            final long seq = claim();
+            final long seq = ringbuffer.consume();
             final Ringbuffer ringbuffer = this.ringbuffer;
             final SectorSlot slot = ringbuffer.getSlot(seq);
             slot.awaitPublication(seq);

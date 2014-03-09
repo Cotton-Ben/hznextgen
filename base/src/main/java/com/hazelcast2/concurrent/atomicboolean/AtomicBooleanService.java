@@ -2,8 +2,8 @@ package com.hazelcast2.concurrent.atomicboolean;
 
 import com.hazelcast2.core.IAtomicBoolean;
 import com.hazelcast2.partition.PartitionService;
-import com.hazelcast2.spi.SectorScheduler;
 import com.hazelcast2.spi.PartitionSettings;
+import com.hazelcast2.spi.SectorScheduler;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;

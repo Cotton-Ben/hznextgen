@@ -3,6 +3,7 @@ package com.hazelcast2.concurrent.atomicboolean;
 import com.hazelcast2.core.Hazelcast;
 import com.hazelcast2.core.HazelcastInstance;
 import com.hazelcast2.core.IAtomicBoolean;
+import com.hazelcast2.test.HazelcastTestSupport;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,7 +14,7 @@ import java.util.concurrent.Future;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class IAtomicBooleanTest {
+public class IAtomicBooleanTest extends HazelcastTestSupport {
 
     private HazelcastInstance hz;
 
@@ -34,6 +35,8 @@ public class IAtomicBooleanTest {
         boolean result = atomicBoolean.get();
 
         assertFalse(result);
+
+        sleepSeconds(1000);
     }
 
     @Test

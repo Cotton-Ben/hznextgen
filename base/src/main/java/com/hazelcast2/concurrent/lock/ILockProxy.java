@@ -6,12 +6,12 @@ import static com.hazelcast2.concurrent.lock.LockUtil.getThreadId;
 
 public class ILockProxy implements ILock {
 
-    private final LockSector partition;
+    private final LockSector sector;
     private final long id;
     private final String name;
 
-    public ILockProxy(LockSector partition, String name, long id) {
-        this.partition = partition;
+    public ILockProxy(LockSector sector, String name, long id) {
+        this.sector = sector;
         this.name = name;
         this.id = id;
     }
@@ -28,17 +28,17 @@ public class ILockProxy implements ILock {
 
     @Override
     public boolean tryLock() {
-        return partition.doTryLock(id, getThreadId());
+        return sector.doTryLock(id, getThreadId());
     }
 
     @Override
     public boolean isLocked() {
-        return partition.doIsLocked(id, getThreadId());
+        return sector.doIsLocked(id, getThreadId());
     }
 
     @Override
     public void unlock() {
-        partition.doUnlock(id, getThreadId());
+        sector.doUnlock(id, getThreadId());
     }
 
     @Override

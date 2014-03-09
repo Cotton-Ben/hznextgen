@@ -16,7 +16,6 @@ import static org.junit.Assert.assertEquals;
  * todo:
  * this test can be improved by not immediately doing a future.get but overloading the system with
  * asynchronous calls. But that will only work if we provide back-pressure.
- *
  */
 public class IncrementStressTest extends HazelcastTestSupport {
 
@@ -34,17 +33,16 @@ public class IncrementStressTest extends HazelcastTestSupport {
 
     @Test
     public void testSingleThreadAsync() throws InterruptedException {
-        testSingleThread(true);
+        testSingleThread(true, 1000000);
     }
 
     @Test
     public void testSingleThreadSync() throws InterruptedException {
-        testSingleThread(false);
+        testSingleThread(false, 100000000);
     }
 
-    public void testSingleThread(boolean async) throws InterruptedException {
+    public void testSingleThread(boolean async, int iterations) throws InterruptedException {
         IAtomicLong atomicLong = hz.getAtomicLong(randomString());
-        int iterations = 100000000;
         IncThread thread = new IncThread(atomicLong, iterations, async);
         thread.start();
         thread.join();
@@ -54,16 +52,15 @@ public class IncrementStressTest extends HazelcastTestSupport {
 
     @Test
     public void testMultipleThreadAsync() throws InterruptedException {
-        testMultipleThreads(true);
+        testMultipleThreads(true,1000000);
     }
 
     @Test
     public void testMultipleThreadSync() throws InterruptedException {
-        testMultipleThreads(false);
+        testMultipleThreads(false,100000000);
     }
 
-    public void testMultipleThreads(boolean async) throws InterruptedException {
-        int iterations = 100000000;
+    public void testMultipleThreads(boolean async, int iterations) throws InterruptedException {
         IAtomicLong atomicLong = hz.getAtomicLong(randomString());
         IncThread thread1 = new IncThread(atomicLong, iterations, async);
         IncThread thread2 = new IncThread(atomicLong, iterations, async);

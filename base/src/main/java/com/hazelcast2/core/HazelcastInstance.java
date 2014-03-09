@@ -8,6 +8,8 @@ public interface HazelcastInstance {
 
     IAtomicLong getAtomicLong(String name);
 
+    <E> IAtomicReference<E> getAtomicReference(String name);
+
     IMap getMap(String name);
 
     void shutdown();

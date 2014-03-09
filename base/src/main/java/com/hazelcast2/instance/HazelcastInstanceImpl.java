@@ -2,6 +2,7 @@ package com.hazelcast2.instance;
 
 import com.hazelcast2.concurrent.atomicboolean.AtomicBooleanService;
 import com.hazelcast2.concurrent.atomiclong.AtomicLongService;
+import com.hazelcast2.concurrent.atomicreference.AtomicReferenceService;
 import com.hazelcast2.concurrent.lock.LockService;
 import com.hazelcast2.core.*;
 import com.hazelcast2.map.MapService;
@@ -15,6 +16,7 @@ public class HazelcastInstanceImpl implements HazelcastInstance {
     private final PartitionService partitionService;
     private final AtomicLongService atomicLongService;
     private final AtomicBooleanService atomicBooleanService;
+    private final AtomicReferenceService atomicReferenceService;
     private final LockService lockService;
     private final MapService mapService;
     private final AtomicBoolean shutdown = new AtomicBoolean();
@@ -24,6 +26,7 @@ public class HazelcastInstanceImpl implements HazelcastInstance {
         this.partitionService = new PartitionServiceImpl(partitionCount);
         this.atomicLongService = new AtomicLongService(partitionService);
         this.atomicBooleanService = new AtomicBooleanService(partitionService);
+        this.atomicReferenceService = new AtomicReferenceService(partitionService);
         this.lockService = new LockService(partitionService);
         this.mapService = new MapService(partitionService);
     }
@@ -36,6 +39,11 @@ public class HazelcastInstanceImpl implements HazelcastInstance {
     @Override
     public IAtomicBoolean getAtomicBoolean(String name) {
         return atomicBooleanService.getDistributedObject(name);
+    }
+
+    @Override
+    public <E> IAtomicReference<E> getAtomicReference(String name) {
+        return atomicReferenceService.getDistributedObject(name);
     }
 
     @Override

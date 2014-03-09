@@ -1,17 +1,18 @@
 package com.hazelcast2.concurrent.atomiclong;
 
 import com.hazelcast2.core.IAtomicLong;
+import com.hazelcast2.core.LongFunction;
 
 import java.util.concurrent.Future;
 
 public class AtomicLongProxy implements IAtomicLong {
 
-    private final LongSector partition;
+    private final LongSector sector;
     private final long id;
     private final String name;
 
-    public AtomicLongProxy(LongSector partition, String name, long id) {
-        this.partition = partition;
+    public AtomicLongProxy(LongSector sector, String name, long id) {
+        this.sector = sector;
         this.name = name;
         this.id = id;
     }
@@ -23,32 +24,52 @@ public class AtomicLongProxy implements IAtomicLong {
 
     @Override
     public long get() {
-        return partition.doGet(id);
+        return sector.doGet(id);
     }
 
     @Override
     public Future<Long> asyncGet() {
-        return partition.asyncDoGet(id);
+        return sector.asyncDoGet(id);
     }
 
     @Override
     public void set(long newValue) {
-        partition.doSet(id, newValue);
+        sector.doSet(id, newValue);
     }
 
     @Override
     public Future<Void> asyncSet(long update) {
-        return partition.asyncDoSet(id, update);
+        return sector.asyncDoSet(id, update);
     }
 
     @Override
     public void inc() {
-        partition.doInc(id);
+        sector.doInc(id);
     }
 
     @Override
     public Future<Void> asyncInc() {
-        return partition.asyncDoInc(id);
+        return sector.asyncDoInc(id);
+    }
+
+    @Override
+    public boolean compareAndSet(long expect, long update) {
+        return sector.doCompareAndSet(id, expect, update);
+    }
+
+    @Override
+    public Future<Boolean> asyncCompareAndSet(long expect, long update) {
+        return sector.asyncDoCompareAndSet(id, expect, update);
+    }
+
+    @Override
+    public long apply(LongFunction f) {
+        return sector.doApply(id, f);
+    }
+
+    @Override
+    public Future<Long> asyncApply(LongFunction f) {
+        return sector.asyncDoApply(id, f);
     }
 
     @Override

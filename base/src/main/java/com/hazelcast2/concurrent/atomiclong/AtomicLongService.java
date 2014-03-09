@@ -2,8 +2,8 @@ package com.hazelcast2.concurrent.atomiclong;
 
 import com.hazelcast2.core.IAtomicLong;
 import com.hazelcast2.partition.PartitionService;
-import com.hazelcast2.spi.SectorScheduler;
 import com.hazelcast2.spi.PartitionSettings;
+import com.hazelcast2.spi.SectorScheduler;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -26,7 +26,7 @@ public final class AtomicLongService {
         int partitionCount = partitionService.getPartitionCount();
         sectors = new LongSector[partitionCount];
         for (int partitionId = 0; partitionId < partitionCount; partitionId++) {
-            PartitionSettings settings = new PartitionSettings(partitionId,scheduler);
+            PartitionSettings settings = new PartitionSettings(partitionId, scheduler);
             try {
                 LongSector partition = constructor.newInstance(settings);
                 sectors[partitionId] = partition;

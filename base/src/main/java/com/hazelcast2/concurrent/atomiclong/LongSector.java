@@ -1,7 +1,8 @@
 package com.hazelcast2.concurrent.atomiclong;
 
-import com.hazelcast2.spi.Sector;
+import com.hazelcast2.core.LongFunction;
 import com.hazelcast2.spi.PartitionSettings;
+import com.hazelcast2.spi.Sector;
 import com.hazelcast2.spi.cellbased.CellBasedSector;
 import com.hazelcast2.spi.cellbased.CellSectorOperation;
 
@@ -58,5 +59,28 @@ public abstract class LongSector extends Sector {
     @CellSectorOperation
     public void inc(LongCell cell) {
         cell.value++;
+    }
+
+    public abstract boolean doCompareAndSet(long id, long expect, long update);
+
+    public abstract Future<Boolean> asyncDoCompareAndSet(long id, long expect, long update);
+
+    @CellSectorOperation
+    public boolean compareAndSet(LongCell cell, long expect, long update) {
+        if (cell.value != expect) {
+            return false;
+        }
+
+        cell.value = update;
+        return true;
+    }
+
+    public abstract long doApply(long id, LongFunction f);
+
+    public abstract Future<Long> asyncDoApply(long id, LongFunction f);
+
+    @CellSectorOperation
+    public long apply(LongCell cell, LongFunction f) {
+        return f.apply(cell.value);
     }
 }

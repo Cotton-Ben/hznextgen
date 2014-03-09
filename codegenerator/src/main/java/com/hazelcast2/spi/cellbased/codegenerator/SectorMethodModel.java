@@ -11,33 +11,101 @@ public class SectorMethodModel {
     public final List<String> args = new LinkedList<>();
 
     public String getMapArgsToInvocation() {
-        List<String> primtiveArgs = getPrimitiveArgs();
         StringBuffer sb = new StringBuffer();
-        for (int k = 0; k < primtiveArgs.size(); k++) {
-            String arg = primtiveArgs.get(k);
-            if ("long".equals(arg)) {
-                sb.append("invocation.long").append(k+1).append(" = arg").append(k).append(";\n");
-            } else if ("boolean".equals(arg)) {
-                sb.append("invocation.long").append(k+1).append(" = arg").append(k).append(" ? 1 : 0;\n");
-            } else if ("int".equals(arg)) {
-                sb.append("invocation.long").append(k+1).append(" = arg0").append(k).append(";\n");
-            } else if ("byte".equals(arg)) {
-                sb.append("invocation.long").append(k+1).append(" = arg0").append(k).append(";\n");
-            } else if ("float".equals(arg)) {
-                sb.append("invocation.long").append(k+1).append(" = arg0").append(k).append(";\n");
-            } else if ("double".equals(arg)) {
-                sb.append("invocation.long").append(k+1).append(" = arg0").append(k).append(";\n");;
-            } else if ("char".equals(arg)) {
-                sb.append("invocation.long").append(k+1).append(" = arg0").append(k).append(";\n");
-            } else if ("short".equals(arg)) {
-                sb.append("invocation.long").append(k+1).append(" = arg0").append(k).append(";\n");
-            } else {
-                throw new RuntimeException();
+        int primitiveIndex = 1;
+        int referenceIndex = 1;
+        for (int argIndex = 1; argIndex<= args.size(); argIndex++) {
+            String arg = args.get(argIndex-1);
+            if(isPrimtive(arg)){
+                if("boolean".equals(arg)){
+                    sb.append("invocation.long").append(primitiveIndex).append(" = arg").append(argIndex).append(" ? 1 : 0;\n");
+                }else if("double".equals(arg)){
+                    throw new UnsupportedOperationException();
+                }else if("float".equals(arg)){
+                    throw new UnsupportedOperationException();
+                }else{
+                    sb.append("invocation.long").append(primitiveIndex).append(" = arg").append(argIndex).append(";\n");
+                }
+                primitiveIndex++;
+            }else{
+                sb.append("invocation.reference").append(referenceIndex).append(" = arg").append(argIndex).append(";\n");
+                referenceIndex++;
             }
+
+
+//            if ("long".equals(arg)) {
+//                sb.append("invocation.long").append(argIndex+1).append(" = arg").append(argIndex).append(";\n");
+//            } else if ("boolean".equals(arg)) {
+//                sb.append("invocation.long").append(argIndex+1).append(" = arg").append(argIndex).append(" ? 1 : 0;\n");
+//            } else if ("int".equals(arg)) {
+//                sb.append("invocation.long").append(argIndex+1).append(" = arg0").append(argIndex).append(";\n");
+//            } else if ("byte".equals(arg)) {
+//                sb.append("invocation.long").append(argIndex+1).append(" = arg0").append(argIndex).append(";\n");
+//            } else if ("float".equals(arg)) {
+//                sb.append("invocation.long").append(argIndex+1).append(" = arg0").append(argIndex).append(";\n");
+//            } else if ("double".equals(arg)) {
+//                sb.append("invocation.long").append(argIndex+1).append(" = arg0").append(argIndex).append(";\n");;
+//            } else if ("char".equals(arg)) {
+//                sb.append("invocation.long").append(argIndex+1).append(" = arg0").append(argIndex).append(";\n");
+//            } else if ("short".equals(arg)) {
+//                sb.append("invocation.long").append(argIndex+1).append(" = arg0").append(argIndex).append(";\n");
+//            } else {
+//                throw new RuntimeException();
+//            }
         }
 
         return sb.toString();
     }
+
+    public String getInvocationToArgs() {
+        StringBuffer sb = new StringBuffer();
+        int primitiveIndex = 1;
+        int referenceIndex = 1;
+        for (int k = 1; k <= args.size(); k++) {
+            String arg = args.get(k-1);
+            if(isPrimtive(arg)){
+                if("boolean".equals(arg)){
+                    sb.append("invocation.long").append(primitiveIndex).append("==1");
+                }else if("double".equals(arg)){
+                    throw new UnsupportedOperationException();
+                }else if("float".equals(arg)){
+                    throw new UnsupportedOperationException();
+                }else{
+                    sb.append("invocation.long").append(primitiveIndex);
+                }
+                primitiveIndex++;
+            }else{
+                sb.append("invocation.reference").append(referenceIndex);
+                referenceIndex++;
+            }
+
+            //if ("long".equals(arg)) {
+            //    sb.append("invocation.long").append(k);
+            //} else if ("boolean".equals(arg)) {
+            //    sb.append("invocation.long").append(k).append("==1");
+            //} else if ("int".equals(arg)) {
+            //    sb.append("invocation.long").append(k);
+            //} else if ("byte".equals(arg)) {
+            //    sb.append("invocation.long").append(k);
+            //} else if ("float".equals(arg)) {
+            //    sb.append("invocation.long").append(k);
+            //} else if ("double".equals(arg)) {
+            //    sb.append("invocation.long").append(k);
+            //} else if ("char".equals(arg)) {
+            //    sb.append("invocation.long").append(k);
+            //} else if ("short".equals(arg)) {
+            //    sb.append("invocation.long").append(k);
+            //} else {
+            //    throw new RuntimeException();
+            //}
+
+            if(k<args.size()) {
+                sb.append(", ");
+            }
+        }
+        return sb.toString();
+    }
+
 
     public List<String> getPrimitiveArgs() {
         List<String> result = new LinkedList<>();
@@ -73,37 +141,6 @@ public class SectorMethodModel {
         }
     }
 
-    public String getInvocationToArgs() {
-        List<String> primtiveArgs = getPrimitiveArgs();
-        StringBuffer sb = new StringBuffer();
-        for (int k = 1; k <= primtiveArgs.size(); k++) {
-            String arg = primtiveArgs.get(k-1);
-            if ("long".equals(arg)) {
-                sb.append("invocation.long").append(k);
-            } else if ("boolean".equals(arg)) {
-                sb.append("invocation.long").append(k).append("==1");
-            } else if ("int".equals(arg)) {
-                sb.append("invocation.long").append(k);
-            } else if ("byte".equals(arg)) {
-                sb.append("invocation.long").append(k);
-            } else if ("float".equals(arg)) {
-                sb.append("invocation.long").append(k);
-            } else if ("double".equals(arg)) {
-                sb.append("invocation.long").append(k);
-            } else if ("char".equals(arg)) {
-                sb.append("invocation.long").append(k);
-            } else if ("short".equals(arg)) {
-                sb.append("invocation.long").append(k);
-            } else {
-                throw new RuntimeException();
-            }
-
-            if(k<primtiveArgs.size()) {
-                sb.append(", ");
-            }
-        }
-        return sb.toString();
-    }
 
     public String getFunctionConstantName() {
         return "FUNCTION_" + name + args.size();
@@ -115,9 +152,9 @@ public class SectorMethodModel {
 
     public String getFormalArguments() {
         StringBuffer sb = new StringBuffer();
-        for (int k = 0; k < args.size(); k++) {
-            sb.append("final ").append(args.get(k)).append(" arg").append(k);
-            if (k < args.size() - 1) {
+        for (int k = 1; k <= args.size(); k++) {
+            sb.append("final ").append(args.get(k-1)).append(" arg").append(k);
+            if (k < args.size() ) {
                 sb.append(", ");
             }
         }
@@ -126,9 +163,9 @@ public class SectorMethodModel {
 
     public String getActualArguments() {
         StringBuffer sb = new StringBuffer();
-        for (int k = 0; k < args.size(); k++) {
+        for (int k = 1; k <= args.size(); k++) {
             sb.append("arg" + k);
-            if (k < args.size() - 1) {
+            if (k < args.size()) {
                 sb.append(", ");
             }
         }

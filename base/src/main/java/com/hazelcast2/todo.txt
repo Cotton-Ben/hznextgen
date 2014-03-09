@@ -45,8 +45,6 @@ This prevents the need to create a completablefuture instance. Only the callback
 - dealing with backpressure: currently a segment will reject the claiming of the slot by returning a Segment.CLAIM_SLOT_NO_CAPACITY
 but we are throwing an exception. At this point you want to deal with backing off.
 
-- arg mapping and reference
-
 - arg mapping an compacting primitives; each primitive arg now takes up one long field. But e.g. 64 booleans could be pushed into
 a single long field.
 
@@ -54,7 +52,13 @@ a single long field.
 
 - calls to the HazelcastInstance.getFoo methods will always return a new instance.
 
+- http://www.coverfire.com/articles/queueing-in-the-linux-network-stack/
+
 DONE
+
+- added the atomicreference
+
+- arg mapping and reference
 
 - padding on the segment.
 

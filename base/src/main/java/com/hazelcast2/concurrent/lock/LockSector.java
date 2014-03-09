@@ -1,9 +1,9 @@
 package com.hazelcast2.concurrent.lock;
 
+import com.hazelcast2.spi.PartitionSettings;
+import com.hazelcast2.spi.Sector;
 import com.hazelcast2.spi.cellbased.CellBasedSector;
 import com.hazelcast2.spi.cellbased.CellSectorOperation;
-import com.hazelcast2.spi.Sector;
-import com.hazelcast2.spi.PartitionSettings;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -3,6 +3,14 @@ package com.hazelcast2.util;
 import com.hazelcast2.utils.UnsafeHelper;
 import sun.misc.Unsafe;
 
+/**
+ * Based on the Sequence of the LMAX Disruptor.
+ * <p/>
+ * todo:
+ * The new sequencer uses an array
+ * <p/>
+ * FOr the padding, can't we rely on @Contended.
+ */
 public final class Sequence {
 
     private static final Unsafe unsafe = UnsafeHelper.findUnsafe();
@@ -38,7 +46,7 @@ public final class Sequence {
     }
 
     public void inc(int amount) {
-        if(amount == 0){
+        if (amount == 0) {
             return;
         }
 
@@ -49,7 +57,6 @@ public final class Sequence {
             }
         }
     }
-
 
     public void inc() {
         inc(1);

@@ -15,4 +15,12 @@ public interface IAtomicLong extends DistributedObject {
     void inc();
 
     Future<Void> asyncInc();
+
+    boolean compareAndSet(long expect, long update);
+
+    Future<Boolean> asyncCompareAndSet(long expect, long update);
+
+    long apply(LongFunction f);
+
+    Future<Long> asyncApply(LongFunction f);
 }
