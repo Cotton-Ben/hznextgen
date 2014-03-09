@@ -2,6 +2,7 @@ package com.hazelcast2.map;
 
 import com.hazelcast2.spi.PartitionSettings;
 import com.hazelcast2.spi.Sector;
+import com.hazelcast2.spi.foo2.Foo2OperationMethod;
 import com.hazelcast2.spi.foo2.Foo2SectorAnnotation;
 
 import java.util.HashMap;
@@ -16,21 +17,16 @@ public abstract class MapSector extends Sector {
         super(settings);
     }
 
-    //todo: abstract
-    public String doGet(String key) {
-        return null;
-    }
+    public abstract String doGet(String key);
 
-    //@Foo2OperationMethod
+    @Foo2OperationMethod
     public String get(String key) {
         return map.get(key);
     }
 
-    //todo: abstract
-    public void doSet(String key, String value) {
-    }
+    public abstract void doSet(String key, String value);
 
-    //@Foo2OperationMethod
+    @Foo2OperationMethod
     public void set(String key, String value) {
         map.put(key, value);
     }

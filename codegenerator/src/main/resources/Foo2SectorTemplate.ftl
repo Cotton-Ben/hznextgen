@@ -32,7 +32,7 @@ public final class ${class.name} extends ${class.superName} {
 
 <#list class.methods as method>
 
-     public Future<${method.returnTypeAsObject}> ${method.asyncName}(final long id${method.trailingComma}${method.formalArguments}) {
+     public Future<${method.returnTypeAsObject}> ${method.asyncName}(${method.formalArguments}) {
         final long x = doClaimSlot();
         final boolean schedule = isScheduled(x);
 
@@ -43,7 +43,7 @@ public final class ${class.name} extends ${class.superName} {
         final long prodSeq = x >> 2;
         final Invocation invocation = getSlot(prodSeq);
         invocation.invocationFuture = future;
-        invocation.id = id;
+        //invocation.id = id;
         invocation.functionId = ${method.functionConstantName};
         ${method.mapArgsToInvocation}
         invocation.commit(prodSeq);
@@ -52,7 +52,7 @@ public final class ${class.name} extends ${class.superName} {
         return future;
     }
 
-    public ${method.returnType} ${method.name}(final long id${method.trailingComma}${method.formalArguments}) {
+    public ${method.returnType} ${method.name}(${method.formalArguments}) {
         final long x = doClaimSlot();
 
         if (!isScheduled(x)) {
@@ -61,7 +61,7 @@ public final class ${class.name} extends ${class.superName} {
             final InvocationFuture future = new InvocationFuture();
             final Invocation invocation = getSlot(prodSeq);
             invocation.invocationFuture = future;
-            invocation.id = id;
+            //invocation.id = id;
             invocation.functionId = ${method.functionConstantName};
             ${method.mapArgsToInvocation}
             invocation.commit(prodSeq);
@@ -77,7 +77,7 @@ public final class ${class.name} extends ${class.superName} {
         }
 
         //we didn't actually use the slot since we are going to do a direct call.
-        conSeq++;
+        conSeq.inc();
         boolean success = false;
         try{
     <#if method.voidReturnType>

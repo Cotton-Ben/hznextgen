@@ -19,6 +19,7 @@ import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -88,15 +89,14 @@ public class SectorCodeGenerator extends AbstractProcessor {
                     method.invocationClassName = capitalizeFirstLetter(methodName) + argCount + "Invocation";
                     method.targetMethod = methodName;
 
-                    int k = 0;
                     for (VariableElement variableElement : methodElement.getParameters()) {
-                        if (k > 0) {
                             method.args.add(variableElement.asType().toString());
-                        }
-                        k++;
                     }
 
                     clazz.methods.add(method);
+
+                    this.messager.printMessage(Diagnostic.Kind.WARNING, methodName + " " + method.args);
+
                 } else if (methodElement.getSimpleName().toString().equals("loadCell")) {
                     clazz.cellName = methodElement.getReturnType().toString();
                 }
