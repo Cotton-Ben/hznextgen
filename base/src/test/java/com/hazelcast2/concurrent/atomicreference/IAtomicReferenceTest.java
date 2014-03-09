@@ -3,6 +3,7 @@ package com.hazelcast2.concurrent.atomicreference;
 import com.hazelcast2.core.Hazelcast;
 import com.hazelcast2.core.HazelcastInstance;
 import com.hazelcast2.core.IAtomicReference;
+import com.hazelcast2.test.HazelcastTestSupport;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,10 +11,9 @@ import org.junit.Test;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
-public class IAtomicReferenceTest {
+public class IAtomicReferenceTest extends HazelcastTestSupport {
     private HazelcastInstance hz;
 
     @Before
@@ -28,7 +28,7 @@ public class IAtomicReferenceTest {
 
     @Test
     public void get() {
-        IAtomicReference<String> atomicReference = hz.getAtomicReference("foo");
+        IAtomicReference<String> atomicReference = hz.getAtomicReference(randomString());
 
         String result = atomicReference.get();
 
@@ -37,7 +37,7 @@ public class IAtomicReferenceTest {
 
     @Test
     public void asyncGet() throws ExecutionException, InterruptedException {
-        IAtomicReference<String> atomicReference = hz.getAtomicReference("foo");
+        IAtomicReference<String> atomicReference = hz.getAtomicReference(randomString());
         String update = "bar";
         atomicReference.set(update);
 
@@ -48,7 +48,7 @@ public class IAtomicReferenceTest {
 
     @Test
     public void set() {
-        IAtomicReference<String> atomicReference = hz.getAtomicReference("foo");
+        IAtomicReference<String> atomicReference = hz.getAtomicReference(randomString());
 
         String update = "bar";
         atomicReference.set(update);
@@ -58,13 +58,35 @@ public class IAtomicReferenceTest {
 
     @Test
     public void asyncSet() throws ExecutionException, InterruptedException {
-        IAtomicReference<String> atomicReference = hz.getAtomicReference("foo");
+        IAtomicReference<String> atomicReference = hz.getAtomicReference(randomString());
 
         String update = "bar";
 
         Future<Void> voidFuture = atomicReference.asyncSet(update);
         voidFuture.get();
 
+        assertEquals(update, atomicReference.get());
+    }
+
+    @Test
+    public void compareAndSet() throws ExecutionException, InterruptedException {
+        IAtomicReference<String> atomicReference = hz.getAtomicReference(randomString());
+        String update = "bar";
+
+        boolean result = atomicReference.compareAndSet(null, update);
+
+        assertTrue(result);
+        assertEquals(update, atomicReference.get());
+    }
+
+    @Test
+    public void asyncCompareAndSet() throws ExecutionException, InterruptedException {
+        IAtomicReference<String> atomicReference = hz.getAtomicReference("foo");
+        String update = "bar";
+
+        boolean result = atomicReference.asyncCompareAndSet(null, update).get();
+
+        assertTrue(result);
         assertEquals(update, atomicReference.get());
     }
 

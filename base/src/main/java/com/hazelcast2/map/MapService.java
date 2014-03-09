@@ -2,8 +2,8 @@ package com.hazelcast2.map;
 
 import com.hazelcast2.core.IMap;
 import com.hazelcast2.partition.PartitionService;
-import com.hazelcast2.spi.SectorScheduler;
 import com.hazelcast2.spi.PartitionSettings;
+import com.hazelcast2.spi.SectorScheduler;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -23,13 +23,13 @@ public class MapService {
     }
 
     public IMap getDistributedObject(String name) {
-        if(true){
+        if (true) {
             return null;
         }
 
         MapSector[] partitions = new MapSector[partitionService.getPartitionCount()];
         for (int partitionId = 0; partitionId < partitions.length; partitionId++) {
-            PartitionSettings partitionSettings = new PartitionSettings(partitionId,scheduler);
+            PartitionSettings partitionSettings = new PartitionSettings(partitionId, scheduler);
             partitionSettings.partitionService = partitionService;
             try {
                 partitions[partitionId] = constructor.newInstance(partitionSettings);

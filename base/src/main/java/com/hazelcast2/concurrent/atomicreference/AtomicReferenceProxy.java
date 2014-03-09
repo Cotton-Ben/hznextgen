@@ -23,12 +23,12 @@ public class AtomicReferenceProxy<E> implements IAtomicReference<E> {
 
     @Override
     public E get() {
-        return (E)sector.doGet(id);
+        return (E) sector.doGet(id);
     }
 
     @Override
     public Future<E> asyncGet() {
-        return (Future<E>)sector.asyncDoGet(id);
+        return (Future<E>) sector.asyncDoGet(id);
     }
 
     @Override
@@ -38,12 +38,12 @@ public class AtomicReferenceProxy<E> implements IAtomicReference<E> {
 
     @Override
     public Future<Void> asyncSet(E update) {
-       return sector.asyncDoSet(id, update);
+        return sector.asyncDoSet(id, update);
     }
 
     @Override
     public boolean compareAndSet(E expect, E update) {
-       return sector.doCompareAndSet(id, expect, update);
+        return sector.doCompareAndSet(id, expect, update);
     }
 
     @Override

@@ -57,11 +57,11 @@ public abstract class ReferenceSector extends Sector {
 
     @CellSectorOperation
     public boolean compareAndSet(ReferenceCell cell, Object expect, Object update) {
-        if(cell.value!=expect){
+        if (cell.value != expect) {
             return false;
         }
 
-        cell.value=update;
+        cell.value = update;
         return true;
     }
 }

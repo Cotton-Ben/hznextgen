@@ -3,16 +3,14 @@ package com.hazelcast2.spi;
 import com.hazelcast2.util.Sequence;
 
 import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicLongFieldUpdater;
 
 /**
  * A partition is composed of sectors. And there are specialized sectors like a sector for AtomicLongs or a sector
  * for MapEntries.
- *
+ * <p/>
  * A sector has a build in pending invocations queue to deal with concurrent operations. Within a sector only
  * 1 thread will be active. But within different sectors of the same partition, different threads can be active.
  * This is a fundamental difference compared to Hazelcast 3.
- *
  */
 public abstract class Sector {
 
