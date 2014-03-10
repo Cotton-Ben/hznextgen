@@ -1,6 +1,8 @@
 package com.hazelcast2.map;
 
+import com.hazelcast2.core.Config;
 import com.hazelcast2.core.IMap;
+import com.hazelcast2.core.MapConfig;
 import com.hazelcast2.partition.PartitionService;
 import com.hazelcast2.spi.PartitionSettings;
 import com.hazelcast2.spi.SectorScheduler;
@@ -17,15 +19,19 @@ public class MapService {
     private final PartitionService partitionService;
     private final Constructor<MapSector> constructor;
     private final SectorScheduler scheduler;
+    private final Config config;
 
-    public MapService(PartitionService partitionService) {
+    public MapService(PartitionService partitionService, Config config) {
         this.partitionService = partitionService;
-        constructor = getConstructor(CLASS_NAME);
+        this.constructor = getConstructor(CLASS_NAME);
         this.scheduler = partitionService.getScheduler();
+        this.config = config;
     }
 
     public IMap getDistributedObject(String name) {
-         MapSector[] sectors = new MapSector[partitionService.getPartitionCount()];
+        MapConfig mapConfig = config.getMapConfig(name);
+
+        MapSector[] sectors = new MapSector[partitionService.getPartitionCount()];
         for (int partitionId = 0; partitionId < sectors.length; partitionId++) {
             PartitionSettings partitionSettings = new PartitionSettings(partitionId, scheduler);
             partitionSettings.partitionService = partitionService;
@@ -35,7 +41,7 @@ public class MapService {
                 throw new RuntimeException(e);
             }
         }
-        MapStore mapStore = new MapStore(sectors);
+        MapStore mapStore = new MapStore(sectors, mapConfig);
         return new MapProxy(mapStore);
     }
 }

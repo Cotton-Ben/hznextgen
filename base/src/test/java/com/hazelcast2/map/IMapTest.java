@@ -24,6 +24,7 @@ public class IMapTest extends HazelcastTestSupport {
         hz.shutdown();
     }
 
+    @Test
     public void get() {
         IMap map = hz.getMap(randomString());
         assertEquals(null, map.get("1"));

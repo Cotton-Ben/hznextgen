@@ -1,5 +1,6 @@
 package com.hazelcast2.concurrent.atomiclong;
 
+import com.hazelcast2.core.Config;
 import com.hazelcast2.core.IAtomicLong;
 import com.hazelcast2.partition.PartitionService;
 import com.hazelcast2.spi.PartitionSettings;
@@ -17,7 +18,7 @@ public final class AtomicLongService {
     private final LongSector[] sectors;
     private final PartitionService partitionService;
 
-    public AtomicLongService(PartitionService partitionService) {
+    public AtomicLongService(PartitionService partitionService, Config config) {
         this.partitionService = partitionService;
 
         Constructor<LongSector> constructor = getConstructor(CLASS_NAME);

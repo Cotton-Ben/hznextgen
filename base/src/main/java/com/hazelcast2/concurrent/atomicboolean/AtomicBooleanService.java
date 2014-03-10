@@ -1,5 +1,6 @@
 package com.hazelcast2.concurrent.atomicboolean;
 
+import com.hazelcast2.core.Config;
 import com.hazelcast2.core.IAtomicBoolean;
 import com.hazelcast2.partition.PartitionService;
 import com.hazelcast2.spi.PartitionSettings;
@@ -17,7 +18,7 @@ public final class AtomicBooleanService {
     private final BooleanSector[] sectors;
     private final PartitionService partitionService;
 
-    public AtomicBooleanService(PartitionService partitionService) {
+    public AtomicBooleanService(PartitionService partitionService, Config config) {
         this.partitionService = partitionService;
 
         Constructor<BooleanSector> constructor = getConstructor(CLASS_NAME);

@@ -21,14 +21,18 @@ public class HazelcastInstanceImpl implements HazelcastInstance {
     private final MapService mapService;
     private final AtomicBoolean shutdown = new AtomicBoolean();
 
-    public HazelcastInstanceImpl() {
+    public HazelcastInstanceImpl(){
+        this(new Config());
+    }
+
+    public HazelcastInstanceImpl(Config config) {
         int partitionCount = 271;
         this.partitionService = new PartitionServiceImpl(partitionCount);
-        this.atomicLongService = new AtomicLongService(partitionService);
-        this.atomicBooleanService = new AtomicBooleanService(partitionService);
-        this.atomicReferenceService = new AtomicReferenceService(partitionService);
-        this.lockService = new LockService(partitionService);
-        this.mapService = new MapService(partitionService);
+        this.atomicLongService = new AtomicLongService(partitionService, config);
+        this.atomicBooleanService = new AtomicBooleanService(partitionService, config);
+        this.atomicReferenceService = new AtomicReferenceService(partitionService, config);
+        this.lockService = new LockService(partitionService, config);
+        this.mapService = new MapService(partitionService, config);
     }
 
     @Override

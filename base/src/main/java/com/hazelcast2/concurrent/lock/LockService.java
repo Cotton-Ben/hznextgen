@@ -1,5 +1,6 @@
 package com.hazelcast2.concurrent.lock;
 
+import com.hazelcast2.core.Config;
 import com.hazelcast2.core.ILock;
 import com.hazelcast2.partition.PartitionService;
 import com.hazelcast2.spi.PartitionSettings;
@@ -17,7 +18,7 @@ public final class LockService {
     private final LockSector[] sectors;
     private final PartitionService partitionService;
 
-    public LockService(PartitionService partitionService) {
+    public LockService(PartitionService partitionService, Config config) {
         this.partitionService = partitionService;
 
         Constructor<LockSector> constructor = getConstructor(CLASS_NAME);

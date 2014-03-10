@@ -1,10 +1,12 @@
 package com.hazelcast2.map;
 
+import com.hazelcast2.core.MapConfig;
+
 public class MapStore {
 
     private final MapSector[] sectors;
 
-    public MapStore(MapSector[] partitions) {
+    public MapStore(MapSector[] partitions, MapConfig mapConfig) {
         this.sectors = partitions;
     }
 

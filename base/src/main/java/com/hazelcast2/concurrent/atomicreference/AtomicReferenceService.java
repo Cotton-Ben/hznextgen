@@ -1,5 +1,6 @@
 package com.hazelcast2.concurrent.atomicreference;
 
+import com.hazelcast2.core.Config;
 import com.hazelcast2.core.IAtomicReference;
 import com.hazelcast2.partition.PartitionService;
 import com.hazelcast2.spi.PartitionSettings;
@@ -17,7 +18,7 @@ public final class AtomicReferenceService {
     private final ReferenceSector[] sectors;
     private final PartitionService partitionService;
 
-    public AtomicReferenceService(PartitionService partitionService) {
+    public AtomicReferenceService(PartitionService partitionService, Config config) {
         this.partitionService = partitionService;
 
         Constructor<ReferenceSector> constructor = getConstructor(CLASS_NAME);
