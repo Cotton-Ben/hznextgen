@@ -99,7 +99,7 @@ public abstract class Sector {
         return (int) ((prodSeq.get() >> 2) - conSeq.get());
     }
 
-    public final long claimSlot() {
+    public final long claimSlotAndReturnStatus() {
         for (; ; ) {
             final long oldProdSeq = prodSeq.get();
 
@@ -157,6 +157,7 @@ public abstract class Sector {
         return ringbuffer[toIndex(seq)];
     }
 
+
     /**
      * Locks the segment. Once it has locked, no slots can be claimed (so no invocations
      * can be done).
@@ -211,11 +212,15 @@ public abstract class Sector {
         return isScheduled(prodSeq.get());
     }
 
-    public static boolean isLocked(final long seq) {
-        return (seq & MASK_LOCKED) != 0;
+    public static boolean isLocked(final long sequenceAndStatus) {
+        return (sequenceAndStatus & MASK_LOCKED) != 0;
     }
 
-    public static boolean isScheduled(final long seq) {
-        return (seq & MASK_SCHEDULED) != 0;
+    public static boolean isScheduled(final long sequenceAndStatus) {
+        return (sequenceAndStatus & MASK_SCHEDULED) != 0;
+    }
+
+    public static final long getSequence(final long sequenceAndStatus){
+        return sequenceAndStatus >> 2;
     }
 }

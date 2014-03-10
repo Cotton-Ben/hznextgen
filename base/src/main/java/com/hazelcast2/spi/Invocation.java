@@ -21,19 +21,12 @@ public final class Invocation {
         invocationFuture = null;
     }
 
-    public final void commit(final long sequence) {
+    public final void publish(final long sequence) {
         this.sequence = sequence;
     }
 
-    public final void waitCommit(final long sequence) {
+    public final void awaitPublication(final long sequence) {
         while (this.sequence != sequence) {
-            //System.out.println("found "+this.sequence+" expected:"+sequence);
-            //
-            //try {
-            //    Thread.sleep(100);
-            //} catch (InterruptedException e) {
-            //    e.printStackTrace();
-            //}
         }
     }
 }

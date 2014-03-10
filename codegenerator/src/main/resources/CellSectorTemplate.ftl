@@ -16,47 +16,46 @@ public final class ${class.name} extends ${class.superName} {
         super(partitionSettings);
     }
 
-    private long doClaimSlot(){
-        final long x = claimSlot();
+    private long doClaimSlotAndReturnStatus(){
+        final long sequenceAndStatus = claimSlotAndReturnStatus();
 
-        if (x == CLAIM_SLOT_LOCKED) {
+        if (sequenceAndStatus == CLAIM_SLOT_LOCKED) {
             throw new UnsupportedOperationException();
         }
 
-        if (x == CLAIM_SLOT_NO_CAPACITY) {
+        if (sequenceAndStatus == CLAIM_SLOT_NO_CAPACITY) {
             throw new UnsupportedOperationException();
         }
 
-        return x;
+        return sequenceAndStatus;
     }
-
 <#list class.methods as method>
 
      public Future<${method.returnTypeAsObject}> ${method.asyncName}(final long id${method.trailingComma}${method.formalArguments}) {
-        final long x = doClaimSlot();
-        final boolean schedule = isScheduled(x);
+        final long sequenceAndStatus = doClaimSlotAndReturnStatus();
+        final boolean schedule = isScheduled(sequenceAndStatus);
 
         //we need to create a new instance because we are exposing this object to the outside world and can't
         //pool it.
         final InvocationFuture future = new InvocationFuture();
 
-        final long prodSeq = x >> 2;
+        final long prodSeq = getSequence(sequenceAndStatus);
         final Invocation invocation = getSlot(prodSeq);
         invocation.invocationFuture = future;
         invocation.id = id;
         invocation.functionId = ${method.functionConstantName};
         ${method.mapArgsToInvocation}
-        invocation.commit(prodSeq);
+        invocation.publish(prodSeq);
 
         if(schedule) scheduler.schedule(this);
         return future;
     }
 
     public ${method.returnType} ${method.name}(final long id${method.trailingComma}${method.formalArguments}) {
-        final long x = doClaimSlot();
+        final long sequenceAndStatus = doClaimSlotAndReturnStatus();
 
-        if (!isScheduled(x)) {
-            final long prodSeq = x >> 2;
+        if (!isScheduled(sequenceAndStatus)) {
+            final long prodSeq = getSequence(sequenceAndStatus);
             //todo: this sucks, we don't want to create new instances.
             final InvocationFuture future = new InvocationFuture();
             final Invocation invocation = getSlot(prodSeq);
@@ -64,7 +63,7 @@ public final class ${class.name} extends ${class.superName} {
             invocation.id = id;
             invocation.functionId = ${method.functionConstantName};
             ${method.mapArgsToInvocation}
-            invocation.commit(prodSeq);
+            invocation.publish(prodSeq);
             //instead of waiting, is it possible to help out other partitions/subsystems?
             //the thing you need to be careful with is that you should not keep building up
             //stackframes, because eventually you will get a stackoverflow.
@@ -103,7 +102,7 @@ public final class ${class.name} extends ${class.superName} {
             //todo: we need to checked the locked flag.
             //there is batching that can be done, so instead of doing item by item, you know where the producer is.
 
-            final long prodSeq = this.prodSeq.get() >> 2;
+            final long prodSeq = getSequence(this.prodSeq.get());
             final long capacity = prodSeq - consumerSeq;
             if (capacity == 0) {
                 if (unschedule()) {
@@ -111,7 +110,7 @@ public final class ${class.name} extends ${class.superName} {
                 }
             } else {
                 final Invocation invocation = getSlot(consumerSeq);
-                invocation.waitCommit(consumerSeq);
+                invocation.awaitPublication(consumerSeq);
                 dispatch(invocation);
                 invocation.clear();
                 consumerSeq++;
@@ -121,7 +120,6 @@ public final class ${class.name} extends ${class.superName} {
     }
 
     public void dispatch(Invocation invocation) {
-
         final ${class.cellName} cell = loadCell(invocation.id);
         try{
             switch (invocation.functionId) {

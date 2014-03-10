@@ -87,7 +87,6 @@ public final class SectorScheduler {
         private final Sequence consSeq = new Sequence(0);
         private final SectorSlot[] elements;
         private final int ringbufferSize;
-        private volatile boolean waitingThread = false;
         private final SectorThread sectorThread;
 
         private Ringbuffer(int ringBufferSize, int id) {
