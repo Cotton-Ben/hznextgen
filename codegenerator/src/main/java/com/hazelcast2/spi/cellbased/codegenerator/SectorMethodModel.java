@@ -25,22 +25,22 @@ public class SectorMethodModel {
         StringBuffer sb = new StringBuffer();
         int primitiveIndex = 1;
         int referenceIndex = 1;
-        for (int argIndex = 1; argIndex<= args.size(); argIndex++) {
-            String arg = args.get(argIndex-1);
-            if(isPrimtive(arg)){
-                if("boolean".equals(arg)){
+        for (int argIndex = 1; argIndex <= args.size(); argIndex++) {
+            String arg = args.get(argIndex - 1);
+            if (isPrimtive(arg)) {
+                if ("boolean".equals(arg)) {
                     sb.append("invocation.long").append(primitiveIndex).append(" = arg")
                             .append(argIndex).append(" ? 1 : 0;\n");
-                }else if("double".equals(arg)){
+                } else if ("double".equals(arg)) {
                     sb.append("invocation.long").append(primitiveIndex).append(" = com.hazelcast2.utils.PrimitiveUtils.doubleAsLong(arg")
                             .append(argIndex).append(");\n");
-                }else if("float".equals(arg)){
+                } else if ("float".equals(arg)) {
                     throw new UnsupportedOperationException();
-                }else{
+                } else {
                     sb.append("invocation.long").append(primitiveIndex).append(" = arg").append(argIndex).append(";\n");
                 }
                 primitiveIndex++;
-            }else{
+            } else {
                 sb.append("invocation.reference").append(referenceIndex).append(" = arg").append(argIndex).append(";\n");
                 referenceIndex++;
             }
@@ -54,27 +54,27 @@ public class SectorMethodModel {
         int primitiveIndex = 1;
         int referenceIndex = 1;
         for (int k = 1; k <= args.size(); k++) {
-            String arg = args.get(k-1);
-            if(isPrimtive(arg)){
-                if("boolean".equals(arg)){
+            String arg = args.get(k - 1);
+            if (isPrimtive(arg)) {
+                if ("boolean".equals(arg)) {
                     sb.append("invocation.long").append(primitiveIndex).append("==1");
-                }else if("double".equals(arg)){
+                } else if ("double".equals(arg)) {
                     sb.append("com.hazelcast2.utils.PrimitiveUtils.longAsDouble(invocation.long").append(primitiveIndex).append(")");
-                }else if("float".equals(arg)){
+                } else if ("float".equals(arg)) {
                     throw new UnsupportedOperationException();
-                }else{
+                } else {
                     sb.append("invocation.long").append(primitiveIndex);
                 }
                 primitiveIndex++;
-            }else{
-                if(!"java.lang.Object".equals(arg)){
+            } else {
+                if (!"java.lang.Object".equals(arg)) {
                     sb.append("(").append(arg).append(")");
                 }
                 sb.append("invocation.reference").append(referenceIndex);
                 referenceIndex++;
             }
 
-            if(k<args.size()) {
+            if (k < args.size()) {
                 sb.append(", ");
             }
         }
@@ -127,8 +127,8 @@ public class SectorMethodModel {
     public String getFormalArguments() {
         StringBuffer sb = new StringBuffer();
         for (int k = 1; k <= args.size(); k++) {
-            sb.append("final ").append(args.get(k-1)).append(" arg").append(k);
-            if (k < args.size() ) {
+            sb.append("final ").append(args.get(k - 1)).append(" arg").append(k);
+            if (k < args.size()) {
                 sb.append(", ");
             }
         }

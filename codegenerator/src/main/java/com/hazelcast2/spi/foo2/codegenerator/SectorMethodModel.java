@@ -15,7 +15,7 @@ public class SectorMethodModel {
         return readonly;
     }
 
-   public String getMapArgsToInvocation() {
+    public String getMapArgsToInvocation() {
         StringBuffer sb = new StringBuffer();
         int primitiveIndex = 1;
         int referenceIndex = 1;

@@ -1,6 +1,5 @@
 package com.hazelcast2.spi.foo2.codegenerator;
 
-import com.hazelcast2.spi.cellbased.CellSectorOperation;
 import com.hazelcast2.spi.foo2.Foo2OperationMethod;
 import com.hazelcast2.spi.foo2.Foo2SectorAnnotation;
 import freemarker.cache.ClassTemplateLoader;
