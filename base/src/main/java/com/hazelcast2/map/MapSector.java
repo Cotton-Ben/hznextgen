@@ -17,12 +17,20 @@ public abstract class MapSector extends Sector {
         super(settings);
     }
 
+    // ==================================================================================
+    //                      get
+    // ==================================================================================
+
     public abstract String doGet(String key);
 
-    @Foo2OperationMethod
+    @Foo2OperationMethod(readonly = true)
     public String get(String key) {
         return map.get(key);
     }
+
+    // ==================================================================================
+    //                      set
+    // ==================================================================================
 
     public abstract void doSet(String key, String value);
 

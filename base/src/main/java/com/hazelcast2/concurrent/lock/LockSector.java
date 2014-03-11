@@ -32,12 +32,21 @@ public abstract class LockSector extends Sector {
         return cells.get(id);
     }
 
+    // ==================================================================================
+    //                      isLocked
+    // ==================================================================================
+
     public abstract boolean doIsLocked(long id, long threadId);
 
     @CellSectorOperation
     public boolean isLocked(LockCell cell, long threadId) {
         return cell.lockOwnerThreadId != -1;
     }
+
+
+    // ==================================================================================
+    //                      tryLock
+    // ==================================================================================
 
     public abstract boolean doTryLock(long id, long threadId);
 
@@ -50,6 +59,10 @@ public abstract class LockSector extends Sector {
         cell.lockOwnerThreadId = threadId;
         return true;
     }
+
+    // ==================================================================================
+    //                      unlock
+    // ==================================================================================
 
     public abstract void doUnlock(long id, long threadId);
 

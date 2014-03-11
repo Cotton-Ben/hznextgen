@@ -33,6 +33,19 @@ public abstract class ReferenceSector extends Sector {
         return cells.get(id);
     }
 
+    // ==================== get ================================================
+
+    public abstract Object doGet(long id);
+
+    public abstract Future<Object> asyncDoGet(long id);
+
+    @CellSectorOperation(readonly = true)
+    public Object get(ReferenceCell cell) {
+        return cell.value;
+    }
+
+    // ==================== set ================================================
+
     public abstract void doSet(long id, Object update);
 
     public abstract Future<Void> asyncDoSet(long id, Object update);
@@ -42,14 +55,7 @@ public abstract class ReferenceSector extends Sector {
         cell.value = update;
     }
 
-    public abstract Object doGet(long id);
-
-    public abstract Future<Object> asyncDoGet(long id);
-
-    @CellSectorOperation
-    public Object get(ReferenceCell cell) {
-        return cell.value;
-    }
+    // ==================== compare and set =====================================
 
     public abstract boolean doCompareAndSet(long id, Object expect, Object update);
 

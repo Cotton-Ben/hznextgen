@@ -32,7 +32,22 @@ public abstract class BooleanSector extends Sector {
         return cells.get(id);
     }
 
-    // ================== set ============================================================
+    // ==================================================================================
+    //                      get
+    // ==================================================================================
+
+    public abstract boolean doGet(long id);
+
+    public abstract Future<Boolean> asyncDoGet(long id);
+
+    @CellSectorOperation(readonly = true)
+    public boolean get(BooleanCell cell) {
+        return cell.value;
+    }
+
+    // ==================================================================================
+    //                      set
+    // ==================================================================================
 
     public abstract boolean doSet(long id, boolean update);
 
@@ -45,18 +60,9 @@ public abstract class BooleanSector extends Sector {
         return oldValue;
     }
 
-    // ================== get ============================================================
-
-    public abstract boolean doGet(long id);
-
-    public abstract Future<Boolean> asyncDoGet(long id);
-
-    @CellSectorOperation
-    public boolean get(BooleanCell cell) {
-        return cell.value;
-    }
-
-    // ================== compareAndSet =================================================
+    // ==================================================================================
+    //                      compareAndSet
+    // ==================================================================================
 
     public abstract boolean doCompareAndSet(long id, boolean old, boolean update);
 
@@ -71,5 +77,4 @@ public abstract class BooleanSector extends Sector {
         cell.value = update;
         return true;
     }
-
 }

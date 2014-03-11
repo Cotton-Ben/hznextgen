@@ -34,6 +34,25 @@ public abstract class LongSector extends Sector {
         return cells.get(id);
     }
 
+    // ==================================================================================
+    //                      get
+    // ==================================================================================
+
+
+    public abstract long doGet(long id);
+
+    public abstract Future<Long> asyncDoGet(long id);
+
+    @CellSectorOperation(readonly = true)
+    public long get(LongCell cell) {
+        return cell.value;
+    }
+
+    // ==================================================================================
+    //                      set
+    // ==================================================================================
+
+
     public abstract void doSet(long id, long update);
 
     public abstract Future<Void> asyncDoSet(long id, long update);
@@ -43,14 +62,11 @@ public abstract class LongSector extends Sector {
         cell.value = update;
     }
 
-    public abstract long doGet(long id);
 
-    public abstract Future<Long> asyncDoGet(long id);
+    // ==================================================================================
+    //                      inc
+    // ==================================================================================
 
-    @CellSectorOperation
-    public long get(LongCell cell) {
-        return cell.value;
-    }
 
     public abstract void doInc(long id);
 
@@ -60,6 +76,11 @@ public abstract class LongSector extends Sector {
     public void inc(LongCell cell) {
         cell.value++;
     }
+
+    // ==================================================================================
+    //                      compareAndSet
+    // ==================================================================================
+
 
     public abstract boolean doCompareAndSet(long id, long expect, long update);
 
@@ -75,11 +96,15 @@ public abstract class LongSector extends Sector {
         return true;
     }
 
+    // ==================================================================================
+    //                      apply
+    // ==================================================================================
+
     public abstract long doApply(long id, LongFunction f);
 
     public abstract Future<Long> asyncDoApply(long id, LongFunction f);
 
-    @CellSectorOperation
+    @CellSectorOperation(readonly = true)
     public long apply(LongCell cell, LongFunction f) {
         return f.apply(cell.value);
     }
