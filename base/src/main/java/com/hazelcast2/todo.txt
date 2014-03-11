@@ -1,5 +1,9 @@
 TODO
 
+- dealing with double
+
+- dealing with floats
+
 - currently the succeeding thread of an operation, will execute all pending operations. This could be problematic
 because a user thread would like to return 'asap'.
 
@@ -60,6 +64,8 @@ for the actual stored cell data. Currently the cell would serve these 2 purposes
 it has inflated concerns and the object becomes bigger than strictly required because of the processing fiels.
 
 DONE
+
+- the readonly field on the sectormethodmodel needs to be set
 
 - added the atomicreference
 

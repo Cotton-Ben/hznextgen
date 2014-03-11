@@ -6,23 +6,14 @@ import freemarker.cache.ClassTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 
-import javax.annotation.processing.AbstractProcessor;
-import javax.annotation.processing.Filer;
-import javax.annotation.processing.Messager;
-import javax.annotation.processing.ProcessingEnvironment;
-import javax.annotation.processing.RoundEnvironment;
-import javax.annotation.processing.SupportedAnnotationTypes;
-import javax.annotation.processing.SupportedSourceVersion;
+import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
+import javax.lang.model.element.*;
 import javax.tools.JavaFileObject;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.lang.annotation.Annotation;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -67,39 +58,41 @@ public class SectorCodeGenerator extends AbstractProcessor {
     }
 
     private SectorClassModel generateClassModel(TypeElement classElement) {
-        final SectorClassModel clazz = new SectorClassModel();
+        SectorClassModel clazz = new SectorClassModel();
         clazz.name = "Generated" + classElement.getSimpleName();
         clazz.superName = classElement.getSimpleName().toString();
         clazz.packageName = getPackageNameFromQualifiedName(classElement.getQualifiedName().toString());
 
         for (Element enclosedElement : classElement.getEnclosedElements()) {
-            if (enclosedElement.getKind().equals(ElementKind.METHOD)) {
-                Annotation annotation = enclosedElement.getAnnotation(CellSectorOperation.class);
-                ExecutableElement methodElement = (ExecutableElement) enclosedElement;
+            if (!enclosedElement.getKind().equals(ElementKind.METHOD)) {
+                continue;
+            }
+            ExecutableElement methodElement = (ExecutableElement) enclosedElement;
+            CellSectorOperation operationAnnotation = methodElement.getAnnotation(CellSectorOperation.class);
 
-                if (annotation != null) {
-                    String methodName = methodElement.getSimpleName().toString();
+            if (operationAnnotation != null) {
+                String methodName = methodElement.getSimpleName().toString();
 
-                    int argCount = methodElement.getParameters().size();
+                int argCount = methodElement.getParameters().size();
 
-                    SectorMethodModel method = new SectorMethodModel();
-                    method.name = "do" + capitalizeFirstLetter(methodName);
-                    method.returnType = methodElement.getReturnType().toString();
-                    method.invocationClassName = capitalizeFirstLetter(methodName) + argCount + "Invocation";
-                    method.targetMethod = methodName;
+                SectorMethodModel method = new SectorMethodModel();
+                method.name = "do" + capitalizeFirstLetter(methodName);
+                method.returnType = methodElement.getReturnType().toString();
+                method.invocationClassName = capitalizeFirstLetter(methodName) + argCount + "Invocation";
+                method.targetMethod = methodName;
+                method.readonly = operationAnnotation.readonly();
 
-                    int k = 0;
-                    for (VariableElement variableElement : methodElement.getParameters()) {
-                        if (k > 0) {
-                            method.args.add(variableElement.asType().toString());
-                        }
-                        k++;
+                int k = 0;
+                for (VariableElement variableElement : methodElement.getParameters()) {
+                    if (k > 0) {
+                        method.args.add(variableElement.asType().toString());
                     }
-
-                    clazz.methods.add(method);
-                } else if (methodElement.getSimpleName().toString().equals("loadCell")) {
-                    clazz.cellName = methodElement.getReturnType().toString();
+                    k++;
                 }
+
+                clazz.methods.add(method);
+            } else if (methodElement.getSimpleName().toString().equals("loadCell")) {
+                clazz.cellName = methodElement.getReturnType().toString();
             }
         }
         return clazz;

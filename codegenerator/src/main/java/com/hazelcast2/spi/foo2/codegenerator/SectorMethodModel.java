@@ -9,14 +9,13 @@ public class SectorMethodModel {
     public String invocationClassName;
     public String returnType;
     public final List<String> args = new LinkedList<>();
-    public String debug;
+    public boolean readonly = false;
 
-
-    public String getDebug(){
-        return debug;
+    public boolean isReadonly() {
+        return readonly;
     }
 
-    public String getMapArgsToInvocation() {
+   public String getMapArgsToInvocation() {
         StringBuffer sb = new StringBuffer();
         int primitiveIndex = 1;
         int referenceIndex = 1;

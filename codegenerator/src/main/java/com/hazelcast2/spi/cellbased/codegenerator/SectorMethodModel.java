@@ -9,6 +9,17 @@ public class SectorMethodModel {
     public String invocationClassName;
     public String returnType;
     public final List<String> args = new LinkedList<>();
+    public boolean readonly = false;
+    //useful while generating code. Has no other meaning then to be able to display some text in generated code.
+    public String debug = "";
+
+    public boolean isReadonly() {
+        return readonly;
+    }
+
+    public String getDebug() {
+        return debug;
+    }
 
     public String getMapArgsToInvocation() {
         StringBuffer sb = new StringBuffer();
@@ -102,7 +113,6 @@ public class SectorMethodModel {
             return false;
         }
     }
-
 
     public String getFunctionConstantName() {
         return "FUNCTION_" + name + args.size();

@@ -1,29 +1,19 @@
 package com.hazelcast2.spi.foo2.codegenerator;
 
+import com.hazelcast2.spi.cellbased.CellSectorOperation;
 import com.hazelcast2.spi.foo2.Foo2OperationMethod;
 import com.hazelcast2.spi.foo2.Foo2SectorAnnotation;
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 
-import javax.annotation.processing.AbstractProcessor;
-import javax.annotation.processing.Filer;
-import javax.annotation.processing.Messager;
-import javax.annotation.processing.ProcessingEnvironment;
-import javax.annotation.processing.RoundEnvironment;
-import javax.annotation.processing.SupportedAnnotationTypes;
-import javax.annotation.processing.SupportedSourceVersion;
+import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
+import javax.lang.model.element.*;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -75,10 +65,11 @@ public class SectorCodeGenerator extends AbstractProcessor {
 
         for (Element enclosedElement : classElement.getEnclosedElements()) {
             if (enclosedElement.getKind().equals(ElementKind.METHOD)) {
-                Annotation annotation = enclosedElement.getAnnotation(Foo2OperationMethod.class);
                 ExecutableElement methodElement = (ExecutableElement) enclosedElement;
 
-                if (annotation != null) {
+                Foo2OperationMethod operationAnnotation = methodElement.getAnnotation(Foo2OperationMethod.class);
+
+                if (operationAnnotation != null) {
                     String methodName = methodElement.getSimpleName().toString();
 
                     int argCount = methodElement.getParameters().size();
@@ -88,9 +79,10 @@ public class SectorCodeGenerator extends AbstractProcessor {
                     method.returnType = methodElement.getReturnType().toString();
                     method.invocationClassName = capitalizeFirstLetter(methodName) + argCount + "Invocation";
                     method.targetMethod = methodName;
+                    method.readonly = operationAnnotation.readonly();
 
                     for (VariableElement variableElement : methodElement.getParameters()) {
-                            method.args.add(variableElement.asType().toString());
+                        method.args.add(variableElement.asType().toString());
                     }
 
                     clazz.methods.add(method);
