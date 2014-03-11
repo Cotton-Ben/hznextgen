@@ -1,6 +1,13 @@
 TODO
 
-- dealing with double
+- cell: there are 2 parts of storing 'cell' based data. One is the actual storage of the cell. The other is the
+object that is used during an operation on that cell. It could contain flags like isDirty; something not needed
+for the actual stored cell data. Currently the cell would serve these 2 purposes and that is no good because
+it has inflated concerns and the object becomes bigger than strictly required because of the processing fiels.
+
+    - change record..
+
+    - a read operation doesn't need to receive a change record, it can receive the id and get the data directly
 
 - dealing with floats
 
@@ -58,12 +65,10 @@ a single long field.
 
 - http://www.coverfire.com/articles/queueing-in-the-linux-network-stack/
 
-- cell: there are 2 parts of storing 'cell' based data. One is the actual storage of the cell. The other is the
-object that is used during an operation on that cell. It could contain flags like isDirty; something not needed
-for the actual stored cell data. Currently the cell would serve these 2 purposes and that is no good because
-it has inflated concerns and the object becomes bigger than strictly required because of the processing fiels.
 
 DONE
+
+- dealing with double
 
 - the readonly field on the sectormethodmodel needs to be set
 
