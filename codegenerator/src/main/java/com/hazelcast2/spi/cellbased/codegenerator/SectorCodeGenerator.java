@@ -74,11 +74,16 @@ public class SectorCodeGenerator extends AbstractProcessor {
                 int argCount = methodElement.getParameters().size();
 
                 SectorMethodModel method = new SectorMethodModel();
+                clazz.methods.add(method);
+
+                int functionId = clazz.methods.size();
+
                 method.name = "do" + capitalizeFirstLetter(methodName);
                 method.returnType = methodElement.getReturnType().toString();
                 method.invocationClassName = capitalizeFirstLetter(methodName) + argCount + "Invocation";
                 method.targetMethod = methodName;
                 method.readonly = operationAnnotation.readonly();
+                method.functionId = method.readonly?-functionId:functionId;
 
                 int k = 0;
                 for (VariableElement variableElement : methodElement.getParameters()) {
@@ -88,7 +93,7 @@ public class SectorCodeGenerator extends AbstractProcessor {
                     k++;
                 }
 
-                clazz.methods.add(method);
+
             } else if (methodElement.getSimpleName().toString().equals("loadCell")) {
                 clazz.cellName = methodElement.getReturnType().toString();
             }

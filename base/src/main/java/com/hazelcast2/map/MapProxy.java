@@ -26,8 +26,8 @@ public class MapProxy implements IMap {
             throw new NullPointerException("key can't be null");
         }
 
-        MapSector partition = getPartition(key);
-        return partition.doGet(key);
+        MapSector sector = getSector(key);
+        return sector.doGet(key);
     }
 
     @Override
@@ -36,11 +36,11 @@ public class MapProxy implements IMap {
             throw new NullPointerException("key can't be null");
         }
 
-        MapSector partition = getPartition(key);
-        partition.doSet(key, value);
+        MapSector sector = getSector(key);
+        sector.doSet(key, value);
     }
 
-    public MapSector getPartition(String key) {
+    public MapSector getSector(String key) {
         int partitionId = getPartitionId(key);
         return mapStore.getSector(partitionId);
     }

@@ -8,8 +8,9 @@ import java.util.concurrent.Future;
 
 public final class ${class.name} extends ${class.superName} {
 
+    //id's are short. So we have 15 bits to identify the function, and 1 bit to see if is readonly or update
 <#list class.methods as method>
-    private final static int ${method.functionConstantName} = ${method_index};
+    private final static short ${method.functionConstantName} = ${method.functionId};
 </#list>
 
     public ${class.name}(PartitionSettings partitionSettings) {

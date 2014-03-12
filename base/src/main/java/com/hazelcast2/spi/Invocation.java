@@ -7,7 +7,7 @@ public final class Invocation {
     public volatile long sequence = -1;
 
     public long id;
-    public int functionId;
+    public short functionId;
     public long long1;
     public long long2;
     public long long3;

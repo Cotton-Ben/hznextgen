@@ -21,6 +21,12 @@ public class SectorMethodModel {
         return debug;
     }
 
+    public int functionId;
+
+    public int getFunctionId(){
+        return functionId;
+    }
+
     public String getMapArgsToInvocation() {
         StringBuffer sb = new StringBuffer();
         int primitiveIndex = 1;
