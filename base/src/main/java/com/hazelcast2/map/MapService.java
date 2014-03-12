@@ -25,7 +25,7 @@ public class MapService implements SpiService {
 
     public MapService(PartitionService partitionService, Config config, short serviceId) {
         this.partitionService = partitionService;
-        this.constructor = getConstructor(CLASS_NAME);
+        this.constructor = getConstructor(CLASS_NAME,MapSectorSettings.class);
         this.scheduler = partitionService.getScheduler();
         this.config = config;
         this.serviceId = serviceId;
@@ -36,7 +36,9 @@ public class MapService implements SpiService {
 
         MapSector[] sectors = new MapSector[partitionService.getPartitionCount()];
         for (int partitionId = 0; partitionId < sectors.length; partitionId++) {
-            SectorSettings sectorSettings = new SectorSettings(partitionId, scheduler);
+            MapSectorSettings sectorSettings = new MapSectorSettings();
+            sectorSettings.partitionId = partitionId;
+            sectorSettings.scheduler = scheduler;
             sectorSettings.serviceId = serviceId;
             sectorSettings.partitionService = partitionService;
             try {

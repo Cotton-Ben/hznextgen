@@ -22,14 +22,17 @@ public final class AtomicBooleanService implements SpiService {
     public AtomicBooleanService(PartitionService partitionService, Config config, short serviceId) {
         this.partitionService = partitionService;
 
-        Constructor<BooleanSector> constructor = getConstructor(CLASS_NAME);
+        Constructor<BooleanSector> constructor = getConstructor(CLASS_NAME, BooleanSectorSettings.class);
 
         int partitionCount = partitionService.getPartitionCount();
         sectors = new BooleanSector[partitionCount];
         SectorScheduler scheduler = partitionService.getScheduler();
         for (int partitionId = 0; partitionId < partitionCount; partitionId++) {
-            SectorSettings settings = new SectorSettings(partitionId, scheduler);
+            BooleanSectorSettings settings = new BooleanSectorSettings();
+            settings.partitionId = partitionId;
+            settings.scheduler = scheduler;
             settings.serviceId = serviceId;
+            settings.service = this;
             try {
                 BooleanSector partition = constructor.newInstance(settings);
                 sectors[partitionId] = partition;

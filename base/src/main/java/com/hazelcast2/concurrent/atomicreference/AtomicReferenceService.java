@@ -22,14 +22,17 @@ public final class AtomicReferenceService implements SpiService {
     public AtomicReferenceService(PartitionService partitionService, Config config, short serviceId) {
         this.partitionService = partitionService;
 
-        Constructor<ReferenceSector> constructor = getConstructor(CLASS_NAME);
+        Constructor<ReferenceSector> constructor = getConstructor(CLASS_NAME,ReferenceSectorSettings.class);
         SectorScheduler scheduler = partitionService.getScheduler();
 
         int partitionCount = partitionService.getPartitionCount();
         sectors = new ReferenceSector[partitionCount];
         for (int partitionId = 0; partitionId < partitionCount; partitionId++) {
-            SectorSettings settings = new SectorSettings(partitionId, scheduler);
+            ReferenceSectorSettings settings = new ReferenceSectorSettings();
+            settings.partitionId = partitionId;
+            settings.scheduler = scheduler;
             settings.serviceId = serviceId;
+            settings.service = this;
             try {
                 ReferenceSector partition = constructor.newInstance(settings);
                 sectors[partitionId] = partition;

@@ -18,8 +18,8 @@ public abstract class ReferenceSector extends Sector {
     //todo: very inefficient structure.
     private final Map<Long, ReferenceCell> cells = new HashMap<Long, ReferenceCell>();
 
-    public ReferenceSector(SectorSettings sectorSettings) {
-        super(sectorSettings);
+    public ReferenceSector(ReferenceSectorSettings settings) {
+        super(settings);
     }
 
     public long createCell() {

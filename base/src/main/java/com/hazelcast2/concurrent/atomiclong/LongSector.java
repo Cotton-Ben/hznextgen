@@ -19,8 +19,8 @@ public abstract class LongSector extends Sector {
     //todo: very inefficient structure.
     private final Map<Long, LongCell> cells = new HashMap<Long, LongCell>();
 
-    public LongSector(SectorSettings sectorSettings) {
-        super(sectorSettings);
+    public LongSector(LongSectorSettings settings) {
+        super(settings);
     }
 
     public long createCell() {

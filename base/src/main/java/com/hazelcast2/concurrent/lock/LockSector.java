@@ -1,6 +1,5 @@
 package com.hazelcast2.concurrent.lock;
 
-import com.hazelcast2.spi.SectorSettings;
 import com.hazelcast2.spi.Sector;
 import com.hazelcast2.spi.cellbased.CellBasedSector;
 import com.hazelcast2.spi.cellbased.CellSectorOperation;
@@ -17,8 +16,8 @@ public abstract class LockSector extends Sector {
     //todo: very inefficient structure.
     public final Map<Long, LockCell> cells = new HashMap<Long, LockCell>();
 
-    public LockSector(SectorSettings sectorSettings) {
-        super(sectorSettings);
+    public LockSector(LockSectorSettings settings) {
+        super(settings);
     }
 
     public long createCell() {

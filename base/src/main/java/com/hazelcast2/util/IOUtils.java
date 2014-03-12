@@ -16,15 +16,15 @@ public class IOUtils {
                 + ((long) (buffer[position + 4] & 255) << 24)
                 + ((buffer[position + 5] & 255) << 16)
                 + ((buffer[position + 6] & 255) << 8)
-                + ((buffer[position + 7] & 255) << 0));
+                + ((buffer[position + 7] & 255)));
 
     }
 
     public static int readInt(byte[] buffer, int position) {
-        return  + ((buffer[position + 0] & 255) << 24)
+        return  + ((buffer[position] & 255) << 24)
                 + ((buffer[position + 1] & 255) << 16)
                 + ((buffer[position + 2] & 255) << 8)
-                + ((buffer[position + 3] & 255) << 0);
+                + ((buffer[position + 3] & 255));
     }
 
     public static String readString(byte[] buffer, int position) {

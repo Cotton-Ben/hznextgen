@@ -23,14 +23,17 @@ public final class AtomicLongService implements SpiService {
     public AtomicLongService(PartitionService partitionService, Config config, short serviceId) {
         this.partitionService = partitionService;
 
-        Constructor<LongSector> constructor = getConstructor(CLASS_NAME);
+        Constructor<LongSector> constructor = getConstructor(CLASS_NAME,LongSectorSettings.class);
         SectorScheduler scheduler = partitionService.getScheduler();
 
         int partitionCount = partitionService.getPartitionCount();
         sectors = new LongSector[partitionCount];
         for (int partitionId = 0; partitionId < partitionCount; partitionId++) {
-            SectorSettings settings = new SectorSettings(partitionId, scheduler);
+            LongSectorSettings settings = new LongSectorSettings();
+            settings.scheduler = scheduler;
+            settings.service = this;
             settings.serviceId = serviceId;
+            settings.partitionId = partitionId;
             try {
                 LongSector partition = constructor.newInstance(settings);
                 sectors[partitionId] = partition;

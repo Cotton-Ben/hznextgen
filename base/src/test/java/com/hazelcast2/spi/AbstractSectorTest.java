@@ -1,6 +1,7 @@
 package com.hazelcast2.spi;
 
 import com.hazelcast2.concurrent.atomiclong.GeneratedLongSector;
+import com.hazelcast2.concurrent.atomiclong.LongSectorSettings;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -72,6 +73,9 @@ public class AbstractSectorTest {
 
     private Sector newPartition() {
         SectorScheduler sectorScheduler = new SectorScheduler(1024,1);
-        return new GeneratedLongSector(new SectorSettings(1, sectorScheduler));
+        LongSectorSettings settings = new LongSectorSettings();
+        settings.partitionId = 1;
+        settings.scheduler = sectorScheduler;
+        return new GeneratedLongSector(settings);
     }
 }

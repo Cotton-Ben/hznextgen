@@ -1,6 +1,7 @@
 package com.hazelcast2.spi;
 
 import com.hazelcast2.concurrent.atomiclong.GeneratedLongSector;
+import com.hazelcast2.concurrent.atomiclong.LongSectorSettings;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -25,7 +26,9 @@ public class SectorTest {
 
     public Sector generatePartition(int ringBufferSize) {
         SectorScheduler sectorScheduler = new SectorScheduler(1024,1);
-        SectorSettings settings = new SectorSettings(1, sectorScheduler);
+        LongSectorSettings settings = new LongSectorSettings();
+        settings.partitionId = 1;
+        settings.scheduler = sectorScheduler;
         settings.ringbufferSize = ringBufferSize;
         return new GeneratedLongSector(settings);
     }

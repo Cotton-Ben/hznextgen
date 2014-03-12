@@ -9,6 +9,8 @@ public class SectorSettings {
     public PartitionService partitionService;
     public short serviceId;
 
+    public SectorSettings(){}
+
     public SectorSettings(int partitionId, SectorScheduler scheduler) {
         this.partitionId = partitionId;
         this.scheduler = scheduler;

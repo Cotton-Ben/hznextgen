@@ -22,14 +22,17 @@ public final class LockService implements SpiService {
     public LockService(PartitionService partitionService, Config config, short serviceId) {
         this.partitionService = partitionService;
 
-        Constructor<LockSector> constructor = getConstructor(CLASS_NAME);
+        Constructor<LockSector> constructor = getConstructor(CLASS_NAME,LockSectorSettings.class);
         SectorScheduler scheduler = partitionService.getScheduler();
 
         int partitionCount = partitionService.getPartitionCount();
         sectors = new LockSector[partitionCount];
         for (int partitionId = 0; partitionId < partitionCount; partitionId++) {
-            SectorSettings settings = new SectorSettings(partitionId, scheduler);
+            LockSectorSettings settings = new LockSectorSettings();
+            settings.service = this;
             settings.serviceId = serviceId;
+            settings.scheduler = scheduler;
+            settings.partitionId = partitionId;
             try {
                 LockSector partition = constructor.newInstance(settings);
                 sectors[partitionId] = partition;

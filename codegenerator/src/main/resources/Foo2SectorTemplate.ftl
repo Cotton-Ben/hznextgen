@@ -12,7 +12,7 @@ public final class ${class.name} extends ${class.superName} {
     private final static short ${method.functionConstantName} = ${method.functionId};
 </#list>
 
-    public ${class.name}(SectorSettings settings) {
+    public ${class.name}(${class.superName}Settings settings) {
         super(settings);
     }
 
