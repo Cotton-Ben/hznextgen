@@ -143,5 +143,8 @@ public final class ${class.name} extends ${class.superName} {
             invocation.invocationFuture.setResponseException(e);
         }
     }
+
+    public void schedule(byte[] invocationBytes){
+    }
 }
 

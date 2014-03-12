@@ -3,6 +3,7 @@ package ${class.packageName};
 import com.hazelcast2.spi.Invocation;
 import com.hazelcast2.spi.SectorSettings;
 import com.hazelcast2.util.InvocationFuture;
+import com.hazelcast2.util.IOUtils;
 
 import java.util.concurrent.Future;
 
@@ -18,6 +19,7 @@ public final class ${class.name} extends ${class.superName} {
         super(settings);
     }
 
+    //todo: this method is replicated in alll sectors..
     private long doClaimSlotAndReturnStatus(){
         final long sequenceAndStatus = claimSlotAndReturnStatus();
 
@@ -98,6 +100,7 @@ public final class ${class.name} extends ${class.superName} {
     }
 </#list>
 
+    @Override
     public void process() {
         long consumerSeq = conSeq.get();
         for (; ; ) {
@@ -113,7 +116,11 @@ public final class ${class.name} extends ${class.superName} {
             } else {
                 final Invocation invocation = getSlot(consumerSeq);
                 invocation.awaitPublication(consumerSeq);
-                dispatch(invocation);
+                if(invocation.bytes == null){
+                    dispatch(invocation);
+                }else{
+                    deserializeAndDispatch(invocation);
+                }
                 invocation.clear();
                 consumerSeq++;
                 this.conSeq.set(consumerSeq);
@@ -121,7 +128,7 @@ public final class ${class.name} extends ${class.superName} {
         }
     }
 
-    public void dispatch(Invocation invocation) {
+    private void dispatch(final Invocation invocation) {
         final ${class.cellName} cell = loadCell(invocation.id);
         try{
             switch (invocation.functionId) {
@@ -132,7 +139,7 @@ public final class ${class.name} extends ${class.superName} {
                         ${method.targetMethod}(cell ${method.trailingComma}${method.invocationToArgs});
                         invocation.invocationFuture.setVoidResponse();
     <#else>
-                        ${method.returnType} result = ${method.targetMethod}(cell ${method.trailingComma}${method.invocationToArgs});
+                        final ${method.returnType} result = ${method.targetMethod}(cell ${method.trailingComma}${method.invocationToArgs});
                         invocation.invocationFuture.setResponse(result);
     </#if>
                     }
@@ -141,10 +148,48 @@ public final class ${class.name} extends ${class.superName} {
                 default:
                     throw new IllegalStateException("Unrecognized function:" + invocation.functionId);
             }
-        }catch(Exception e){
+        } catch(Exception e) {
             //todo: this sucks big time because notification is killing for performance
             invocation.invocationFuture.setResponseException(e);
         }
+    }
+
+    private void deserializeAndDispatch(final Invocation invocation){
+        final byte[] bytes = invocation.bytes;
+        final short functionId = IOUtils.readShort(bytes, 4);
+        final long id = IOUtils.readLong(bytes, 6);
+        final ${class.cellName} cell = loadCell(id);
+        switch (invocation.functionId) {
+<#list class.methods as method>
+            case ${method.functionConstantName}:
+                {
+                    //todo: instead of using the invocation arguments, we need to deserialize
+    <#if method.voidReturnType>
+                    ${method.targetMethod}(cell ${method.trailingComma}${method.invocationToArgs});
+    <#else>
+                    final ${method.returnType} result = ${method.targetMethod}(cell ${method.trailingComma}${method.invocationToArgs});
+    </#if>
+                    //todo: now we need to send back a response to the invoking machine
+                }
+                break;
+</#list>
+            default:
+                throw new IllegalStateException("Unrecognized function:" + functionId);
+        }
+    }
+
+    //todo: do we need this method in this subclass or can we move it to sector?
+    public void schedule(final byte[] invocationBytes){
+        final long sequenceAndStatus = doClaimSlotAndReturnStatus();
+
+        final boolean schedule = isScheduled(sequenceAndStatus);
+
+        final long prodSeq = getSequence(sequenceAndStatus);
+        final Invocation invocation = getSlot(prodSeq);
+        invocation.bytes = invocationBytes;
+        invocation.publish(prodSeq);
+
+        if(schedule) scheduler.schedule(this);
     }
 }
 

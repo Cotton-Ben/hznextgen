@@ -22,5 +22,10 @@ public class SectorSchedulerTest {
         public void process() {
 
         }
+
+        @Override
+        public void schedule(byte[] bytes) {
+            throw new UnsupportedOperationException();
+        }
     }
 }

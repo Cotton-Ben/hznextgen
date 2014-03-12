@@ -3,15 +3,16 @@ package com.hazelcast2.concurrent.atomicreference;
 import com.hazelcast2.core.Config;
 import com.hazelcast2.core.IAtomicReference;
 import com.hazelcast2.partition.PartitionService;
-import com.hazelcast2.spi.SectorSettings;
 import com.hazelcast2.spi.SectorScheduler;
+import com.hazelcast2.spi.SectorSettings;
+import com.hazelcast2.spi.SpiService;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 import static com.hazelcast2.util.ReflectionUtils.getConstructor;
 
-public final class AtomicReferenceService {
+public final class AtomicReferenceService implements SpiService {
 
     public static final String CLASS_NAME = "com.hazelcast2.concurrent.atomicreference.GeneratedReferenceSector";
 
@@ -47,5 +48,10 @@ public final class AtomicReferenceService {
         final ReferenceSector partition = sectors[partitionId];
         final long id = partition.createCell();
         return new AtomicReferenceProxy(partition, name, id);
+    }
+
+    @Override
+    public void schedule(byte[] invocationBytes) {
+        throw new UnsupportedOperationException();
     }
 }

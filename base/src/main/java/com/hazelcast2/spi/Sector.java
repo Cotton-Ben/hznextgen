@@ -225,4 +225,11 @@ public abstract class Sector {
     public static long getSequence(final long sequenceAndStatus){
         return sequenceAndStatus >> 2;
     }
+
+    /**
+     * The schedule wants to schedule a operation invocation on this sector.
+     *
+     * @param bytes
+     */
+    public abstract void schedule(byte[] bytes);
 }

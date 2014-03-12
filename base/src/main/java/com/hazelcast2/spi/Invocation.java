@@ -14,11 +14,14 @@ public final class Invocation {
     public Object reference1;
     public Object reference2;
     public InvocationFuture invocationFuture;
+    public byte[] bytes;
 
     public final void clear() {
+        //todo: is doing a null check if fields are not null cheaper?
         reference1 = null;
         reference2 = null;
         invocationFuture = null;
+        bytes = null;
     }
 
     public final void publish(final long sequence) {

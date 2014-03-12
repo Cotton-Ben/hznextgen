@@ -3,15 +3,16 @@ package com.hazelcast2.concurrent.lock;
 import com.hazelcast2.core.Config;
 import com.hazelcast2.core.ILock;
 import com.hazelcast2.partition.PartitionService;
-import com.hazelcast2.spi.SectorSettings;
 import com.hazelcast2.spi.SectorScheduler;
+import com.hazelcast2.spi.SectorSettings;
+import com.hazelcast2.spi.SpiService;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 import static com.hazelcast2.util.ReflectionUtils.getConstructor;
 
-public final class LockService {
+public final class LockService implements SpiService {
 
     public static final String CLASS_NAME = "com.hazelcast2.concurrent.lock.GeneratedLockSector";
 
@@ -47,5 +48,10 @@ public final class LockService {
         final LockSector partition = sectors[partitionId];
         final long id = partition.createCell();
         return new ILockProxy(partition, name, id);
+    }
+
+    @Override
+    public void schedule(byte[] invocationBytes) {
+        throw new UnsupportedOperationException();
     }
 }

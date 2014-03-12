@@ -87,6 +87,38 @@ public class SectorMethodModel {
         return sb.toString();
     }
 
+    public String getBytesToArgs() {
+        StringBuffer sb = new StringBuffer();
+        int primitiveIndex = 1;
+        int referenceIndex = 1;
+        for (int k = 1; k <= args.size(); k++) {
+            String arg = args.get(k - 1);
+            if (isPrimtive(arg)) {
+                if ("boolean".equals(arg)) {
+                    sb.append("invocation.long").append(primitiveIndex).append("==1");
+                } else if ("double".equals(arg)) {
+                    sb.append("Double.longBitsToDouble(invocation.long").append(primitiveIndex).append(")");
+                } else if ("float".equals(arg)) {
+                    throw new UnsupportedOperationException();
+                } else {
+                    sb.append("invocation.long").append(primitiveIndex);
+                }
+                primitiveIndex++;
+            } else {
+                if (!"java.lang.Object".equals(arg)) {
+                    sb.append("(").append(arg).append(")");
+                }
+                sb.append("invocation.reference").append(referenceIndex);
+                referenceIndex++;
+            }
+
+            if (k < args.size()) {
+                sb.append(", ");
+            }
+        }
+        return sb.toString();
+    }
+
 
     public List<String> getPrimitiveArgs() {
         List<String> result = new LinkedList<>();

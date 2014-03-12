@@ -3,15 +3,17 @@ package com.hazelcast2.concurrent.atomiclong;
 import com.hazelcast2.core.Config;
 import com.hazelcast2.core.IAtomicLong;
 import com.hazelcast2.partition.PartitionService;
-import com.hazelcast2.spi.SectorSettings;
 import com.hazelcast2.spi.SectorScheduler;
+import com.hazelcast2.spi.SectorSettings;
+import com.hazelcast2.spi.SpiService;
+import com.hazelcast2.util.IOUtils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 import static com.hazelcast2.util.ReflectionUtils.getConstructor;
 
-public final class AtomicLongService {
+public final class AtomicLongService implements SpiService {
 
     public static final String CLASS_NAME = "com.hazelcast2.concurrent.atomiclong.GeneratedLongSector";
 
@@ -47,5 +49,16 @@ public final class AtomicLongService {
         final LongSector partition = sectors[partitionId];
         final long id = partition.createCell();
         return new AtomicLongProxy(partition, name, id);
+    }
+
+    @Override
+    public void schedule(final byte[] invocationBytes) {
+        final short partitionId = getPartitionId(invocationBytes);
+        final LongSector sector = sectors[partitionId];
+        sector.schedule(invocationBytes);
+    }
+
+    private short getPartitionId(byte[] bytes) {
+        return IOUtils.readShort(bytes,2);
     }
 }

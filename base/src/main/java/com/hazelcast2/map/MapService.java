@@ -6,13 +6,14 @@ import com.hazelcast2.core.MapConfig;
 import com.hazelcast2.partition.PartitionService;
 import com.hazelcast2.spi.SectorSettings;
 import com.hazelcast2.spi.SectorScheduler;
+import com.hazelcast2.spi.SpiService;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 import static com.hazelcast2.util.ReflectionUtils.getConstructor;
 
-public class MapService {
+public class MapService implements SpiService {
 
     public static final String CLASS_NAME = "com.hazelcast2.map.GeneratedMapSector";
 
@@ -46,5 +47,10 @@ public class MapService {
         }
         MapStore mapStore = new MapStore(sectors, mapConfig);
         return new MapProxy(mapStore);
+    }
+
+    @Override
+    public void schedule(byte[] invocationBytes) {
+        throw new UnsupportedOperationException();
     }
 }

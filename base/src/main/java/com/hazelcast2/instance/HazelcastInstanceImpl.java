@@ -8,16 +8,18 @@ import com.hazelcast2.core.*;
 import com.hazelcast2.map.MapService;
 import com.hazelcast2.partition.PartitionService;
 import com.hazelcast2.partition.impl.PartitionServiceImpl;
+import com.hazelcast2.spi.SpiService;
+import com.hazelcast2.util.IOUtils;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class HazelcastInstanceImpl implements HazelcastInstance {
 
-    private static final short SERVICE_ID_LONG = 1;
-    private static final short SERVICE_ID_BOOLEAN = 2;
-    private static final short SERVICE_ID_REFERENCE = 3;
-    private static final short SERVICE_ID_LOCK = 4;
-    private static final short SERVICE_ID_MAP = 5;
+/**
+ * When an invocation is serialized, first the service id needs to be published. That will
+ * be the first 16 bits. So when serialized operation is received, the first 16 bits can be
+ * read to determine the service.
+ */
+public class HazelcastInstanceImpl implements HazelcastInstance {
 
     private final PartitionService partitionService;
     private final AtomicLongService atomicLongService;
@@ -26,20 +28,35 @@ public class HazelcastInstanceImpl implements HazelcastInstance {
     private final LockService lockService;
     private final MapService mapService;
     private final AtomicBoolean shutdown = new AtomicBoolean();
-
-    public HazelcastInstanceImpl(){
-        this(new Config());
-    }
+    private final SpiService[] services;
 
     public HazelcastInstanceImpl(Config config) {
+        //todo: should come from the config
         int partitionCount = 271;
         this.partitionService = new PartitionServiceImpl(partitionCount);
 
-        this.atomicLongService = new AtomicLongService(partitionService, config, SERVICE_ID_LONG);
-        this.atomicBooleanService = new AtomicBooleanService(partitionService, config, SERVICE_ID_BOOLEAN);
-        this.atomicReferenceService = new AtomicReferenceService(partitionService, config,SERVICE_ID_REFERENCE);
-        this.lockService = new LockService(partitionService, config, SERVICE_ID_LOCK);
-        this.mapService = new MapService(partitionService, config, SERVICE_ID_MAP);
+        this.services = new SpiService[5];
+
+        short k = 0;
+        this.atomicLongService = new AtomicLongService(partitionService, config, k);
+        services[k] = atomicLongService;
+
+        k++;
+        this.atomicBooleanService = new AtomicBooleanService(partitionService, config, k);
+        services[k] = atomicBooleanService;
+
+        k++;
+        this.atomicReferenceService = new AtomicReferenceService(partitionService, config, k);
+        services[k] = atomicReferenceService;
+
+
+        k++;
+        this.lockService = new LockService(partitionService, config, k);
+        services[k] = lockService;
+
+        k++;
+        this.mapService = new MapService(partitionService, config, k);
+        services[k] = mapService;
     }
 
     @Override
@@ -76,5 +93,16 @@ public class HazelcastInstanceImpl implements HazelcastInstance {
 
         partitionService.shutdown();
         //todo: we need to shutdown the services.
+    }
+
+    public void dispatch(final byte[] bytes) {
+        final short serviceId = getServiceId(bytes);
+        final SpiService spiService = services[serviceId];
+        //here we have a polymorphic method call
+        spiService.schedule(bytes);
+    }
+
+    private short getServiceId(byte[] bytes) {
+        return IOUtils.readShort(bytes, 0);
     }
 }
