@@ -17,8 +17,8 @@ public class SectorTest {
 
         for (int k = 0; k < 1000; k++) {
             long seq = sector.claimSlotAndReturnStatus();
-            assertTrue(sector.isScheduled(seq));
-            assertFalse(sector.isLocked(seq));
+            assertTrue(Sector.isScheduled(seq));
+            assertFalse(Sector.isLocked(seq));
             sector.conSeq.inc();
             assertTrue(sector.unschedule());
         }
@@ -43,7 +43,7 @@ public class SectorTest {
             assertEquals(k, seq >> 2);
         }
 
-        assertEquals(sector.CLAIM_SLOT_NO_CAPACITY, sector.claimSlotAndReturnStatus());
+        assertEquals(Sector.CLAIM_SLOT_NO_CAPACITY, sector.claimSlotAndReturnStatus());
     }
 
     @Test
@@ -53,9 +53,9 @@ public class SectorTest {
 
         long seq = sector.claimSlotAndReturnStatus();
 
-        assertTrue(sector.isScheduled(seq));
-        assertEquals(initialSeq + sector.MASK_SCHEDULED, seq);
-        assertEquals(initialSeq + sector.DELTA + sector.MASK_SCHEDULED, sector.prodSeq);
+        assertTrue(Sector.isScheduled(seq));
+        assertEquals(initialSeq + Sector.MASK_SCHEDULED, seq);
+        assertEquals(initialSeq + Sector.DELTA + Sector.MASK_SCHEDULED, sector.prodSeq.get());
         assertFalse(sector.isLocked());
         assertTrue(sector.isScheduled());
         assertEquals(1, sector.size());
@@ -69,8 +69,8 @@ public class SectorTest {
 
         long seq = sector.claimSlotAndReturnStatus();
 
-        assertEquals(sector.CLAIM_SLOT_LOCKED, seq);
-        assertEquals(initialSeq, sector.prodSeq);
+        assertEquals(Sector.CLAIM_SLOT_LOCKED, seq);
+        assertEquals(initialSeq, sector.prodSeq.get());
         assertTrue(sector.isLocked());
         assertFalse(sector.isScheduled());
         assertEquals(0, sector.size());
@@ -84,9 +84,9 @@ public class SectorTest {
 
         long seq = sector.claimSlotAndReturnStatus();
 
-        assertFalse(sector.isScheduled(seq));
-        assertEquals(initialSeq - sector.MASK_SCHEDULED, seq);
-        assertEquals(initialSeq + sector.DELTA, sector.prodSeq);
+        assertFalse(Sector.isScheduled(seq));
+        assertEquals(initialSeq - Sector.MASK_SCHEDULED, seq);
+        assertEquals(initialSeq + Sector.DELTA, sector.prodSeq.get());
         assertTrue(sector.isScheduled());
         assertFalse(sector.isLocked());
         assertEquals(2, sector.size());
@@ -101,7 +101,7 @@ public class SectorTest {
         long initialValue = sector.prodSeq.get();
         long result = sector.claimSlotAndReturnStatus();
 
-        assertEquals(initialValue - sector.MASK_SCHEDULED, result);
+        assertEquals(initialValue - Sector.MASK_SCHEDULED, result);
         //assertEquals(result, sector.prodSeq);
         assertEquals(3, sector.size());
     }
@@ -113,7 +113,7 @@ public class SectorTest {
         sector.claimSlotAndReturnStatus();
 
         long result = sector.claimSlotAndReturnStatus();
-        assertEquals(sector.CLAIM_SLOT_NO_CAPACITY, result);
+        assertEquals(Sector.CLAIM_SLOT_NO_CAPACITY, result);
         assertEquals(2, sector.size());
     }
 
@@ -131,21 +131,21 @@ public class SectorTest {
 
         }
 
-        assertEquals(initialSeq, sector.prodSeq);
+        assertEquals(initialSeq, sector.prodSeq.get());
     }
 
     @Test
     public void unschedule_whenNoPendingWork() {
         Sector sector = generatePartition(64);
         sector.claimSlotAndReturnStatus();
-        sector.conSeq.inc(sector.DELTA);
+        sector.conSeq.inc(Sector.DELTA);
 
         long initialSeq = sector.prodSeq.get();
 
         boolean unscheduled = sector.unschedule();
 
         assertTrue(unscheduled);
-        assertEquals(initialSeq - sector.MASK_SCHEDULED, sector.prodSeq);
+        assertEquals(initialSeq - sector.MASK_SCHEDULED, sector.prodSeq.get());
     }
 
     @Test
@@ -160,7 +160,7 @@ public class SectorTest {
         boolean unscheduled = sector.unschedule();
 
         assertTrue(unscheduled);
-        assertEquals(initialSeq - sector.MASK_SCHEDULED, sector.prodSeq);
+        assertEquals(initialSeq - Sector.MASK_SCHEDULED, sector.prodSeq.get());
     }
 
     @Test
@@ -173,7 +173,7 @@ public class SectorTest {
         boolean unscheduled = sector.unschedule();
 
         assertFalse(unscheduled);
-        assertEquals(initialSeq, sector.prodSeq);
+        assertEquals(initialSeq, sector.prodSeq.get());
     }
 
     @Test
@@ -187,7 +187,7 @@ public class SectorTest {
         boolean unscheduled = sector.unschedule();
 
         assertFalse(unscheduled);
-        assertEquals(initialSeq, sector.prodSeq);
+        assertEquals(initialSeq, sector.prodSeq.get());
     }
 
     // ========================== lock ====================================
@@ -201,7 +201,7 @@ public class SectorTest {
 
         assertTrue(sector.isLocked());
         assertFalse(sector.isScheduled());
-        assertEquals(initialValue + sector.MASK_LOCKED, sector.prodSeq);
+        assertEquals(initialValue + Sector.MASK_LOCKED, sector.prodSeq.get());
     }
 
     @Test
@@ -214,7 +214,7 @@ public class SectorTest {
 
         assertTrue(sector.isLocked());
         assertTrue(sector.isScheduled());
-        assertEquals(prodSeq + sector.MASK_LOCKED, sector.prodSeq);
+        assertEquals(prodSeq + Sector.MASK_LOCKED, sector.prodSeq.get());
     }
 
     @Test
@@ -229,7 +229,7 @@ public class SectorTest {
         } catch (IllegalStateException expected) {
         }
 
-        assertEquals(prodSeq, sector.prodSeq);
+        assertEquals(prodSeq, sector.prodSeq.get());
         assertTrue(sector.isLocked());
         assertFalse(sector.isScheduled());
     }

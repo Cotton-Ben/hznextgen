@@ -35,9 +35,7 @@ public class IAtomicBooleanTest extends HazelcastTestSupport {
         boolean result = atomicBoolean.get();
 
         assertFalse(result);
-
-        sleepSeconds(1000);
-    }
+   }
 
     @Test
     public void asyncGet() throws ExecutionException, InterruptedException {

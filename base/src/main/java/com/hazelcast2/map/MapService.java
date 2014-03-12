@@ -36,13 +36,14 @@ public class MapService implements SpiService {
 
         MapSector[] sectors = new MapSector[partitionService.getPartitionCount()];
         for (int partitionId = 0; partitionId < sectors.length; partitionId++) {
-            MapSectorSettings sectorSettings = new MapSectorSettings();
-            sectorSettings.partitionId = partitionId;
-            sectorSettings.scheduler = scheduler;
-            sectorSettings.serviceId = serviceId;
-            sectorSettings.partitionService = partitionService;
+            MapSectorSettings settings = new MapSectorSettings();
+            settings.partitionId = partitionId;
+            settings.scheduler = scheduler;
+            settings.serviceId = serviceId;
+            settings.partitionService = partitionService;
+            settings.mapConfig = mapConfig;
             try {
-                sectors[partitionId] = constructor.newInstance(sectorSettings);
+                sectors[partitionId] = constructor.newInstance(settings);
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 throw new RuntimeException(e);
             }
