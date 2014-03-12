@@ -4,7 +4,9 @@ import com.hazelcast2.spi.Invocation;
 import com.hazelcast2.spi.SectorSettings;
 import com.hazelcast2.util.InvocationFuture;
 import com.hazelcast2.util.IOUtils;
+import com.hazelcast2.util.ByteArrayObjectDataInput;
 
+import java.io.ByteArrayInputStream;
 import java.util.concurrent.Future;
 
 public final class ${class.name} extends ${class.superName} {
@@ -159,22 +161,33 @@ public final class ${class.name} extends ${class.superName} {
         final short functionId = IOUtils.readShort(bytes, 4);
         final long id = IOUtils.readLong(bytes, 6);
         final ${class.cellName} cell = loadCell(id);
-        switch (invocation.functionId) {
+
+        ///todo: if a method only has 'simple' types like string, primitive etc. We should not need to create
+        //the ByteArrayObjectDataInput, but we can directly read from the bytes.
+
+        try{
+            switch (invocation.functionId) {
 <#list class.methods as method>
-            case ${method.functionConstantName}:
-                {
-                    //todo: instead of using the invocation arguments, we need to deserialize
-    <#if method.voidReturnType>
-                    ${method.targetMethod}(cell ${method.trailingComma}${method.invocationToArgs});
-    <#else>
-                    final ${method.returnType} result = ${method.targetMethod}(cell ${method.trailingComma}${method.invocationToArgs});
+                case ${method.functionConstantName}:
+                    {
+    <#if method.hasOneArgOrMore>
+                        ByteArrayObjectDataInput in = new ByteArrayObjectDataInput(bytes, 14, serializationService);
     </#if>
-                    //todo: now we need to send back a response to the invoking machine
-                }
-                break;
+    <#if method.voidReturnType>
+                        ${method.targetMethod}(cell${method.trailingComma} ${method.deserializedInvocationToArgs});
+    <#else>
+                        final ${method.returnType} result = ${method.targetMethod}(cell${method.trailingComma} ${method.deserializedInvocationToArgs});
+    </#if>
+                        //todo: now we need to send back a response to the invoking machine
+                    }
+                    break;
 </#list>
-            default:
-                throw new IllegalStateException("Unrecognized function:" + functionId);
+                default:
+                    throw new IllegalStateException("Unrecognized function:" + functionId);
+            }
+        } catch (Exception e){
+            //todo:
+            e.printStackTrace();
         }
     }
 
