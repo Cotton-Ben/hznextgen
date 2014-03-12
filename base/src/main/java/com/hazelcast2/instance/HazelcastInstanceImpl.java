@@ -13,6 +13,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class HazelcastInstanceImpl implements HazelcastInstance {
 
+    private static final short SERVICE_ID_LONG = 1;
+    private static final short SERVICE_ID_BOOLEAN = 2;
+    private static final short SERVICE_ID_REFERENCE = 3;
+    private static final short SERVICE_ID_LOCK = 4;
+    private static final short SERVICE_ID_MAP = 5;
+
     private final PartitionService partitionService;
     private final AtomicLongService atomicLongService;
     private final AtomicBooleanService atomicBooleanService;
@@ -28,11 +34,12 @@ public class HazelcastInstanceImpl implements HazelcastInstance {
     public HazelcastInstanceImpl(Config config) {
         int partitionCount = 271;
         this.partitionService = new PartitionServiceImpl(partitionCount);
-        this.atomicLongService = new AtomicLongService(partitionService, config);
-        this.atomicBooleanService = new AtomicBooleanService(partitionService, config);
-        this.atomicReferenceService = new AtomicReferenceService(partitionService, config);
-        this.lockService = new LockService(partitionService, config);
-        this.mapService = new MapService(partitionService, config);
+
+        this.atomicLongService = new AtomicLongService(partitionService, config, SERVICE_ID_LONG);
+        this.atomicBooleanService = new AtomicBooleanService(partitionService, config, SERVICE_ID_BOOLEAN);
+        this.atomicReferenceService = new AtomicReferenceService(partitionService, config,SERVICE_ID_REFERENCE);
+        this.lockService = new LockService(partitionService, config, SERVICE_ID_LOCK);
+        this.mapService = new MapService(partitionService, config, SERVICE_ID_MAP);
     }
 
     @Override

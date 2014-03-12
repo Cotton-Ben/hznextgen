@@ -72,6 +72,6 @@ public class AbstractSectorTest {
 
     private Sector newPartition() {
         SectorScheduler sectorScheduler = new SectorScheduler(1024,1);
-        return new GeneratedLongSector(new PartitionSettings(1, sectorScheduler));
+        return new GeneratedLongSector(new SectorSettings(1, sectorScheduler));
     }
 }

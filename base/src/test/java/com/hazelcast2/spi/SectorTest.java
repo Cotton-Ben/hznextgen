@@ -25,7 +25,7 @@ public class SectorTest {
 
     public Sector generatePartition(int ringBufferSize) {
         SectorScheduler sectorScheduler = new SectorScheduler(1024,1);
-        PartitionSettings settings = new PartitionSettings(1, sectorScheduler);
+        SectorSettings settings = new SectorSettings(1, sectorScheduler);
         settings.ringbufferSize = ringBufferSize;
         return new GeneratedLongSector(settings);
     }

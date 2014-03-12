@@ -1,6 +1,6 @@
 package com.hazelcast2.concurrent.atomicreference;
 
-import com.hazelcast2.spi.PartitionSettings;
+import com.hazelcast2.spi.SectorSettings;
 import com.hazelcast2.spi.Sector;
 import com.hazelcast2.spi.cellbased.CellBasedSector;
 import com.hazelcast2.spi.cellbased.CellSectorOperation;
@@ -18,8 +18,8 @@ public abstract class ReferenceSector extends Sector {
     //todo: very inefficient structure.
     private final Map<Long, ReferenceCell> cells = new HashMap<Long, ReferenceCell>();
 
-    public ReferenceSector(PartitionSettings partitionSettings) {
-        super(partitionSettings);
+    public ReferenceSector(SectorSettings sectorSettings) {
+        super(sectorSettings);
     }
 
     public long createCell() {

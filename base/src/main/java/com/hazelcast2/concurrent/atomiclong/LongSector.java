@@ -1,7 +1,7 @@
 package com.hazelcast2.concurrent.atomiclong;
 
 import com.hazelcast2.core.LongFunction;
-import com.hazelcast2.spi.PartitionSettings;
+import com.hazelcast2.spi.SectorSettings;
 import com.hazelcast2.spi.Sector;
 import com.hazelcast2.spi.cellbased.CellBasedSector;
 import com.hazelcast2.spi.cellbased.CellSectorOperation;
@@ -19,8 +19,8 @@ public abstract class LongSector extends Sector {
     //todo: very inefficient structure.
     private final Map<Long, LongCell> cells = new HashMap<Long, LongCell>();
 
-    public LongSector(PartitionSettings partitionSettings) {
-        super(partitionSettings);
+    public LongSector(SectorSettings sectorSettings) {
+        super(sectorSettings);
     }
 
     public long createCell() {

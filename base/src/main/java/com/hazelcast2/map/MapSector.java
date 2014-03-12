@@ -1,6 +1,6 @@
 package com.hazelcast2.map;
 
-import com.hazelcast2.spi.PartitionSettings;
+import com.hazelcast2.spi.SectorSettings;
 import com.hazelcast2.spi.Sector;
 import com.hazelcast2.spi.foo2.Foo2OperationMethod;
 import com.hazelcast2.spi.foo2.Foo2SectorAnnotation;
@@ -13,7 +13,7 @@ public abstract class MapSector extends Sector {
 
     private final Map<String, String> map = new HashMap<>();
 
-    protected MapSector(PartitionSettings settings) {
+    protected MapSector(SectorSettings settings) {
         super(settings);
     }
 

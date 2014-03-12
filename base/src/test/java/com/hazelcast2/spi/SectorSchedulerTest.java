@@ -7,15 +7,15 @@ public class SectorSchedulerTest {
     @Test
     public void test(){
         SectorScheduler scheduler = new SectorScheduler(1024,1);
-        Sector sector = new DummySector(new PartitionSettings(1,scheduler));
+        Sector sector = new DummySector(new SectorSettings(1,scheduler));
         scheduler.schedule(sector);
 
 
     }
 
     class DummySector extends Sector{
-        DummySector(PartitionSettings partitionSettings) {
-            super(partitionSettings);
+        DummySector(SectorSettings sectorSettings) {
+            super(sectorSettings);
         }
 
         @Override

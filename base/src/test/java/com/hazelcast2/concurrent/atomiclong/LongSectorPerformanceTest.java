@@ -1,7 +1,7 @@
 package com.hazelcast2.concurrent.atomiclong;
 
 import com.hazelcast2.spi.SectorScheduler;
-import com.hazelcast2.spi.PartitionSettings;
+import com.hazelcast2.spi.SectorSettings;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -27,7 +27,7 @@ public class LongSectorPerformanceTest {
 
     private LongSector createLongPartition() {
         SectorScheduler sectorScheduler = new SectorScheduler(1024,1);
-        return new GeneratedLongSector(new PartitionSettings(1, sectorScheduler));
+        return new GeneratedLongSector(new SectorSettings(1, sectorScheduler));
     }
 
     @Test

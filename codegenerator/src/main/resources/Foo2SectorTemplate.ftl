@@ -1,7 +1,7 @@
 package ${class.packageName};
 
 import com.hazelcast2.spi.Invocation;
-import com.hazelcast2.spi.PartitionSettings;
+import com.hazelcast2.spi.SectorSettings;
 import com.hazelcast2.util.InvocationFuture;
 
 import java.util.concurrent.Future;
@@ -12,8 +12,8 @@ public final class ${class.name} extends ${class.superName} {
     private final static short ${method.functionConstantName} = ${method.functionId};
 </#list>
 
-    public ${class.name}(PartitionSettings partitionSettings) {
-        super(partitionSettings);
+    public ${class.name}(SectorSettings settings) {
+        super(settings);
     }
 
     private long doClaimSlotAndReturnStatus(){

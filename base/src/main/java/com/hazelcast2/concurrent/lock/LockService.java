@@ -3,7 +3,7 @@ package com.hazelcast2.concurrent.lock;
 import com.hazelcast2.core.Config;
 import com.hazelcast2.core.ILock;
 import com.hazelcast2.partition.PartitionService;
-import com.hazelcast2.spi.PartitionSettings;
+import com.hazelcast2.spi.SectorSettings;
 import com.hazelcast2.spi.SectorScheduler;
 
 import java.lang.reflect.Constructor;
@@ -18,7 +18,7 @@ public final class LockService {
     private final LockSector[] sectors;
     private final PartitionService partitionService;
 
-    public LockService(PartitionService partitionService, Config config) {
+    public LockService(PartitionService partitionService, Config config, short serviceId) {
         this.partitionService = partitionService;
 
         Constructor<LockSector> constructor = getConstructor(CLASS_NAME);
@@ -27,7 +27,8 @@ public final class LockService {
         int partitionCount = partitionService.getPartitionCount();
         sectors = new LockSector[partitionCount];
         for (int partitionId = 0; partitionId < partitionCount; partitionId++) {
-            PartitionSettings settings = new PartitionSettings(partitionId, scheduler);
+            SectorSettings settings = new SectorSettings(partitionId, scheduler);
+            settings.serviceId = serviceId;
             try {
                 LockSector partition = constructor.newInstance(settings);
                 sectors[partitionId] = partition;

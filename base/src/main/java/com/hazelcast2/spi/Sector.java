@@ -30,17 +30,19 @@ public abstract class Sector {
 
     public final Invocation[] ringbuffer;
     public final int ringbufferSize;
+    public final short serviceId;
 
-    public Sector(PartitionSettings partitionSettings) {
-        if (partitionSettings == null) {
+    public Sector(SectorSettings sectorSettings) {
+        if (sectorSettings == null) {
             throw new NullPointerException();
         }
-        if (partitionSettings.getPartitionId() < 0) {
+        if (sectorSettings.partitionId < 0) {
             throw new IllegalArgumentException();
         }
-        this.partitionId = partitionSettings.getPartitionId();
-        this.scheduler = partitionSettings.scheduler;
-        this.ringbufferSize = partitionSettings.ringbufferSize;
+        this.serviceId = sectorSettings.serviceId;
+        this.partitionId = sectorSettings.partitionId;
+        this.scheduler = sectorSettings.scheduler;
+        this.ringbufferSize = sectorSettings.ringbufferSize;
         this.ringbuffer = new Invocation[ringbufferSize];
         for (int k = 0; k < ringbuffer.length; k++) {
             ringbuffer[k] = new Invocation();

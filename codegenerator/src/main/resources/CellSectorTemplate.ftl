@@ -1,20 +1,21 @@
 package ${class.packageName};
 
 import com.hazelcast2.spi.Invocation;
-import com.hazelcast2.spi.PartitionSettings;
+import com.hazelcast2.spi.SectorSettings;
 import com.hazelcast2.util.InvocationFuture;
 
 import java.util.concurrent.Future;
 
 public final class ${class.name} extends ${class.superName} {
 
-    //id's are short. So we have 15 bits to identify the function, and 1 bit to see if is readonly or update
+    //id's are short. So we have 15 bits to identify the function, and 1 bit to see if is readonly or update.
+    //If the switch case for these negative values is not optimally jitted, we can e.g. do something with even number.
 <#list class.methods as method>
     private final static short ${method.functionConstantName} = ${method.functionId};
 </#list>
 
-    public ${class.name}(PartitionSettings partitionSettings) {
-        super(partitionSettings);
+    public ${class.name}(SectorSettings settings) {
+        super(settings);
     }
 
     private long doClaimSlotAndReturnStatus(){
