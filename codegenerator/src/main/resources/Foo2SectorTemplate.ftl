@@ -9,7 +9,7 @@ import java.util.concurrent.Future;
 public final class ${class.name} extends ${class.superName} {
 
 <#list class.methods as method>
-    private final static int ${method.functionConstantName} = ${method_index};
+    private final static short ${method.functionConstantName} = ${method.functionId};
 </#list>
 
     public ${class.name}(PartitionSettings partitionSettings) {
