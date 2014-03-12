@@ -78,6 +78,16 @@ public class AtomicLongProxy implements IAtomicLong {
     }
 
     @Override
+    public void alter(LongFunction f) {
+        sector.doAlter(id, f);
+    }
+
+    @Override
+    public Future<Void> asyncAlter(LongFunction f) {
+        return sector.asyncDoAlter(id, f);
+    }
+
+    @Override
     public String toString() {
         return "IAtomicLong{" +
                 "id=" + id +

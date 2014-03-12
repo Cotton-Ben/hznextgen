@@ -1,5 +1,12 @@
 TODO
 
+- research:
+    http://en.wikipedia.org/wiki/Open_addressing
+    http://www.coverfire.com/articles/queueing-in-the-linux-network-stack/
+
+- the function-id needs to have readonly setting encoded in it. This is needed to figure out when an operation
+comes in, that replication needs to be done.
+
 - cell: there are 2 parts of storing 'cell' based data. One is the actual storage of the cell. The other is the
 object that is used during an operation on that cell. It could contain flags like isDirty; something not needed
 for the actual stored cell data. Currently the cell would serve these 2 purposes and that is no good because
@@ -24,15 +31,17 @@ because a user thread would like to return 'asap'.
 
 - dealing with overload in the generated sector
 
-- the lock completion is missing; so a lock can be started, but there is no way to know when the lock has been fully
-completed. Only the thread that is scheduling a segment will be able to indicate when the locking is done
+- sector locking
 
-- dealing with locking in generated sector
+    - the lock completion is missing; so a lock can be started, but there is no way to know when the lock has been fully
+    completed. Only the thread that is scheduling a segment will be able to indicate when the locking is done
+
+    - dealing with locking in generated sector
+
+    - we need to check during the execution of pending work if the segment is locked.
 
 - when lock is acquired on a segment, there is currently no way to know when all threads have completed and
 the segment is exclusively owned
-
-- the dispatch method needs to be generated correctly
 
 - deadlock: we need to make sure that if an operation on a segment is executed while already executing from
 a different segment, they you are not going to deadlock (because the lock on the original segment is not released)
@@ -40,8 +49,6 @@ a different segment, they you are not going to deadlock (because the lock on the
 - optimization with reading immutable data, volatile read would be enough. more thinking needed.
 
 - optimization for operations that don't return a response since there is no
-
-- we need to check during the execution of pending work if the segment is locked.
 
 - concurrent invocations on the same cell, caused new invocationfuture to be created. Would be nice if they could be pooled.
 
@@ -62,9 +69,6 @@ a single long field.
 - actual implementation of the lock
 
 - calls to the HazelcastInstance.getFoo methods will always return a new instance.
-
-- http://www.coverfire.com/articles/queueing-in-the-linux-network-stack/
-
 
 DONE
 

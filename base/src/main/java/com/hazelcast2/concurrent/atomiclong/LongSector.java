@@ -108,4 +108,17 @@ public abstract class LongSector extends Sector {
     public long apply(LongCell cell, LongFunction f) {
         return f.apply(cell.value);
     }
+
+    // ==================================================================================
+    //                      alter
+    // ==================================================================================
+
+    public abstract void doAlter(long id, LongFunction f);
+
+    public abstract Future<Void> asyncDoAlter(long id, LongFunction f);
+
+    @CellSectorOperation
+    public void alter(LongCell cell, LongFunction f) {
+        cell.value = f.apply(cell.value);
+    }
 }

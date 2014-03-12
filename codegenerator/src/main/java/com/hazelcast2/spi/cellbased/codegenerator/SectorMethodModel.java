@@ -32,7 +32,7 @@ public class SectorMethodModel {
                     sb.append("invocation.long").append(primitiveIndex).append(" = arg")
                             .append(argIndex).append(" ? 1 : 0;\n");
                 } else if ("double".equals(arg)) {
-                    sb.append("invocation.long").append(primitiveIndex).append(" = com.hazelcast2.utils.PrimitiveUtils.doubleAsLong(arg")
+                    sb.append("invocation.long").append(primitiveIndex).append(" = Double.doubleToLongBits(arg")
                             .append(argIndex).append(");\n");
                 } else if ("float".equals(arg)) {
                     throw new UnsupportedOperationException();
@@ -59,7 +59,7 @@ public class SectorMethodModel {
                 if ("boolean".equals(arg)) {
                     sb.append("invocation.long").append(primitiveIndex).append("==1");
                 } else if ("double".equals(arg)) {
-                    sb.append("com.hazelcast2.utils.PrimitiveUtils.longAsDouble(invocation.long").append(primitiveIndex).append(")");
+                    sb.append("Double.longBitsToDouble(invocation.long").append(primitiveIndex).append(")");
                 } else if ("float".equals(arg)) {
                     throw new UnsupportedOperationException();
                 } else {

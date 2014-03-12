@@ -220,7 +220,7 @@ public abstract class Sector {
         return (sequenceAndStatus & MASK_SCHEDULED) != 0;
     }
 
-    public static final long getSequence(final long sequenceAndStatus){
+    public static long getSequence(final long sequenceAndStatus){
         return sequenceAndStatus >> 2;
     }
 }

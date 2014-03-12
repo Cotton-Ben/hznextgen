@@ -23,4 +23,8 @@ public interface IAtomicLong extends DistributedObject {
     long apply(LongFunction f);
 
     Future<Long> asyncApply(LongFunction f);
+
+    void alter(LongFunction f);
+
+    Future<Void> asyncAlter(LongFunction f);
 }
