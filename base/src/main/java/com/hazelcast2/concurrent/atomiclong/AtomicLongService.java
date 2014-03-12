@@ -1,11 +1,10 @@
 package com.hazelcast2.concurrent.atomiclong;
 
-import com.hazelcast2.core.Config;
 import com.hazelcast2.core.IAtomicLong;
 import com.hazelcast2.partition.PartitionService;
 import com.hazelcast2.spi.SectorScheduler;
-import com.hazelcast2.spi.SectorSettings;
 import com.hazelcast2.spi.SpiService;
+import com.hazelcast2.spi.SpiServiceSettings;
 import com.hazelcast2.util.IOUtils;
 
 import java.lang.reflect.Constructor;
@@ -20,22 +19,23 @@ public final class AtomicLongService implements SpiService {
     private final LongSector[] sectors;
     private final PartitionService partitionService;
 
-    public AtomicLongService(PartitionService partitionService, Config config, short serviceId) {
-        this.partitionService = partitionService;
+    public AtomicLongService(SpiServiceSettings serviceSettings) {
+        this.partitionService = serviceSettings.partitionService;
 
-        Constructor<LongSector> constructor = getConstructor(CLASS_NAME,LongSectorSettings.class);
+        Constructor<LongSector> constructor = getConstructor(CLASS_NAME, LongSectorSettings.class);
         SectorScheduler scheduler = partitionService.getScheduler();
 
         int partitionCount = partitionService.getPartitionCount();
         sectors = new LongSector[partitionCount];
         for (int partitionId = 0; partitionId < partitionCount; partitionId++) {
-            LongSectorSettings settings = new LongSectorSettings();
-            settings.scheduler = scheduler;
-            settings.service = this;
-            settings.serviceId = serviceId;
-            settings.partitionId = partitionId;
+            LongSectorSettings sectorSettings = new LongSectorSettings();
+            sectorSettings.scheduler = scheduler;
+            sectorSettings.service = this;
+            sectorSettings.serviceId = serviceSettings.serviceId;
+            sectorSettings.partitionId = partitionId;
+            sectorSettings.serializationService = serviceSettings.serializationService;
             try {
-                LongSector partition = constructor.newInstance(settings);
+                LongSector partition = constructor.newInstance(sectorSettings);
                 sectors[partitionId] = partition;
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 throw new RuntimeException(e);
@@ -62,6 +62,6 @@ public final class AtomicLongService implements SpiService {
     }
 
     private short getPartitionId(byte[] bytes) {
-        return IOUtils.readShort(bytes,2);
+        return IOUtils.readShort(bytes, 2);
     }
 }

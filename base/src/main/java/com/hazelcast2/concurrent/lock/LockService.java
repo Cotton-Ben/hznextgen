@@ -1,11 +1,10 @@
 package com.hazelcast2.concurrent.lock;
 
-import com.hazelcast2.core.Config;
 import com.hazelcast2.core.ILock;
 import com.hazelcast2.partition.PartitionService;
 import com.hazelcast2.spi.SectorScheduler;
-import com.hazelcast2.spi.SectorSettings;
 import com.hazelcast2.spi.SpiService;
+import com.hazelcast2.spi.SpiServiceSettings;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -19,22 +18,23 @@ public final class LockService implements SpiService {
     private final LockSector[] sectors;
     private final PartitionService partitionService;
 
-    public LockService(PartitionService partitionService, Config config, short serviceId) {
-        this.partitionService = partitionService;
+    public LockService(SpiServiceSettings serviceSettings) {
+        this.partitionService = serviceSettings.partitionService;
 
-        Constructor<LockSector> constructor = getConstructor(CLASS_NAME,LockSectorSettings.class);
+        Constructor<LockSector> constructor = getConstructor(CLASS_NAME, LockSectorSettings.class);
         SectorScheduler scheduler = partitionService.getScheduler();
 
         int partitionCount = partitionService.getPartitionCount();
         sectors = new LockSector[partitionCount];
         for (int partitionId = 0; partitionId < partitionCount; partitionId++) {
-            LockSectorSettings settings = new LockSectorSettings();
-            settings.service = this;
-            settings.serviceId = serviceId;
-            settings.scheduler = scheduler;
-            settings.partitionId = partitionId;
+            LockSectorSettings sectorSettings = new LockSectorSettings();
+            sectorSettings.service = this;
+            sectorSettings.serializationService = serviceSettings.serializationService;
+            sectorSettings.serviceId = serviceSettings.serviceId;
+            sectorSettings.scheduler = scheduler;
+            sectorSettings.partitionId = partitionId;
             try {
-                LockSector partition = constructor.newInstance(settings);
+                LockSector partition = constructor.newInstance(sectorSettings);
                 sectors[partitionId] = partition;
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 throw new RuntimeException(e);

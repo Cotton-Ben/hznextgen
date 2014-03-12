@@ -4,9 +4,8 @@ import com.hazelcast2.core.Config;
 import com.hazelcast2.core.IMap;
 import com.hazelcast2.core.MapConfig;
 import com.hazelcast2.partition.PartitionService;
-import com.hazelcast2.spi.SectorSettings;
-import com.hazelcast2.spi.SectorScheduler;
 import com.hazelcast2.spi.SpiService;
+import com.hazelcast2.spi.SpiServiceSettings;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -19,16 +18,14 @@ public class MapService implements SpiService {
 
     private final PartitionService partitionService;
     private final Constructor<MapSector> constructor;
-    private final SectorScheduler scheduler;
     private final Config config;
-    private final short serviceId;
+    private final SpiServiceSettings serviceSettings;
 
-    public MapService(PartitionService partitionService, Config config, short serviceId) {
-        this.partitionService = partitionService;
-        this.constructor = getConstructor(CLASS_NAME,MapSectorSettings.class);
-        this.scheduler = partitionService.getScheduler();
-        this.config = config;
-        this.serviceId = serviceId;
+    public MapService(SpiServiceSettings sectorSettings) {
+        this.partitionService = sectorSettings.partitionService;
+        this.constructor = getConstructor(CLASS_NAME, MapSectorSettings.class);
+        this.serviceSettings = sectorSettings;
+        this.config = sectorSettings.config;
     }
 
     public IMap getDistributedObject(String name) {
@@ -36,14 +33,15 @@ public class MapService implements SpiService {
 
         MapSector[] sectors = new MapSector[partitionService.getPartitionCount()];
         for (int partitionId = 0; partitionId < sectors.length; partitionId++) {
-            MapSectorSettings settings = new MapSectorSettings();
-            settings.partitionId = partitionId;
-            settings.scheduler = scheduler;
-            settings.serviceId = serviceId;
-            settings.partitionService = partitionService;
-            settings.mapConfig = mapConfig;
+            MapSectorSettings sectorSettings = new MapSectorSettings();
+            sectorSettings.partitionId = partitionId;
+            sectorSettings.scheduler = partitionService.getScheduler();
+            sectorSettings.serviceId = serviceSettings.serviceId;
+            sectorSettings.partitionService = partitionService;
+            sectorSettings.mapConfig = mapConfig;
+            sectorSettings.serializationService = serviceSettings.serializationService;
             try {
-                sectors[partitionId] = constructor.newInstance(settings);
+                sectors[partitionId] = constructor.newInstance(sectorSettings);
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 throw new RuntimeException(e);
             }

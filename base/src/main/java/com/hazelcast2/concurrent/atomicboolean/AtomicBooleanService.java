@@ -1,11 +1,10 @@
 package com.hazelcast2.concurrent.atomicboolean;
 
-import com.hazelcast2.core.Config;
 import com.hazelcast2.core.IAtomicBoolean;
 import com.hazelcast2.partition.PartitionService;
 import com.hazelcast2.spi.SectorScheduler;
-import com.hazelcast2.spi.SectorSettings;
 import com.hazelcast2.spi.SpiService;
+import com.hazelcast2.spi.SpiServiceSettings;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -19,8 +18,8 @@ public final class AtomicBooleanService implements SpiService {
     private final BooleanSector[] sectors;
     private final PartitionService partitionService;
 
-    public AtomicBooleanService(PartitionService partitionService, Config config, short serviceId) {
-        this.partitionService = partitionService;
+    public AtomicBooleanService(SpiServiceSettings serviceSettings) {
+        this.partitionService = serviceSettings.partitionService;
 
         Constructor<BooleanSector> constructor = getConstructor(CLASS_NAME, BooleanSectorSettings.class);
 
@@ -28,13 +27,14 @@ public final class AtomicBooleanService implements SpiService {
         sectors = new BooleanSector[partitionCount];
         SectorScheduler scheduler = partitionService.getScheduler();
         for (int partitionId = 0; partitionId < partitionCount; partitionId++) {
-            BooleanSectorSettings settings = new BooleanSectorSettings();
-            settings.partitionId = partitionId;
-            settings.scheduler = scheduler;
-            settings.serviceId = serviceId;
-            settings.service = this;
+            BooleanSectorSettings sectorSettings = new BooleanSectorSettings();
+            sectorSettings.partitionId = partitionId;
+            sectorSettings.scheduler = scheduler;
+            sectorSettings.serializationService = serviceSettings.serializationService;
+            sectorSettings.serviceId = serviceSettings.serviceId;
+            sectorSettings.service = this;
             try {
-                BooleanSector partition = constructor.newInstance(settings);
+                BooleanSector partition = constructor.newInstance(sectorSettings);
                 sectors[partitionId] = partition;
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 throw new RuntimeException(e);

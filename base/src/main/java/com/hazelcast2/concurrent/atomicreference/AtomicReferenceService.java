@@ -1,11 +1,10 @@
 package com.hazelcast2.concurrent.atomicreference;
 
-import com.hazelcast2.core.Config;
 import com.hazelcast2.core.IAtomicReference;
 import com.hazelcast2.partition.PartitionService;
 import com.hazelcast2.spi.SectorScheduler;
-import com.hazelcast2.spi.SectorSettings;
 import com.hazelcast2.spi.SpiService;
+import com.hazelcast2.spi.SpiServiceSettings;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -19,8 +18,8 @@ public final class AtomicReferenceService implements SpiService {
     private final ReferenceSector[] sectors;
     private final PartitionService partitionService;
 
-    public AtomicReferenceService(PartitionService partitionService, Config config, short serviceId) {
-        this.partitionService = partitionService;
+    public AtomicReferenceService(SpiServiceSettings serviceSettings) {
+        this.partitionService = serviceSettings.partitionService;
 
         Constructor<ReferenceSector> constructor = getConstructor(CLASS_NAME,ReferenceSectorSettings.class);
         SectorScheduler scheduler = partitionService.getScheduler();
@@ -28,13 +27,14 @@ public final class AtomicReferenceService implements SpiService {
         int partitionCount = partitionService.getPartitionCount();
         sectors = new ReferenceSector[partitionCount];
         for (int partitionId = 0; partitionId < partitionCount; partitionId++) {
-            ReferenceSectorSettings settings = new ReferenceSectorSettings();
-            settings.partitionId = partitionId;
-            settings.scheduler = scheduler;
-            settings.serviceId = serviceId;
-            settings.service = this;
+            ReferenceSectorSettings sectorSettings = new ReferenceSectorSettings();
+            sectorSettings.partitionId = partitionId;
+            sectorSettings.scheduler = scheduler;
+            sectorSettings.serializationService = serviceSettings.serializationService;
+            sectorSettings.serviceId = serviceSettings.serviceId;
+            sectorSettings.service = this;
             try {
-                ReferenceSector partition = constructor.newInstance(settings);
+                ReferenceSector partition = constructor.newInstance(sectorSettings);
                 sectors[partitionId] = partition;
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 throw new RuntimeException(e);

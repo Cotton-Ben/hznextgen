@@ -1,5 +1,6 @@
 package com.hazelcast2.spi;
 
+import com.hazelcast2.serialization.SerializationService;
 import com.hazelcast2.util.Sequence;
 
 import java.util.concurrent.Future;
@@ -24,6 +25,7 @@ public abstract class Sector {
     private volatile boolean isLocked;
     private final int partitionId;
     public final SectorScheduler scheduler;
+    public final SerializationService serializationService;
 
     public final Sequence prodSeq = new Sequence(INITIAL_VALUE);
     public final Sequence conSeq = new Sequence(INITIAL_VALUE);
@@ -32,17 +34,18 @@ public abstract class Sector {
     public final int ringbufferSize;
     public final short serviceId;
 
-    public Sector(SectorSettings sectorSettings) {
-        if (sectorSettings == null) {
+    public Sector(SectorSettings settings) {
+        if (settings == null) {
             throw new NullPointerException();
         }
-        if (sectorSettings.partitionId < 0) {
+        if (settings.partitionId < 0) {
             throw new IllegalArgumentException();
         }
-        this.serviceId = sectorSettings.serviceId;
-        this.partitionId = sectorSettings.partitionId;
-        this.scheduler = sectorSettings.scheduler;
-        this.ringbufferSize = sectorSettings.ringbufferSize;
+        this.serviceId = settings.serviceId;
+        this.partitionId = settings.partitionId;
+        this.scheduler = settings.scheduler;
+        this.serializationService = settings.serializationService;
+        this.ringbufferSize = settings.ringbufferSize;
         this.ringbuffer = new Invocation[ringbufferSize];
         for (int k = 0; k < ringbuffer.length; k++) {
             ringbuffer[k] = new Invocation();
@@ -222,7 +225,7 @@ public abstract class Sector {
         return (sequenceAndStatus & MASK_SCHEDULED) != 0;
     }
 
-    public static long getSequence(final long sequenceAndStatus){
+    public static long getSequence(final long sequenceAndStatus) {
         return sequenceAndStatus >> 2;
     }
 

@@ -8,7 +8,9 @@ import com.hazelcast2.core.*;
 import com.hazelcast2.map.MapService;
 import com.hazelcast2.partition.PartitionService;
 import com.hazelcast2.partition.impl.PartitionServiceImpl;
+import com.hazelcast2.serialization.SerializationService;
 import com.hazelcast2.spi.SpiService;
+import com.hazelcast2.spi.SpiServiceSettings;
 import com.hazelcast2.util.IOUtils;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -22,41 +24,54 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class HazelcastInstanceImpl implements HazelcastInstance {
 
     private final PartitionService partitionService;
+    private final SerializationService serializationService;
+    private final AtomicBoolean shutdown = new AtomicBoolean();
+    private final Config config;
+    private final SpiService[] services;
+
     private final AtomicLongService atomicLongService;
     private final AtomicBooleanService atomicBooleanService;
     private final AtomicReferenceService atomicReferenceService;
     private final LockService lockService;
     private final MapService mapService;
-    private final AtomicBoolean shutdown = new AtomicBoolean();
-    private final SpiService[] services;
 
     public HazelcastInstanceImpl(Config config) {
         //todo: should come from the config
         int partitionCount = 271;
+        this.config = config;
         this.partitionService = new PartitionServiceImpl(partitionCount);
+        this.serializationService = new SerializationService();
 
         this.services = new SpiService[5];
 
-        short k = 0;
-        this.atomicLongService = new AtomicLongService(partitionService, config, k);
-        services[k] = atomicLongService;
+        short serviceId = 0;
+        this.atomicLongService = new AtomicLongService(newSpiServiceSettings(serviceId));
+        services[serviceId] = atomicLongService;
 
-        k++;
-        this.atomicBooleanService = new AtomicBooleanService(partitionService, config, k);
-        services[k] = atomicBooleanService;
+        serviceId++;
+        this.atomicBooleanService = new AtomicBooleanService(newSpiServiceSettings(serviceId));
+        services[serviceId] = atomicBooleanService;
 
-        k++;
-        this.atomicReferenceService = new AtomicReferenceService(partitionService, config, k);
-        services[k] = atomicReferenceService;
+        serviceId++;
+        this.atomicReferenceService = new AtomicReferenceService(newSpiServiceSettings(serviceId));
+        services[serviceId] = atomicReferenceService;
 
+        serviceId++;
+        this.lockService = new LockService(newSpiServiceSettings(serviceId));
+        services[serviceId] = lockService;
 
-        k++;
-        this.lockService = new LockService(partitionService, config, k);
-        services[k] = lockService;
+        serviceId++;
+        this.mapService = new MapService(newSpiServiceSettings(serviceId));
+        services[serviceId] = mapService;
+    }
 
-        k++;
-        this.mapService = new MapService(partitionService, config, k);
-        services[k] = mapService;
+    private SpiServiceSettings newSpiServiceSettings(short serviceId){
+        SpiServiceSettings dependencies = new SpiServiceSettings();
+        dependencies.partitionService = partitionService;
+        dependencies.serializationService = serializationService;
+        dependencies.config = config;
+        dependencies.serviceId =serviceId;
+        return dependencies;
     }
 
     @Override
