@@ -1,5 +1,6 @@
 package com.hazelcast2.spi;
 
+import com.hazelcast2.nio.ConnectionManager;
 import com.hazelcast2.serialization.SerializationService;
 import com.hazelcast2.util.Sequence;
 
@@ -26,6 +27,7 @@ public abstract class Sector {
     private final int partitionId;
     public final SectorScheduler scheduler;
     public final SerializationService serializationService;
+    public final ConnectionManager connectionManager;
 
     public final Sequence prodSeq = new Sequence(INITIAL_VALUE);
     public final Sequence conSeq = new Sequence(INITIAL_VALUE);
@@ -45,6 +47,7 @@ public abstract class Sector {
         this.partitionId = settings.partitionId;
         this.scheduler = settings.scheduler;
         this.serializationService = settings.serializationService;
+        this.connectionManager = settings.connectionManager;
         this.ringbufferSize = settings.ringbufferSize;
         this.ringbuffer = new Invocation[ringbufferSize];
         for (int k = 0; k < ringbuffer.length; k++) {

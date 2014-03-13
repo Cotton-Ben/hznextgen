@@ -1,4 +1,4 @@
-package com.hazelcast2.util;
+package com.hazelcast2.nio;
 
 public class IOUtils {
 

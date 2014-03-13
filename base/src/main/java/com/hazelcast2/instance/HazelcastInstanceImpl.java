@@ -6,12 +6,15 @@ import com.hazelcast2.concurrent.atomicreference.AtomicReferenceService;
 import com.hazelcast2.concurrent.lock.LockService;
 import com.hazelcast2.core.*;
 import com.hazelcast2.map.MapService;
+import com.hazelcast2.nio.ConnectionManager;
+import com.hazelcast2.nio.Gateway;
+import com.hazelcast2.nio.impl.ConnectionManagerImpl;
 import com.hazelcast2.partition.PartitionService;
 import com.hazelcast2.partition.impl.PartitionServiceImpl;
 import com.hazelcast2.serialization.SerializationService;
 import com.hazelcast2.spi.SpiService;
 import com.hazelcast2.spi.SpiServiceSettings;
-import com.hazelcast2.util.IOUtils;
+import com.hazelcast2.nio.IOUtils;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -21,7 +24,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * be the first 16 bits. So when serialized operation is received, the first 16 bits can be
  * read to determine the service.
  */
-public class HazelcastInstanceImpl implements HazelcastInstance {
+public class HazelcastInstanceImpl implements HazelcastInstance,Gateway {
 
     private final PartitionService partitionService;
     private final SerializationService serializationService;
@@ -34,12 +37,12 @@ public class HazelcastInstanceImpl implements HazelcastInstance {
     private final AtomicReferenceService atomicReferenceService;
     private final LockService lockService;
     private final MapService mapService;
+    private final ConnectionManager connectionManager;
 
     public HazelcastInstanceImpl(Config config) {
-        //todo: should come from the config
-        int partitionCount = 271;
         this.config = config;
-        this.partitionService = new PartitionServiceImpl(partitionCount);
+        this.connectionManager = new ConnectionManagerImpl();
+        this.partitionService = new PartitionServiceImpl(config.getPartitionCount());
         this.serializationService = new SerializationService();
 
         this.services = new SpiService[5];
@@ -89,6 +92,7 @@ public class HazelcastInstanceImpl implements HazelcastInstance {
         SpiServiceSettings dependencies = new SpiServiceSettings();
         dependencies.partitionService = partitionService;
         dependencies.serializationService = serializationService;
+        dependencies.connectionManager = connectionManager;
         dependencies.config = config;
         dependencies.serviceId =serviceId;
         return dependencies;
@@ -130,6 +134,7 @@ public class HazelcastInstanceImpl implements HazelcastInstance {
         //todo: we need to shutdown the services.
     }
 
+    @Override
     public void dispatch(final byte[] bytes) {
         final short serviceId = getServiceId(bytes);
         final SpiService spiService = services[serviceId];

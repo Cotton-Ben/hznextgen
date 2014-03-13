@@ -1,6 +1,7 @@
 package com.hazelcast2.spi;
 
 import com.hazelcast2.core.Config;
+import com.hazelcast2.nio.ConnectionManager;
 import com.hazelcast2.partition.PartitionService;
 import com.hazelcast2.serialization.SerializationService;
 
@@ -10,4 +11,5 @@ public class SpiServiceSettings {
     public SerializationService serializationService;
     public Config config;
     public short serviceId;
+    public ConnectionManager connectionManager;
 }

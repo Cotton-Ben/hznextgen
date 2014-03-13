@@ -1,10 +1,10 @@
 package com.hazelcast2.concurrent.lock;
 
 import com.hazelcast2.core.ILock;
+import com.hazelcast2.nio.IOUtils;
 import com.hazelcast2.partition.PartitionService;
 import com.hazelcast2.spi.SpiService;
 import com.hazelcast2.spi.SpiServiceSettings;
-import com.hazelcast2.util.IOUtils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -35,6 +35,7 @@ public final class LockService implements SpiService {
         LockSectorSettings sectorSettings = new LockSectorSettings();
         sectorSettings.service = this;
         sectorSettings.serializationService = serviceSettings.serializationService;
+        sectorSettings.connectionManager = serviceSettings.connectionManager;
         sectorSettings.serviceId = serviceSettings.serviceId;
         sectorSettings.scheduler = partitionService.getScheduler();
         sectorSettings.partitionId = partitionId;

@@ -41,10 +41,11 @@ public class MapService implements SpiService {
         MapSector[] sectors = new MapSector[partitionService.getPartitionCount()];
         for (int partitionId = 0; partitionId < sectors.length; partitionId++) {
             MapSectorSettings sectorSettings = new MapSectorSettings();
-            sectorSettings.partitionId = partitionId;
             sectorSettings.scheduler = partitionService.getScheduler();
+            sectorSettings.partitionService = serviceSettings.partitionService;
+            sectorSettings.connectionManager = serviceSettings.connectionManager;
             sectorSettings.serviceId = serviceSettings.serviceId;
-            sectorSettings.partitionService = partitionService;
+            sectorSettings.partitionId = partitionId;
             sectorSettings.mapConfig = mapConfig;
             sectorSettings.serializationService = serviceSettings.serializationService;
             try {

@@ -12,9 +12,13 @@ public class Config {
         return this;
     }
 
-    public MapConfig getMapConfig(String name){
+    public int getPartitionCount() {
+        return 271;
+    }
+
+    public MapConfig getMapConfig(String name) {
         MapConfig config = mapConfigs.get(name);
-        if(config == null){
+        if (config == null) {
             config = new MapConfig("default");
         }
         return config;

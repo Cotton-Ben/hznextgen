@@ -4,7 +4,7 @@ import com.hazelcast2.core.IAtomicLong;
 import com.hazelcast2.partition.PartitionService;
 import com.hazelcast2.spi.SpiService;
 import com.hazelcast2.spi.SpiServiceSettings;
-import com.hazelcast2.util.IOUtils;
+import com.hazelcast2.nio.IOUtils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -34,10 +34,11 @@ public final class AtomicLongService implements SpiService {
     private LongSector newSector(SpiServiceSettings serviceSettings, int partitionId) {
         LongSectorSettings sectorSettings = new LongSectorSettings();
         sectorSettings.scheduler = partitionService.getScheduler();
+        sectorSettings.serializationService = serviceSettings.serializationService;
+        sectorSettings.connectionManager = serviceSettings.connectionManager;
         sectorSettings.service = this;
         sectorSettings.serviceId = serviceSettings.serviceId;
         sectorSettings.partitionId = partitionId;
-        sectorSettings.serializationService = serviceSettings.serializationService;
         try {
             return CONSTRUCTOR.newInstance(sectorSettings);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {

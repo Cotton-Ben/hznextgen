@@ -2,8 +2,8 @@ package ${class.packageName};
 
 import com.hazelcast2.spi.Invocation;
 import com.hazelcast2.util.InvocationFuture;
-import com.hazelcast2.util.IOUtils;
-import com.hazelcast2.util.ByteArrayObjectDataInput;
+import com.hazelcast2.nio.IOUtils;
+import com.hazelcast2.nio.ByteArrayObjectDataInput;
 
 import java.util.concurrent.Future;
 
@@ -33,25 +33,9 @@ public final class ${class.name} extends ${class.superName} {
     }
 <#list class.methods as method>
 
-     public Future<${method.returnTypeAsObject}> ${method.asyncName}(final long id${method.trailingComma}${method.formalArguments}) {
-        final long sequenceAndStatus = doClaimSlotAndReturnStatus();
-        final boolean schedule = isScheduled(sequenceAndStatus);
-
-        //we need to create a new instance because we are exposing this object to the outside world and can't
-        //pool it.
-        final InvocationFuture future = new InvocationFuture();
-
-        final long prodSeq = getSequence(sequenceAndStatus);
-        final Invocation invocation = getSlot(prodSeq);
-        invocation.invocationFuture = future;
-        invocation.id = id;
-        invocation.functionId = ${method.functionConstantName};
-        ${method.mapArgsToInvocation}
-        invocation.publish(prodSeq);
-
-        if(schedule) scheduler.schedule(this);
-        return future;
-    }
+    // ===================================================================================================
+    //                      ${method.name}
+    // ===================================================================================================
 
     public ${method.returnType} ${method.name}(final long id${method.trailingComma}${method.formalArguments}) {
         final long sequenceAndStatus = doClaimSlotAndReturnStatus();
@@ -95,6 +79,46 @@ public final class ${class.name} extends ${class.superName} {
         }finally{
             if(!success) scheduler.schedule(this);
         }
+    }
+
+    public Future<${method.returnTypeAsObject}> ${method.asyncName}(final long id${method.trailingComma}${method.formalArguments}) {
+        final long sequenceAndStatus = doClaimSlotAndReturnStatus();
+        final boolean schedule = isScheduled(sequenceAndStatus);
+
+        //we need to create a new instance because we are exposing this object to the outside world and can't pool it.
+        final InvocationFuture future = new InvocationFuture();
+
+        final long prodSeq = getSequence(sequenceAndStatus);
+        final Invocation invocation = getSlot(prodSeq);
+        invocation.invocationFuture = future;
+        invocation.id = id;
+        invocation.functionId = ${method.functionConstantName};
+        ${method.mapArgsToInvocation}
+        invocation.publish(prodSeq);
+
+        if(schedule) scheduler.schedule(this);
+        return future;
+    }
+
+    private void deserializeAndInvoke_${method.uniqueMethodName}(final byte[] bytes) throws Exception{
+        final long id = IOUtils.readLong(bytes, 8);
+        final ${class.cellName} cell = loadCell(id);
+
+    <#if method.hasOneArgOrMore>
+        ///todo: if a method only has 'simple' types like string, primitive etc. We should not need to create
+        //the ByteArrayObjectDataInput, but we can directly read from the bytes.
+        final ByteArrayObjectDataInput in = new ByteArrayObjectDataInput(bytes, 16, serializationService);
+    </#if>
+    <#if method.voidReturnType>
+        ${method.targetMethod}(cell${method.trailingComma} ${method.deserializedInvocationToArgs});
+    <#else>
+        final ${method.returnType} result = ${method.targetMethod}(cell${method.trailingComma} ${method.deserializedInvocationToArgs});
+    </#if>
+        //todo: now we need to send back a response to the invoking machine
+    }
+
+    private Future<${method.returnTypeAsObject}> remoteInvoke_${method.uniqueMethodName}(final long id${method.trailingComma}${method.formalArguments}) {
+        throw new UnsupportedOperationException();
     }
 </#list>
 
@@ -171,25 +195,6 @@ public final class ${class.name} extends ${class.superName} {
             e.printStackTrace();
         }
     }
-<#list class.methods as method>
-
-    private void deserializeAndInvoke_${method.uniqueMethodName}(final byte[] bytes) throws Exception{
-        final long id = IOUtils.readLong(bytes, 8);
-        final ${class.cellName} cell = loadCell(id);
-
-    <#if method.hasOneArgOrMore>
-        ///todo: if a method only has 'simple' types like string, primitive etc. We should not need to create
-        //the ByteArrayObjectDataInput, but we can directly read from the bytes.
-        final ByteArrayObjectDataInput in = new ByteArrayObjectDataInput(bytes, 16, serializationService);
-    </#if>
-    <#if method.voidReturnType>
-        ${method.targetMethod}(cell${method.trailingComma} ${method.deserializedInvocationToArgs});
-    <#else>
-        final ${method.returnType} result = ${method.targetMethod}(cell${method.trailingComma} ${method.deserializedInvocationToArgs});
-    </#if>
-        //todo: now we need to send back a response to the invoking machine
-    }
-</#list>
 
     //todo: do we need this method in this subclass or can we move it to sector?
     public void schedule(final byte[] invocationBytes){

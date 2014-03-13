@@ -4,9 +4,9 @@ import org.junit.Test;
 
 import java.nio.ByteBuffer;
 
-import static com.hazelcast2.util.IOUtils.readInt;
-import static com.hazelcast2.util.IOUtils.readLong;
-import static com.hazelcast2.util.IOUtils.readShort;
+import static com.hazelcast2.nio.IOUtils.readInt;
+import static com.hazelcast2.nio.IOUtils.readLong;
+import static com.hazelcast2.nio.IOUtils.readShort;
 import static org.junit.Assert.assertEquals;
 
 public class IOUtilsTest {

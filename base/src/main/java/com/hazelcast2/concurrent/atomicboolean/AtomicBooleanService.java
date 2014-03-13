@@ -4,7 +4,7 @@ import com.hazelcast2.core.IAtomicBoolean;
 import com.hazelcast2.partition.PartitionService;
 import com.hazelcast2.spi.SpiService;
 import com.hazelcast2.spi.SpiServiceSettings;
-import com.hazelcast2.util.IOUtils;
+import com.hazelcast2.nio.IOUtils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -33,9 +33,10 @@ public final class AtomicBooleanService implements SpiService {
 
     private BooleanSector newSector(SpiServiceSettings serviceSettings, int partitionId) {
         BooleanSectorSettings sectorSettings = new BooleanSectorSettings();
-        sectorSettings.partitionId = partitionId;
         sectorSettings.scheduler = partitionService.getScheduler();
         sectorSettings.serializationService = serviceSettings.serializationService;
+        sectorSettings.connectionManager = serviceSettings.connectionManager;
+        sectorSettings.partitionId = partitionId;
         sectorSettings.serviceId = serviceSettings.serviceId;
         sectorSettings.service = this;
         try {
