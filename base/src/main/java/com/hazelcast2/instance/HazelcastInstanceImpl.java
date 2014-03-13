@@ -65,6 +65,26 @@ public class HazelcastInstanceImpl implements HazelcastInstance {
         services[serviceId] = mapService;
     }
 
+    public AtomicLongService getAtomicLongService() {
+        return atomicLongService;
+    }
+
+    public AtomicBooleanService getAtomicBooleanService() {
+        return atomicBooleanService;
+    }
+
+    public AtomicReferenceService getAtomicReferenceService() {
+        return atomicReferenceService;
+    }
+
+    public LockService getLockService() {
+        return lockService;
+    }
+
+    public MapService getMapService() {
+        return mapService;
+    }
+
     private SpiServiceSettings newSpiServiceSettings(short serviceId){
         SpiServiceSettings dependencies = new SpiServiceSettings();
         dependencies.partitionService = partitionService;

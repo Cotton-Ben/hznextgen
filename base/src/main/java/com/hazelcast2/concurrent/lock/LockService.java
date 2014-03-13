@@ -17,9 +17,11 @@ public final class LockService implements SpiService {
 
     private final LockSector[] sectors;
     private final PartitionService partitionService;
+    private final short serviceId;
 
     public LockService(SpiServiceSettings serviceSettings) {
         this.partitionService = serviceSettings.partitionService;
+        this.serviceId = serviceSettings.serviceId;
 
         Constructor<LockSector> constructor = getConstructor(CLASS_NAME, LockSectorSettings.class);
         SectorScheduler scheduler = partitionService.getScheduler();
@@ -40,6 +42,11 @@ public final class LockService implements SpiService {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    @Override
+    public short getServiceId() {
+        return serviceId;
     }
 
     public ILock getDistributedObject(final String name) {

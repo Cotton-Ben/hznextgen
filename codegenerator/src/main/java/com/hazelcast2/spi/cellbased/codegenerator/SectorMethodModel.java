@@ -160,6 +160,10 @@ public class SectorMethodModel {
         return "FUNCTION_" + name + args.size();
     }
 
+    public String getUniqueMethodName() {
+        return name + args.size();
+    }
+
     public String getTrailingComma() {
         return args.size() == 0 ? "" : ", ";
     }

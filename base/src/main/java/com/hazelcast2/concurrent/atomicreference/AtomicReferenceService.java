@@ -17,9 +17,11 @@ public final class AtomicReferenceService implements SpiService {
 
     private final ReferenceSector[] sectors;
     private final PartitionService partitionService;
+    private final short serviceId;
 
     public AtomicReferenceService(SpiServiceSettings serviceSettings) {
         this.partitionService = serviceSettings.partitionService;
+        this.serviceId = serviceSettings.serviceId;
 
         Constructor<ReferenceSector> constructor = getConstructor(CLASS_NAME,ReferenceSectorSettings.class);
         SectorScheduler scheduler = partitionService.getScheduler();
@@ -40,6 +42,11 @@ public final class AtomicReferenceService implements SpiService {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    @Override
+    public short getServiceId() {
+        return serviceId;
     }
 
     public IAtomicReference getDistributedObject(final String name) {

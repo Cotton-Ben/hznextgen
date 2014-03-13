@@ -1,20 +1,16 @@
 package ${class.packageName};
 
 import com.hazelcast2.spi.Invocation;
-import com.hazelcast2.spi.SectorSettings;
 import com.hazelcast2.util.InvocationFuture;
 import com.hazelcast2.util.IOUtils;
 import com.hazelcast2.util.ByteArrayObjectDataInput;
 
-import java.io.ByteArrayInputStream;
 import java.util.concurrent.Future;
 
 public final class ${class.name} extends ${class.superName} {
 
-    //id's are short. So we have 15 bits to identify the function, and 1 bit to see if is readonly or update.
-    //If the switch case for these negative values is not optimally jitted, we can e.g. do something with even number.
 <#list class.methods as method>
-    private final static short ${method.functionConstantName} = ${method.functionId};
+    public final static short ${method.functionConstantName} = ${method.functionId};
 </#list>
 
     public ${class.name}(${class.superName}Settings settings) {
@@ -119,9 +115,9 @@ public final class ${class.name} extends ${class.superName} {
                 final Invocation invocation = getSlot(consumerSeq);
                 invocation.awaitPublication(consumerSeq);
                 if(invocation.bytes == null){
-                    dispatch(invocation);
+                    invoke(invocation);
                 }else{
-                    deserializeAndDispatch(invocation);
+                    deserializeAndInvoke(invocation);
                 }
                 invocation.clear();
                 consumerSeq++;
@@ -130,7 +126,7 @@ public final class ${class.name} extends ${class.superName} {
         }
     }
 
-    private void dispatch(final Invocation invocation) {
+    private void invoke(final Invocation invocation) {
         final ${class.cellName} cell = loadCell(invocation.id);
         try{
             switch (invocation.functionId) {
@@ -156,30 +152,15 @@ public final class ${class.name} extends ${class.superName} {
         }
     }
 
-    private void deserializeAndDispatch(final Invocation invocation){
+    private void deserializeAndInvoke(final Invocation invocation){
         final byte[] bytes = invocation.bytes;
-        final short functionId = IOUtils.readShort(bytes, 4);
-        final long id = IOUtils.readLong(bytes, 6);
-        final ${class.cellName} cell = loadCell(id);
-
-        ///todo: if a method only has 'simple' types like string, primitive etc. We should not need to create
-        //the ByteArrayObjectDataInput, but we can directly read from the bytes.
+        final short functionId = IOUtils.readShort(bytes, 6);
 
         try{
-            switch (invocation.functionId) {
+            switch (functionId) {
 <#list class.methods as method>
                 case ${method.functionConstantName}:
-                    {
-    <#if method.hasOneArgOrMore>
-                        ByteArrayObjectDataInput in = new ByteArrayObjectDataInput(bytes, 14, serializationService);
-    </#if>
-    <#if method.voidReturnType>
-                        ${method.targetMethod}(cell${method.trailingComma} ${method.deserializedInvocationToArgs});
-    <#else>
-                        final ${method.returnType} result = ${method.targetMethod}(cell${method.trailingComma} ${method.deserializedInvocationToArgs});
-    </#if>
-                        //todo: now we need to send back a response to the invoking machine
-                    }
+                    deserializeAndInvoke_${method.uniqueMethodName}(bytes);
                     break;
 </#list>
                 default:
@@ -190,6 +171,25 @@ public final class ${class.name} extends ${class.superName} {
             e.printStackTrace();
         }
     }
+<#list class.methods as method>
+
+    private void deserializeAndInvoke_${method.uniqueMethodName}(final byte[] bytes) throws Exception{
+        final long id = IOUtils.readLong(bytes, 8);
+        final ${class.cellName} cell = loadCell(id);
+
+    <#if method.hasOneArgOrMore>
+        ///todo: if a method only has 'simple' types like string, primitive etc. We should not need to create
+        //the ByteArrayObjectDataInput, but we can directly read from the bytes.
+        final ByteArrayObjectDataInput in = new ByteArrayObjectDataInput(bytes, 16, serializationService);
+    </#if>
+    <#if method.voidReturnType>
+        ${method.targetMethod}(cell${method.trailingComma} ${method.deserializedInvocationToArgs});
+    <#else>
+        final ${method.returnType} result = ${method.targetMethod}(cell${method.trailingComma} ${method.deserializedInvocationToArgs});
+    </#if>
+        //todo: now we need to send back a response to the invoking machine
+    }
+</#list>
 
     //todo: do we need this method in this subclass or can we move it to sector?
     public void schedule(final byte[] invocationBytes){

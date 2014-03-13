@@ -82,8 +82,7 @@ public class SectorCodeGenerator extends AbstractProcessor {
                 method.invocationClassName = capitalizeFirstLetter(methodName) + argCount + "Invocation";
                 method.targetMethod = methodName;
                 method.readonly = operationAnnotation.readonly();
-                int functionId = clazz.methods.size();
-                method.functionId = method.readonly?-functionId:functionId;
+                method.functionId =clazz.methods.size();
 
                 int k = 0;
                 for (VariableElement variableElement : methodElement.getParameters()) {

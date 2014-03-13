@@ -10,6 +10,8 @@ public class SectorSettings {
     public PartitionService partitionService;
     public SerializationService serializationService;
     public short serviceId;
+    public byte asyncBackupCount;
+    public byte syncBackupCOunt;
 
     public SectorSettings(){}
 

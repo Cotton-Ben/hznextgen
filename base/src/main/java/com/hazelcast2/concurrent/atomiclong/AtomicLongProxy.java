@@ -17,6 +17,10 @@ public class AtomicLongProxy implements IAtomicLong {
         this.id = id;
     }
 
+    public LongSector getSector(){
+        return sector;
+    }
+
     @Override
     public String getName() {
         return name;

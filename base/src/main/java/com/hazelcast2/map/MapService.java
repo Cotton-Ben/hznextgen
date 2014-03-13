@@ -20,12 +20,19 @@ public class MapService implements SpiService {
     private final Constructor<MapSector> constructor;
     private final Config config;
     private final SpiServiceSettings serviceSettings;
+    private final short serviceId;
 
-    public MapService(SpiServiceSettings sectorSettings) {
-        this.partitionService = sectorSettings.partitionService;
+    public MapService(SpiServiceSettings serviceSettings) {
+        this.partitionService = serviceSettings.partitionService;
+        this.serviceId = serviceSettings.serviceId;
         this.constructor = getConstructor(CLASS_NAME, MapSectorSettings.class);
-        this.serviceSettings = sectorSettings;
-        this.config = sectorSettings.config;
+        this.serviceSettings = serviceSettings;
+        this.config = serviceSettings.config;
+    }
+
+    @Override
+    public short getServiceId() {
+        return serviceId;
     }
 
     public IMap getDistributedObject(String name) {

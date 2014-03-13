@@ -18,9 +18,11 @@ public final class AtomicLongService implements SpiService {
 
     private final LongSector[] sectors;
     private final PartitionService partitionService;
+    private final short serviceId;
 
     public AtomicLongService(SpiServiceSettings serviceSettings) {
         this.partitionService = serviceSettings.partitionService;
+        this.serviceId = serviceSettings.serviceId;
 
         Constructor<LongSector> constructor = getConstructor(CLASS_NAME, LongSectorSettings.class);
         SectorScheduler scheduler = partitionService.getScheduler();
@@ -43,6 +45,11 @@ public final class AtomicLongService implements SpiService {
         }
     }
 
+    @Override
+    public short getServiceId() {
+        return serviceId;
+    }
+
     public IAtomicLong getDistributedObject(final String name) {
         if (name == null) {
             throw new NullPointerException("name can't be null");
@@ -56,12 +63,12 @@ public final class AtomicLongService implements SpiService {
 
     @Override
     public void schedule(final byte[] invocationBytes) {
-        final short partitionId = getPartitionId(invocationBytes);
+        final int partitionId = getPartitionId(invocationBytes);
         final LongSector sector = sectors[partitionId];
         sector.schedule(invocationBytes);
     }
 
-    private short getPartitionId(byte[] bytes) {
-        return IOUtils.readShort(bytes, 2);
+    private int getPartitionId(byte[] bytes) {
+        return IOUtils.readInt(bytes, 2);
     }
 }

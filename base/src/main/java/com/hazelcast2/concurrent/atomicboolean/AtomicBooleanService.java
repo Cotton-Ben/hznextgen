@@ -17,9 +17,11 @@ public final class AtomicBooleanService implements SpiService {
 
     private final BooleanSector[] sectors;
     private final PartitionService partitionService;
+    private final short serviceId;
 
     public AtomicBooleanService(SpiServiceSettings serviceSettings) {
         this.partitionService = serviceSettings.partitionService;
+        this.serviceId = serviceSettings.serviceId;
 
         Constructor<BooleanSector> constructor = getConstructor(CLASS_NAME, BooleanSectorSettings.class);
 
@@ -40,6 +42,11 @@ public final class AtomicBooleanService implements SpiService {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    @Override
+    public short getServiceId() {
+        return serviceId;
     }
 
     public IAtomicBoolean getDistributedObject(final String name) {
