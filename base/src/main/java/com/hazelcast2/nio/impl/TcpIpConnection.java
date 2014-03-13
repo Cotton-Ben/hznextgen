@@ -4,8 +4,15 @@ import com.hazelcast2.nio.Address;
 import com.hazelcast2.nio.Connection;
 
 import java.nio.ByteBuffer;
+import java.nio.channels.SocketChannel;
 
 public class TcpIpConnection implements Connection {
+
+    protected final SocketChannel socketChannel;
+
+    public TcpIpConnection(SocketChannel socketChannel) {
+        this.socketChannel = socketChannel;
+    }
 
     @Override
     public ByteBuffer newByteBuffer() {

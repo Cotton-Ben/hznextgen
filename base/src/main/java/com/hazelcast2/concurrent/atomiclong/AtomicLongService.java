@@ -35,7 +35,6 @@ public final class AtomicLongService implements SpiService {
         LongSectorSettings sectorSettings = new LongSectorSettings();
         sectorSettings.scheduler = partitionService.getScheduler();
         sectorSettings.serializationService = serviceSettings.serializationService;
-        sectorSettings.connectionManager = serviceSettings.connectionManager;
         sectorSettings.service = this;
         sectorSettings.serviceId = serviceSettings.serviceId;
         sectorSettings.partitionId = partitionId;

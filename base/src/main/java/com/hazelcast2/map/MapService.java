@@ -43,11 +43,10 @@ public class MapService implements SpiService {
             MapSectorSettings sectorSettings = new MapSectorSettings();
             sectorSettings.scheduler = partitionService.getScheduler();
             sectorSettings.partitionService = serviceSettings.partitionService;
-            sectorSettings.connectionManager = serviceSettings.connectionManager;
+            sectorSettings.serializationService = serviceSettings.serializationService;
             sectorSettings.serviceId = serviceSettings.serviceId;
             sectorSettings.partitionId = partitionId;
             sectorSettings.mapConfig = mapConfig;
-            sectorSettings.serializationService = serviceSettings.serializationService;
             try {
                 sectors[partitionId] = constructor.newInstance(sectorSettings);
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {

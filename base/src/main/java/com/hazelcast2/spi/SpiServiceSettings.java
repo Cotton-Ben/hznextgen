@@ -11,5 +11,4 @@ public class SpiServiceSettings {
     public SerializationService serializationService;
     public Config config;
     public short serviceId;
-    public ConnectionManager connectionManager;
 }

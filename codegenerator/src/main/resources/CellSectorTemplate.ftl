@@ -1,9 +1,8 @@
 package ${class.packageName};
 
-import com.hazelcast2.spi.Invocation;
-import com.hazelcast2.util.InvocationFuture;
-import com.hazelcast2.nio.IOUtils;
-import com.hazelcast2.nio.ByteArrayObjectDataInput;
+import com.hazelcast2.spi.*;
+import com.hazelcast2.util.*;
+import com.hazelcast2.nio.*;
 
 import java.util.concurrent.Future;
 
@@ -38,7 +37,21 @@ public final class ${class.name} extends ${class.superName} {
     // ===================================================================================================
 
     public ${method.returnType} ${method.name}(final long id${method.trailingComma}${method.formalArguments}) {
-        final long sequenceAndStatus = doClaimSlotAndReturnStatus();
+         final long sequenceAndStatus = claimSlotAndReturnStatus();
+
+         if (sequenceAndStatus == CLAIM_SLOT_LOCKED) {
+            InvocationFuture future = remoteInvoke_${method.uniqueMethodName}(id${method.trailingComma}${method.actualArguments});
+    <#if method.voidReturnType>
+            future.getSafely();
+            return;
+    <#else>
+            return (${method.returnTypeAsObject})future.getSafely();
+    </#if>
+         }
+
+         if (sequenceAndStatus == CLAIM_SLOT_NO_CAPACITY) {
+            throw new UnsupportedOperationException();
+         }
 
         if (!isScheduled(sequenceAndStatus)) {
             final long prodSeq = getSequence(sequenceAndStatus);
@@ -50,9 +63,6 @@ public final class ${class.name} extends ${class.superName} {
             invocation.functionId = ${method.functionConstantName};
             ${method.mapArgsToInvocation}
             invocation.publish(prodSeq);
-            //instead of waiting, is it possible to help out other partitions/subsystems?
-            //the thing you need to be careful with is that you should not keep building up
-            //stackframes, because eventually you will get a stackoverflow.
     <#if method.voidReturnType>
             future.getSafely();
             return;
@@ -81,7 +91,7 @@ public final class ${class.name} extends ${class.superName} {
         }
     }
 
-    public Future<${method.returnTypeAsObject}> ${method.asyncName}(final long id${method.trailingComma}${method.formalArguments}) {
+    public InvocationFuture ${method.asyncName}(final long id${method.trailingComma}${method.formalArguments}) {
         final long sequenceAndStatus = doClaimSlotAndReturnStatus();
         final boolean schedule = isScheduled(sequenceAndStatus);
 
@@ -117,7 +127,8 @@ public final class ${class.name} extends ${class.superName} {
         //todo: now we need to send back a response to the invoking machine
     }
 
-    private Future<${method.returnTypeAsObject}> remoteInvoke_${method.uniqueMethodName}(final long id${method.trailingComma}${method.formalArguments}) {
+    private InvocationFuture remoteInvoke_${method.uniqueMethodName}(final long id${method.trailingComma}${method.formalArguments}) {
+        InvocationEndpoint endpoint = endpoints[0];
         throw new UnsupportedOperationException();
     }
 </#list>

@@ -35,7 +35,6 @@ public final class LockService implements SpiService {
         LockSectorSettings sectorSettings = new LockSectorSettings();
         sectorSettings.service = this;
         sectorSettings.serializationService = serviceSettings.serializationService;
-        sectorSettings.connectionManager = serviceSettings.connectionManager;
         sectorSettings.serviceId = serviceSettings.serviceId;
         sectorSettings.scheduler = partitionService.getScheduler();
         sectorSettings.partitionId = partitionId;

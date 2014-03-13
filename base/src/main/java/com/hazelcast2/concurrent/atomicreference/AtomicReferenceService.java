@@ -35,7 +35,6 @@ public final class AtomicReferenceService implements SpiService {
         ReferenceSectorSettings sectorSettings = new ReferenceSectorSettings();
         sectorSettings.scheduler = partitionService.getScheduler();
         sectorSettings.serializationService = serviceSettings.serializationService;
-        sectorSettings.connectionManager = serviceSettings.connectionManager;
         sectorSettings.partitionId = partitionId;
         sectorSettings.serviceId = serviceSettings.serviceId;
         sectorSettings.service = this;

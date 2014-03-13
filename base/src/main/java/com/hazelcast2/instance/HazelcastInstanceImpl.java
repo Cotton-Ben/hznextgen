@@ -92,7 +92,6 @@ public class HazelcastInstanceImpl implements HazelcastInstance,Gateway {
         SpiServiceSettings dependencies = new SpiServiceSettings();
         dependencies.partitionService = partitionService;
         dependencies.serializationService = serializationService;
-        dependencies.connectionManager = connectionManager;
         dependencies.config = config;
         dependencies.serviceId =serviceId;
         return dependencies;

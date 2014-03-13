@@ -1,6 +1,5 @@
 package com.hazelcast2.spi;
 
-import com.hazelcast2.nio.ConnectionManager;
 import com.hazelcast2.serialization.SerializationService;
 import com.hazelcast2.util.Sequence;
 
@@ -27,8 +26,20 @@ public abstract class Sector {
     private final int partitionId;
     public final SectorScheduler scheduler;
     public final SerializationService serializationService;
-    public final ConnectionManager connectionManager;
 
+    /**
+     * The endpoints for a sector. So a sector can be in multiple states:
+     * - it is the master
+     * - it is a backup
+     * - none of the above
+     * In this endpoints you can find on the first position the master and after that you
+     * get the replicas. These endpoints will be updated when partitions are moving around.
+     * <p/>
+     * The advantage of this approach instead of first looking up the replica index, and then
+     * retrieving the connection, you immediately have the endpoints available without needing
+     * to do any lookup.
+     */
+    public volatile InvocationEndpoint[] endpoints;
     public final Sequence prodSeq = new Sequence(INITIAL_VALUE);
     public final Sequence conSeq = new Sequence(INITIAL_VALUE);
 
@@ -47,7 +58,6 @@ public abstract class Sector {
         this.partitionId = settings.partitionId;
         this.scheduler = settings.scheduler;
         this.serializationService = settings.serializationService;
-        this.connectionManager = settings.connectionManager;
         this.ringbufferSize = settings.ringbufferSize;
         this.ringbuffer = new Invocation[ringbufferSize];
         for (int k = 0; k < ringbuffer.length; k++) {
