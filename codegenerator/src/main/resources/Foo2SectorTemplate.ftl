@@ -19,7 +19,7 @@ public final class ${class.name} extends ${class.superName} {
     private long doClaimSlotAndReturnStatus(){
         final long sequenceAndStatus = claimSlotAndReturnStatus();
 
-        if (sequenceAndStatus == CLAIM_SLOT_LOCKED) {
+        if (sequenceAndStatus == CLAIM_SLOT_REMOTE) {
             throw new UnsupportedOperationException();
         }
 

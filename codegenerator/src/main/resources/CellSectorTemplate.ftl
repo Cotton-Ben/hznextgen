@@ -15,21 +15,6 @@ public final class ${class.name} extends ${class.superName} {
     public ${class.name}(${class.superName}Settings settings) {
         super(settings);
     }
-
-    //todo: this method is replicated in alll sectors..
-    private long doClaimSlotAndReturnStatus(){
-        final long sequenceAndStatus = claimSlotAndReturnStatus();
-
-        if (sequenceAndStatus == CLAIM_SLOT_LOCKED) {
-            throw new UnsupportedOperationException();
-        }
-
-        if (sequenceAndStatus == CLAIM_SLOT_NO_CAPACITY) {
-            throw new UnsupportedOperationException();
-        }
-
-        return sequenceAndStatus;
-    }
 <#list class.methods as method>
 
     // ===================================================================================================
@@ -39,8 +24,8 @@ public final class ${class.name} extends ${class.superName} {
     public ${method.returnType} ${method.name}(final long id${method.trailingComma}${method.formalArguments}) {
          final long sequenceAndStatus = claimSlotAndReturnStatus();
 
-         if (sequenceAndStatus == CLAIM_SLOT_LOCKED) {
-            InvocationFuture future = remoteInvoke_${method.uniqueMethodName}(id${method.trailingComma}${method.actualArguments});
+         if (sequenceAndStatus == CLAIM_SLOT_REMOTE) {
+            InvocationFuture future = remoteInvoke_${method.name}(id${method.trailingComma}${method.actualArguments});
     <#if method.voidReturnType>
             future.getSafely();
             return;
@@ -92,7 +77,16 @@ public final class ${class.name} extends ${class.superName} {
     }
 
     public InvocationFuture ${method.asyncName}(final long id${method.trailingComma}${method.formalArguments}) {
-        final long sequenceAndStatus = doClaimSlotAndReturnStatus();
+        final long sequenceAndStatus = claimSlotAndReturnStatus();
+
+        if (sequenceAndStatus == CLAIM_SLOT_REMOTE) {
+            return remoteInvoke_${method.name}(id${method.trailingComma}${method.actualArguments});
+        }
+
+        if (sequenceAndStatus == CLAIM_SLOT_NO_CAPACITY) {
+            throw new UnsupportedOperationException();
+        }
+
         final boolean schedule = isScheduled(sequenceAndStatus);
 
         //we need to create a new instance because we are exposing this object to the outside world and can't pool it.
@@ -127,9 +121,22 @@ public final class ${class.name} extends ${class.superName} {
         //todo: now we need to send back a response to the invoking machine
     }
 
-    private InvocationFuture remoteInvoke_${method.uniqueMethodName}(final long id${method.trailingComma}${method.formalArguments}) {
-        InvocationEndpoint endpoint = endpoints[0];
-        throw new UnsupportedOperationException();
+    private InvocationFuture remoteInvoke_${method.name}(final long id${method.trailingComma}${method.formalArguments}) {
+        InvocationFuture invocationFuture = new InvocationFuture();
+        try{
+            ByteArrayObjectDataOutput out = new ByteArrayObjectDataOutput(serializationService);
+            out.writeShort(serviceId);
+            out.writeInt(partitionId);
+            out.writeShort(${method.functionConstantName});
+            out.writeLong(id);
+            ${method.argsToSerialize}
+            InvocationEndpoint endpoint = endpoints[0];
+            endpoint.invoke(out.toByteArray());
+            //todo: we need to register the future. We also need to generate a call id.
+        }catch(Exception e){
+            invocationFuture.setResponseException(e);
+        }
+        return invocationFuture;
     }
 </#list>
 
@@ -166,8 +173,7 @@ public final class ${class.name} extends ${class.superName} {
         try{
             switch (invocation.functionId) {
 <#list class.methods as method>
-                case ${method.functionConstantName}:
-                    {
+                case ${method.functionConstantName}:{
     <#if method.voidReturnType>
                         ${method.targetMethod}(cell ${method.trailingComma}${method.invocationToArgs});
                         invocation.invocationFuture.setVoidResponse();
@@ -209,7 +215,15 @@ public final class ${class.name} extends ${class.superName} {
 
     //todo: do we need this method in this subclass or can we move it to sector?
     public void schedule(final byte[] invocationBytes){
-        final long sequenceAndStatus = doClaimSlotAndReturnStatus();
+        final long sequenceAndStatus = claimSlotAndReturnStatus();
+
+        if (sequenceAndStatus == CLAIM_SLOT_REMOTE) {
+            throw new UnsupportedOperationException();
+        }
+
+        if (sequenceAndStatus == CLAIM_SLOT_NO_CAPACITY) {
+            throw new UnsupportedOperationException();
+        }
 
         final boolean schedule = isScheduled(sequenceAndStatus);
 

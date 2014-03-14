@@ -18,6 +18,7 @@ public class IAtomicLongDispatchTest extends HazelcastTestSupport {
     @Before
     public void setUp() {
         hz = (HazelcastInstanceImpl) Hazelcast.newHazelcastInstance();
+        hz.startMaster();
     }
 
     @After

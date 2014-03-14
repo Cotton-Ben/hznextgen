@@ -13,4 +13,10 @@ public interface HazelcastInstance {
     IMap getMap(String name);
 
     void shutdown();
+
+    //temp methods
+
+    void startMaster();
+
+    void startAndJoin(HazelcastInstance master);
 }

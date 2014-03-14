@@ -122,6 +122,33 @@ public class SectorMethodModel {
         return sb.toString();
     }
 
+    public String getArgsToSerialize() {
+        StringBuffer sb = new StringBuffer();
+        for (int k = 1; k <= args.size(); k++) {
+            String arg = args.get(k - 1);
+            if ("long".equals(arg)) {
+                sb.append("out.writeLong(arg").append(k).append(");\n");
+            } else if ("boolean".equals(arg)) {
+                sb.append("out.writeBoolean(arg").append(k).append(");\n");
+            } else if ("int".equals(arg)) {
+                sb.append("out.writeInt(arg").append(k).append(");\n");
+            } else if ("byte".equals(arg)) {
+                sb.append("out.writeByte(arg").append(k).append(");\n");
+            } else if ("float".equals(arg)) {
+                sb.append("out.writeFloat(arg").append(k).append(");\n");
+            } else if ("double".equals(arg)) {
+                sb.append("out.writeDouble(arg").append(k).append(");\n");
+            } else if ("char".equals(arg)) {
+                sb.append("out.writeChar(arg").append(k).append(");\n");
+            } else if ("short".equals(arg)) {
+                sb.append("out.writeShort(arg").append(k).append(");\n");
+            } else {
+                sb.append("out.writeObject(arg").append(k).append(");\n");
+            }
+        }
+        return sb.toString();
+    }
+
     public List<String> getPrimitiveArgs() {
         List<String> result = new LinkedList<>();
         for (String arg : args) {

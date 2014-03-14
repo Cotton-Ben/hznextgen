@@ -19,6 +19,7 @@ public class IAtomicReferenceTest extends HazelcastTestSupport {
     @Before
     public void setUp() {
         hz = Hazelcast.newHazelcastInstance();
+        hz.startMaster();
     }
 
     @After

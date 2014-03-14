@@ -17,6 +17,7 @@ public class IMapTest extends HazelcastTestSupport {
     @Before
     public void setUp() {
         hz = Hazelcast.newHazelcastInstance();
+        hz.startMaster();
     }
 
     @After

@@ -1,5 +1,6 @@
 package com.hazelcast2.concurrent.atomicreference;
 
+import com.hazelcast2.concurrent.atomicboolean.BooleanSector;
 import com.hazelcast2.core.IAtomicReference;
 import com.hazelcast2.partition.PartitionService;
 import com.hazelcast2.spi.SpiService;
@@ -70,5 +71,15 @@ public final class AtomicReferenceService implements SpiService {
 
     private int getPartitionId(byte[] bytes) {
         return IOUtils.readInt(bytes, 2);
+    }
+
+    @Override
+    public void enablePartition(int partitionId, boolean enable) {
+        ReferenceSector sector = sectors[partitionId];
+        if (enable) {
+            sector.unlock();
+        } else {
+            sector.lock();
+        }
     }
 }

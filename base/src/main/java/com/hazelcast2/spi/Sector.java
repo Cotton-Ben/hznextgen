@@ -15,15 +15,15 @@ import java.util.concurrent.Future;
  */
 public abstract class Sector {
 
-    public static final long CLAIM_SLOT_LOCKED = -2;
+    public static final long CLAIM_SLOT_REMOTE = -2;
     public static final long CLAIM_SLOT_NO_CAPACITY = -3;
     public static final int DELTA = 4;
-    public static final long INITIAL_VALUE = 0;
     public static final int MASK_LOCKED = 1;
+    public static final long INITIAL_VALUE = MASK_LOCKED;
     public static final int MASK_SCHEDULED = 2;
 
     private volatile boolean isLocked;
-    private final int partitionId;
+    public final int partitionId;
     public final SectorScheduler scheduler;
     public final SerializationService serializationService;
 
@@ -41,7 +41,7 @@ public abstract class Sector {
      */
     public volatile InvocationEndpoint[] endpoints;
     public final Sequence prodSeq = new Sequence(INITIAL_VALUE);
-    public final Sequence conSeq = new Sequence(INITIAL_VALUE);
+    public final Sequence conSeq = new Sequence(0);
 
     public final Invocation[] ringbuffer;
     public final int ringbufferSize;
@@ -122,7 +122,7 @@ public abstract class Sector {
             final long oldProdSeq = prodSeq.get();
 
             if ((oldProdSeq & MASK_LOCKED) != 0) {
-                return CLAIM_SLOT_LOCKED;
+                return CLAIM_SLOT_REMOTE;
             }
 
             //todo: shitty name p.

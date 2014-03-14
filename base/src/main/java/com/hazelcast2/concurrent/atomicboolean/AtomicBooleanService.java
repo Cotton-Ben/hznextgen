@@ -71,4 +71,14 @@ public final class AtomicBooleanService implements SpiService {
     private int getPartitionId(byte[] bytes) {
         return IOUtils.readInt(bytes, 2);
     }
+
+    @Override
+    public void enablePartition(int partitionId, boolean enable) {
+        BooleanSector sector = sectors[partitionId];
+        if (enable) {
+            sector.unlock();
+        } else {
+            sector.lock();
+        }
+    }
 }

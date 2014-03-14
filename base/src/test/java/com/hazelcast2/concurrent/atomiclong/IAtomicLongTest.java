@@ -21,6 +21,7 @@ public class IAtomicLongTest {
     @Before
     public void setUp() {
         hz = Hazelcast.newHazelcastInstance();
+        hz.startMaster();
     }
 
     @After

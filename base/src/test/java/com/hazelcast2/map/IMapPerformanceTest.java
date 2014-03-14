@@ -18,6 +18,7 @@ public class IMapPerformanceTest {
     @Before
     public void setUp() {
         hz = Hazelcast.newHazelcastInstance();
+        hz.startMaster();
     }
 
     @After

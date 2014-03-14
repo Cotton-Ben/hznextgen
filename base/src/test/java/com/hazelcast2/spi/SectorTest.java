@@ -13,7 +13,7 @@ public class SectorTest {
 
     @Test
     public void usingRingbufferForFewRounds() {
-        Sector sector = generatePartition(64);
+        Sector sector = generateSector(64);
 
         for (int k = 0; k < 1000; k++) {
             long seq = sector.claimSlotAndReturnStatus();
@@ -24,19 +24,21 @@ public class SectorTest {
         }
     }
 
-    public Sector generatePartition(int ringBufferSize) {
+    public Sector generateSector(int ringBufferSize) {
         SectorScheduler sectorScheduler = new SectorScheduler(1024,1);
         LongSectorSettings settings = new LongSectorSettings();
         settings.partitionId = 1;
         settings.scheduler = sectorScheduler;
         settings.ringbufferSize = ringBufferSize;
-        return new GeneratedLongSector(settings);
+        Sector sector = new GeneratedLongSector(settings);
+        sector.unlock();
+        return sector;
     }
 
     @Test
     public void claimSlot_whenOverloadDetected() {
         int length = 64;
-        Sector sector = generatePartition(length);
+        Sector sector = generateSector(length);
 
         for (int k = 0; k < length; k++) {
             long seq = sector.claimSlotAndReturnStatus();
@@ -48,7 +50,7 @@ public class SectorTest {
 
     @Test
     public void claimSlot_whenUnscheduled_thenSchedule() {
-        Sector sector = generatePartition(64);
+        Sector sector = generateSector(64);
         long initialSeq = sector.prodSeq.get();
 
         long seq = sector.claimSlotAndReturnStatus();
@@ -63,13 +65,13 @@ public class SectorTest {
 
     @Test
     public void claimSlot_whenLocked() {
-        Sector sector = generatePartition(64);
+        Sector sector = generateSector(64);
         sector.lock();
         long initialSeq = sector.prodSeq.get();
 
         long seq = sector.claimSlotAndReturnStatus();
 
-        assertEquals(Sector.CLAIM_SLOT_LOCKED, seq);
+        assertEquals(Sector.CLAIM_SLOT_REMOTE, seq);
         assertEquals(initialSeq, sector.prodSeq.get());
         assertTrue(sector.isLocked());
         assertFalse(sector.isScheduled());
@@ -78,7 +80,7 @@ public class SectorTest {
 
     @Test
     public void claimSlot_whenScheduled() {
-        Sector sector = generatePartition(64);
+        Sector sector = generateSector(64);
         sector.claimSlotAndReturnStatus();
         long initialSeq = sector.prodSeq.get();
 
@@ -94,7 +96,7 @@ public class SectorTest {
 
     @Test
     public void claimSlot_slotBeforeLast() {
-        Sector sector = generatePartition(3);
+        Sector sector = generateSector(3);
         long c1 = sector.claimSlotAndReturnStatus();
         long c2 = sector.claimSlotAndReturnStatus();
 
@@ -108,7 +110,7 @@ public class SectorTest {
 
     @Test
     public void claimSlot_WhenOverloaded() {
-        Sector sector = generatePartition(2);
+        Sector sector = generateSector(2);
         sector.claimSlotAndReturnStatus();
         sector.claimSlotAndReturnStatus();
 
@@ -121,7 +123,7 @@ public class SectorTest {
 
     @Test
     public void unschedule_whenUnscheduled() {
-        Sector sector = generatePartition(64);
+        Sector sector = generateSector(64);
         long initialSeq = sector.prodSeq.get();
 
         try {
@@ -136,7 +138,7 @@ public class SectorTest {
 
     @Test
     public void unschedule_whenNoPendingWork() {
-        Sector sector = generatePartition(64);
+        Sector sector = generateSector(64);
         sector.claimSlotAndReturnStatus();
         sector.conSeq.inc(Sector.DELTA);
 
@@ -150,7 +152,7 @@ public class SectorTest {
 
     @Test
     public void unschedule_whenNoPendingWorkAndLocked() {
-        Sector sector = generatePartition(64);
+        Sector sector = generateSector(64);
         sector.claimSlotAndReturnStatus();
         sector.lock();
         sector.conSeq.set(sector.prodSeq.get());
@@ -165,7 +167,7 @@ public class SectorTest {
 
     @Test
     public void unschedule_whenPendingWork() {
-        Sector sector = generatePartition(64);
+        Sector sector = generateSector(64);
         sector.claimSlotAndReturnStatus();
 
         long initialSeq = sector.prodSeq.get();
@@ -178,7 +180,7 @@ public class SectorTest {
 
     @Test
     public void unschedule_whenPendingWorkAndLocked() {
-        Sector sector = generatePartition(64);
+        Sector sector = generateSector(64);
         sector.claimSlotAndReturnStatus();
         sector.lock();
 
@@ -194,7 +196,7 @@ public class SectorTest {
 
     @Test
     public void lock() {
-        Sector sector = generatePartition(64);
+        Sector sector = generateSector(64);
         long initialValue = sector.prodSeq.get();
 
         sector.lock();
@@ -206,7 +208,7 @@ public class SectorTest {
 
     @Test
     public void lock_whenScheduled() {
-        Sector sector = generatePartition(64);
+        Sector sector = generateSector(64);
         sector.claimSlotAndReturnStatus();
         long prodSeq = sector.prodSeq.get();
 
@@ -219,7 +221,7 @@ public class SectorTest {
 
     @Test
     public void lock_whenAlreadyLocked() {
-        Sector sector = generatePartition(64);
+        Sector sector = generateSector(64);
         sector.lock();
         long prodSeq = sector.prodSeq.get();
 

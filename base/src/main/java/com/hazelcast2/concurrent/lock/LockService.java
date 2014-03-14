@@ -1,5 +1,6 @@
 package com.hazelcast2.concurrent.lock;
 
+import com.hazelcast2.concurrent.atomicboolean.BooleanSector;
 import com.hazelcast2.core.ILock;
 import com.hazelcast2.nio.IOUtils;
 import com.hazelcast2.partition.PartitionService;
@@ -70,5 +71,15 @@ public final class LockService implements SpiService {
 
     private int getPartitionId(byte[] bytes) {
         return IOUtils.readInt(bytes, 2);
+    }
+
+    @Override
+    public void enablePartition(int partitionId, boolean enable) {
+        LockSector sector = sectors[partitionId];
+        if (enable) {
+            sector.unlock();
+        } else {
+            sector.lock();
+        }
     }
 }

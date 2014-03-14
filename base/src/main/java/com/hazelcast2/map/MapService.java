@@ -1,5 +1,6 @@
 package com.hazelcast2.map;
 
+import com.hazelcast2.concurrent.atomicboolean.BooleanSector;
 import com.hazelcast2.core.Config;
 import com.hazelcast2.core.IMap;
 import com.hazelcast2.core.MapConfig;
@@ -60,5 +61,15 @@ public class MapService implements SpiService {
     @Override
     public void schedule(byte[] invocationBytes) {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void enablePartition(int partitionId, boolean enable) {
+        //BooleanSector sector = sectors[partitionId];
+        //if (enable) {
+        //    sector.lock();
+        //} else {
+        //    sector.unlock();
+       // }
     }
 }

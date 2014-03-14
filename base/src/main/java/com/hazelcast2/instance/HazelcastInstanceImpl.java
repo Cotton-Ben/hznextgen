@@ -8,13 +8,13 @@ import com.hazelcast2.core.*;
 import com.hazelcast2.map.MapService;
 import com.hazelcast2.nio.ConnectionManager;
 import com.hazelcast2.nio.Gateway;
+import com.hazelcast2.nio.IOUtils;
 import com.hazelcast2.nio.impl.ConnectionManagerImpl;
 import com.hazelcast2.partition.PartitionService;
 import com.hazelcast2.partition.impl.PartitionServiceImpl;
 import com.hazelcast2.serialization.SerializationService;
 import com.hazelcast2.spi.SpiService;
 import com.hazelcast2.spi.SpiServiceSettings;
-import com.hazelcast2.nio.IOUtils;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * be the first 16 bits. So when serialized operation is received, the first 16 bits can be
  * read to determine the service.
  */
-public class HazelcastInstanceImpl implements HazelcastInstance,Gateway {
+public class HazelcastInstanceImpl implements HazelcastInstance, Gateway {
 
     private final PartitionService partitionService;
     private final SerializationService serializationService;
@@ -88,12 +88,12 @@ public class HazelcastInstanceImpl implements HazelcastInstance,Gateway {
         return mapService;
     }
 
-    private SpiServiceSettings newSpiServiceSettings(short serviceId){
+    private SpiServiceSettings newSpiServiceSettings(short serviceId) {
         SpiServiceSettings dependencies = new SpiServiceSettings();
         dependencies.partitionService = partitionService;
         dependencies.serializationService = serializationService;
         dependencies.config = config;
-        dependencies.serviceId =serviceId;
+        dependencies.serviceId = serviceId;
         return dependencies;
     }
 
@@ -131,6 +131,24 @@ public class HazelcastInstanceImpl implements HazelcastInstance,Gateway {
 
         partitionService.shutdown();
         //todo: we need to shutdown the services.
+    }
+
+    @Override
+    public void startMaster() {
+        for (int partitionId = 0; partitionId < partitionService.getPartitionCount(); partitionId++) {
+            enablePartition(partitionId, true);
+        }
+    }
+
+    @Override
+    public void startAndJoin(HazelcastInstance master) {
+
+    }
+
+    private void enablePartition(int partitionId, boolean enable) {
+        for (SpiService service : services) {
+            service.enablePartition(partitionId, enable);
+        }
     }
 
     @Override
