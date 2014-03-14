@@ -1,5 +1,7 @@
 package com.hazelcast2.instance;
 
+import com.hazelcast2.cluster.Cluster;
+import com.hazelcast2.cluster.ClusterSettings;
 import com.hazelcast2.concurrent.atomicboolean.AtomicBooleanService;
 import com.hazelcast2.concurrent.atomiclong.AtomicLongService;
 import com.hazelcast2.concurrent.atomicreference.AtomicReferenceService;
@@ -37,17 +39,28 @@ public class HazelcastInstanceImpl implements HazelcastInstance, Gateway {
     private final AtomicReferenceService atomicReferenceService;
     private final LockService lockService;
     private final MapService mapService;
+    private final Cluster cluster;
 
     public HazelcastInstanceImpl(Config config) {
         this.config = config;
         this.partitionService = new PartitionServiceImpl(config.getPartitionCount());
         this.serializationService = new SerializationService();
-        this.invocationCompletionService = new InvocationCompletionService((short) 0);
 
-        this.services = new SpiService[6];
-        services[0] = invocationCompletionService;
+        short serviceId = 0;
 
-        short serviceId = 1;
+        this.invocationCompletionService = new InvocationCompletionService(serviceId);
+
+        serviceId++;
+        ClusterSettings clusterSettings = new ClusterSettings();
+        clusterSettings.serviceId  = serviceId;
+        clusterSettings.serializationService = serializationService;
+        this.cluster = new Cluster(clusterSettings);
+        cluster.start();
+
+        this.services = new SpiService[7];
+        services[invocationCompletionService.getServiceId()] = invocationCompletionService;
+        services[cluster.getServiceId()] = cluster;
+
         this.atomicLongService = new AtomicLongService(newSpiServiceSettings(serviceId));
         services[serviceId] = atomicLongService;
 
@@ -131,6 +144,7 @@ public class HazelcastInstanceImpl implements HazelcastInstance, Gateway {
         }
 
         partitionService.shutdown();
+        cluster.shutdown();
         //todo: we need to shutdown the services.
     }
 

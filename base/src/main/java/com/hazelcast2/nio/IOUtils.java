@@ -29,6 +29,6 @@ public class IOUtils {
 
     public static String readString(byte[] buffer, int position) {
         int size = readInt(buffer,position);
-        return null;
+        throw new UnsupportedOperationException();
     }
 }
