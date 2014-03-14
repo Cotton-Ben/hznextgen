@@ -75,8 +75,9 @@ public final class LockService implements PartitionAwareSpiService {
     }
 
     @Override
-    public void enablePartition(int partitionId, boolean enable) {
+    public void enablePartition(int partitionId, boolean enable, InvocationEndpoint[] endpoints) {
         LockSector sector = sectors[partitionId];
+        sector.endpoints = endpoints;
         if (enable) {
             sector.unlock();
         } else {

@@ -191,7 +191,8 @@ public abstract class Sector {
             final long oldProdSeq = prodSeq.get();
 
             if ((oldProdSeq & MASK_LOCKED) != 0) {
-                throw new IllegalStateException("Already locked");
+                return;
+                //throw new IllegalStateException("Already locked");
             }
 
             if (prodSeq.compareAndSet(oldProdSeq, oldProdSeq + MASK_LOCKED)) {

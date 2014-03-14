@@ -7,6 +7,7 @@ import com.hazelcast2.spi.InvocationEndpoint;
 import com.hazelcast2.spi.PartitionAwareSpiService;
 import com.hazelcast2.spi.SpiServiceSettings;
 
+import javax.xml.ws.Endpoint;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
@@ -75,8 +76,9 @@ public final class AtomicReferenceService implements PartitionAwareSpiService {
     }
 
     @Override
-    public void enablePartition(int partitionId, boolean enable) {
+    public void enablePartition(int partitionId, boolean enable, InvocationEndpoint[] endpoints) {
         ReferenceSector sector = sectors[partitionId];
+        sector.endpoints = endpoints;
         if (enable) {
             sector.unlock();
         } else {

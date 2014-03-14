@@ -35,17 +35,15 @@ public class InvocationFuture implements Future {
     }
 
     public Object getSafely() {
-        if (value != NO_RESPONSE) {
-            return value;
-        }
-
-        synchronized (this) {
-            while (value == NO_RESPONSE) {
-                try {
-                    //todo: instead of waiting, try to see if there is work that can be done.
-                    wait();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+        if (value == NO_RESPONSE) {
+            synchronized (this) {
+                while (value == NO_RESPONSE) {
+                    try {
+                        //todo: instead of waiting, try to see if there is work that can be done.
+                        wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }

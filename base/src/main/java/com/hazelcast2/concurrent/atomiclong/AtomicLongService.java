@@ -75,8 +75,9 @@ public final class AtomicLongService implements PartitionAwareSpiService {
     }
 
     @Override
-    public void enablePartition(int partitionId, boolean enable) {
+    public void enablePartition(int partitionId, boolean enable, InvocationEndpoint[] endpoints) {
         LongSector sector = sectors[partitionId];
+        sector.endpoints = endpoints;
         if (enable) {
             sector.unlock();
         } else {

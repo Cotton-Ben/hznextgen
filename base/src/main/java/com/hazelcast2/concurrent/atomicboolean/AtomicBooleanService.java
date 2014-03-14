@@ -5,9 +5,9 @@ import com.hazelcast2.nio.IOUtils;
 import com.hazelcast2.partition.PartitionService;
 import com.hazelcast2.spi.InvocationEndpoint;
 import com.hazelcast2.spi.PartitionAwareSpiService;
-import com.hazelcast2.spi.SpiService;
 import com.hazelcast2.spi.SpiServiceSettings;
 
+import javax.xml.ws.Endpoint;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
@@ -76,8 +76,9 @@ public final class AtomicBooleanService implements PartitionAwareSpiService {
     }
 
     @Override
-    public void enablePartition(int partitionId, boolean enable) {
+    public void enablePartition(int partitionId, boolean enable, InvocationEndpoint[] endpoints) {
         BooleanSector sector = sectors[partitionId];
+        sector.endpoints = endpoints;
         if (enable) {
             sector.unlock();
         } else {

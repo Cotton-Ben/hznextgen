@@ -8,6 +8,7 @@ import com.hazelcast2.spi.InvocationEndpoint;
 import com.hazelcast2.spi.PartitionAwareSpiService;
 import com.hazelcast2.spi.SpiServiceSettings;
 
+import javax.xml.ws.Endpoint;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
@@ -65,7 +66,7 @@ public class MapService implements PartitionAwareSpiService {
     }
 
     @Override
-    public void enablePartition(int partitionId, boolean enable) {
+    public void enablePartition(int partitionId, boolean enable, InvocationEndpoint[] endpoints) {
         //BooleanSector sector = sectors[partitionId];
         //if (enable) {
         //    sector.lock();

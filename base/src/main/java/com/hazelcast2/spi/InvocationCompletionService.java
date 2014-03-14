@@ -50,15 +50,21 @@ public class InvocationCompletionService implements SpiService {
         this.serviceId = serviceId;
     }
 
-    public void sendResponse(long callid, byte[] response){
-
-    }
-
     @Override
     public void dispatch(InvocationEndpoint source, byte[] invocationBytes) {
-        long callId = IOUtils.readLong(invocationBytes, 2);
-        InvocationFuture f = calls.get(callId);
-        //f.setResponse();
+        final long callId = IOUtils.readLong(invocationBytes, 2);
+        final InvocationFuture f = calls.get(callId);
+        if (f == null) {
+            System.out.println("No invocation found for callid:" + callId);
+            return;
+        }
+
+        //todo: this part is no good because the invocation future should not
+        if (invocationBytes.length == 10) {
+            f.setVoidResponse();
+        } else {
+            f.setResponse(IOUtils.readLong(invocationBytes, 10));
+        }
     }
 
     public long register(InvocationFuture future) {

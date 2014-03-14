@@ -6,15 +6,15 @@ import com.hazelcast2.concurrent.atomicreference.AtomicReferenceService;
 import com.hazelcast2.concurrent.lock.LockService;
 import com.hazelcast2.core.*;
 import com.hazelcast2.map.MapService;
-import com.hazelcast2.nio.ConnectionManager;
 import com.hazelcast2.nio.Gateway;
 import com.hazelcast2.nio.IOUtils;
-import com.hazelcast2.nio.impl.ConnectionManagerImpl;
 import com.hazelcast2.partition.PartitionService;
 import com.hazelcast2.partition.impl.PartitionServiceImpl;
 import com.hazelcast2.serialization.SerializationService;
 import com.hazelcast2.spi.*;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 
@@ -42,10 +42,10 @@ public class HazelcastInstanceImpl implements HazelcastInstance, Gateway {
         this.config = config;
         this.partitionService = new PartitionServiceImpl(config.getPartitionCount());
         this.serializationService = new SerializationService();
-        this.invocationCompletionService = new InvocationCompletionService((short)0);
+        this.invocationCompletionService = new InvocationCompletionService((short) 0);
 
         this.services = new SpiService[6];
-        services[0]=invocationCompletionService;
+        services[0] = invocationCompletionService;
 
         short serviceId = 1;
         this.atomicLongService = new AtomicLongService(newSpiServiceSettings(serviceId));
@@ -134,6 +134,11 @@ public class HazelcastInstanceImpl implements HazelcastInstance, Gateway {
         //todo: we need to shutdown the services.
     }
 
+    public boolean ownsPartition(int partitionId) {
+        return partitionOwns.get(partitionId);
+    }
+
+
     @Override
     public void startMaster() {
         for (int partitionId = 0; partitionId < partitionService.getPartitionCount(); partitionId++) {
@@ -143,14 +148,33 @@ public class HazelcastInstanceImpl implements HazelcastInstance, Gateway {
 
     @Override
     public void startAndJoin(HazelcastInstance master) {
+        HazelcastInstanceImpl m = (HazelcastInstanceImpl) master;
 
+        DirectInvocationEndpoint e1 = new DirectInvocationEndpoint(this);
+        DirectInvocationEndpoint e2 = new DirectInvocationEndpoint(m);
+        e1.source = e2;
+        e2.source = e1;
+
+        for (int partitionId = 0; partitionId < partitionService.getPartitionCount(); partitionId++) {
+            if (partitionId % 2 == 0) {
+                enablePartition(partitionId, true);
+                m.enablePartition(partitionId, false, e1);
+            } else {
+                m.enablePartition(partitionId, true);
+                enablePartition(partitionId, false, e2);
+            }
+        }
     }
 
-    private void enablePartition(int partitionId, boolean enable) {
+    private Map<Integer, Boolean> partitionOwns = new HashMap<>();
+
+    private void enablePartition(int partitionId, boolean enable, InvocationEndpoint... endpoints) {
+        partitionOwns.put(partitionId, enable);
+
         for (SpiService service : services) {
-            if(service instanceof PartitionAwareSpiService){
-                PartitionAwareSpiService partitionAwareSpiService = (PartitionAwareSpiService)service;
-                partitionAwareSpiService.enablePartition(partitionId, enable);
+            if (service instanceof PartitionAwareSpiService) {
+                PartitionAwareSpiService partitionAwareSpiService = (PartitionAwareSpiService) service;
+                partitionAwareSpiService.enablePartition(partitionId, enable, endpoints);
             }
         }
     }

@@ -104,7 +104,8 @@ public final class ${class.name} extends ${class.superName} {
         return future;
     }
 
-    private void deserializeAndInvoke_${method.uniqueMethodName}(final byte[] bytes) throws Exception{
+    private void deserializeAndInvoke_${method.uniqueMethodName}(final Invocation invocation) throws Exception{
+        final byte[] bytes = invocation.bytes;
         final long id = IOUtils.readLong(bytes, 8);
         final ${class.cellName} cell = loadCell(id);
         final long callId = IOUtils.readLong(bytes, 16);
@@ -119,13 +120,54 @@ public final class ${class.name} extends ${class.superName} {
     <#else>
         final ${method.returnType} result = ${method.targetMethod}(cell${method.trailingComma} ${method.deserializedInvocationToArgs});
     </#if>
-        //todo: now we need to send back a response to the invoking machine
+
+        final InvocationEndpoint source = invocation.source;
+        if(source != null){
+            //todo: another object created.
+            //todo: in case of void or primtive, we don't need to create the out object at all. Just create a
+            //byte-array and immediately put the responses on the right place.
+            final ByteArrayObjectDataOutput out = new ByteArrayObjectDataOutput(serializationService);
+            out.writeShort(invocationCompletionService.getServiceId());
+            out.writeLong(callId);
+    <#switch method.returnType>
+        <#case "void">
+            <#break>
+        <#case "long">
+            out.writeLong(result);
+            <#break>
+        <#case "boolean">
+            out.writeBoolean(result);
+            <#break>
+        <#case "int">
+            out.writeInt(result);
+            <#break>
+        <#case "byte">
+            out.writeByte(result);
+            <#break>
+        <#case "float">
+            out.writeFloat(result);
+            <#break>
+        <#case "double">
+            out.writeDouble(result);
+            <#break>
+        <#case "char">
+            out.writeChar(result);
+            <#break>
+        <#case "short">
+            out.writeShort(result);
+            <#break>
+        <#default>
+            out.writeObject(result);
+    </#switch>
+            source.send(out.toByteArray());
+        }
     }
 
     private InvocationFuture remoteInvoke_${method.name}(final long id${method.trailingComma}${method.formalArguments}) {
         InvocationFuture invocationFuture = new InvocationFuture();
         try{
             long callId = invocationCompletionService.register(invocationFuture);
+            //todo: we don't like this.
             ByteArrayObjectDataOutput out = new ByteArrayObjectDataOutput(serializationService);
             out.writeShort(serviceId);
             out.writeInt(partitionId);
@@ -134,7 +176,7 @@ public final class ${class.name} extends ${class.superName} {
             out.writeLong(callId);
             ${method.argsToSerialize}
             InvocationEndpoint endpoint = endpoints[0];
-            endpoint.invoke(out.toByteArray());
+            endpoint.send(out.toByteArray());
         }catch(Exception e){
             invocationFuture.setResponseException(e);
         }
@@ -196,14 +238,13 @@ public final class ${class.name} extends ${class.superName} {
     }
 
     private void deserializeAndInvoke(final Invocation invocation){
-        final byte[] bytes = invocation.bytes;
-        final short functionId = IOUtils.readShort(bytes, 6);
+        final short functionId = IOUtils.readShort(invocation.bytes, 6);
 
         try{
             switch (functionId) {
 <#list class.methods as method>
                 case ${method.functionConstantName}:
-                    deserializeAndInvoke_${method.uniqueMethodName}(bytes);
+                    deserializeAndInvoke_${method.uniqueMethodName}(invocation);
                     break;
 </#list>
                 default:
