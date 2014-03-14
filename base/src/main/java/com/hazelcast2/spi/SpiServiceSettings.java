@@ -9,6 +9,7 @@ public class SpiServiceSettings {
 
     public PartitionService partitionService;
     public SerializationService serializationService;
+    public InvocationCompletionService invocationCompletionService;
     public Config config;
     public short serviceId;
 }

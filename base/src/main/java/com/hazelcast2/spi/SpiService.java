@@ -2,9 +2,18 @@ package com.hazelcast2.spi;
 
 public interface SpiService {
 
-    void schedule(byte[] invocationBytes);
-
+    /**
+     * Returns the id that uniquely identifies this SpiService.
+     *
+     * @return
+     */
     short getServiceId();
 
-    void enablePartition(int partitionId, boolean enable);
+    /**
+     * Remote invocation enters here.
+     *
+     * @param invocationBytes
+     */
+    void dispatch(byte[] invocationBytes);
+
 }

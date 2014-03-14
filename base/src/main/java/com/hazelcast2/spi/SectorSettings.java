@@ -6,6 +6,7 @@ import com.hazelcast2.serialization.SerializationService;
 public class SectorSettings {
     public PartitionService partitionService;
     public SerializationService serializationService;
+    public InvocationCompletionService invocationCompletionService;
 
     public int partitionId;
     public SectorScheduler scheduler;

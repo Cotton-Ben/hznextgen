@@ -1,5 +1,13 @@
 TODO
 
+- completion token for calls with a response.
+    - for a completion token, we need to have an id (callid). This call id can be unique within a hz-instance,
+    but if a serviceid is attached, it needs to be unique within a service. The advantage of having mulitple
+    id-generators is that you have less contention. But how many id generators should you have. And should
+    it be a striped id-generator, or should each service have its own id generator.
+
+- the create cell function should be a remote call if needed.
+
 - research:
     http://en.wikipedia.org/wiki/Open_addressing
     http://www.coverfire.com/articles/queueing-in-the-linux-network-stack/
@@ -26,8 +34,6 @@ because a user thread would like to return 'asap'.
 - replicating the write.
 
 - padding on the invocation
-
-- each sector should generate long with the sector id included.
 
 - dealing with overload in the generated sector
 

@@ -3,6 +3,7 @@ package com.hazelcast2.concurrent.atomicboolean;
 import com.hazelcast2.core.IAtomicBoolean;
 import com.hazelcast2.nio.IOUtils;
 import com.hazelcast2.partition.PartitionService;
+import com.hazelcast2.spi.PartitionAwareSpiService;
 import com.hazelcast2.spi.SpiService;
 import com.hazelcast2.spi.SpiServiceSettings;
 
@@ -11,7 +12,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import static com.hazelcast2.util.ReflectionUtils.getConstructor;
 
-public final class AtomicBooleanService implements SpiService {
+public final class AtomicBooleanService implements PartitionAwareSpiService {
 
     private static final String CLASS_NAME = "com.hazelcast2.concurrent.atomicboolean.GeneratedBooleanSector";
     private static final Constructor<BooleanSector> CONSTRUCTOR = getConstructor(CLASS_NAME, BooleanSectorSettings.class);
@@ -35,6 +36,7 @@ public final class AtomicBooleanService implements SpiService {
         BooleanSectorSettings sectorSettings = new BooleanSectorSettings();
         sectorSettings.scheduler = partitionService.getScheduler();
         sectorSettings.serializationService = serviceSettings.serializationService;
+        sectorSettings.invocationCompletionService = serviceSettings.invocationCompletionService;
         sectorSettings.partitionId = partitionId;
         sectorSettings.serviceId = serviceSettings.serviceId;
         sectorSettings.service = this;
@@ -56,13 +58,13 @@ public final class AtomicBooleanService implements SpiService {
         }
 
         final int partitionId = partitionService.getPartitionId(name);
-        final BooleanSector partition = sectors[partitionId];
-        final long id = partition.createCell();
-        return new AtomicBooleanProxy(partition, name, id);
+        final BooleanSector sector = sectors[partitionId];
+        final long id = sector.createCell();
+        return new AtomicBooleanProxy(sector, name, id);
     }
 
     @Override
-    public void schedule(final byte[] invocationBytes) {
+    public void dispatch(final byte[] invocationBytes) {
         final int partitionId = getPartitionId(invocationBytes);
         final BooleanSector sector = sectors[partitionId];
         sector.schedule(invocationBytes);

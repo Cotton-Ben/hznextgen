@@ -1,18 +1,17 @@
 package com.hazelcast2.concurrent.atomiclong;
 
-import com.hazelcast2.concurrent.atomicboolean.BooleanSector;
 import com.hazelcast2.core.IAtomicLong;
-import com.hazelcast2.partition.PartitionService;
-import com.hazelcast2.spi.SpiService;
-import com.hazelcast2.spi.SpiServiceSettings;
 import com.hazelcast2.nio.IOUtils;
+import com.hazelcast2.partition.PartitionService;
+import com.hazelcast2.spi.PartitionAwareSpiService;
+import com.hazelcast2.spi.SpiServiceSettings;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 import static com.hazelcast2.util.ReflectionUtils.getConstructor;
 
-public final class AtomicLongService implements SpiService {
+public final class AtomicLongService implements PartitionAwareSpiService {
 
     private static final String CLASS_NAME = "com.hazelcast2.concurrent.atomiclong.GeneratedLongSector";
     private static final Constructor<LongSector> CONSTRUCTOR = getConstructor(CLASS_NAME, LongSectorSettings.class);
@@ -36,6 +35,7 @@ public final class AtomicLongService implements SpiService {
         LongSectorSettings sectorSettings = new LongSectorSettings();
         sectorSettings.scheduler = partitionService.getScheduler();
         sectorSettings.serializationService = serviceSettings.serializationService;
+        sectorSettings.invocationCompletionService = serviceSettings.invocationCompletionService;
         sectorSettings.service = this;
         sectorSettings.serviceId = serviceSettings.serviceId;
         sectorSettings.partitionId = partitionId;
@@ -57,13 +57,13 @@ public final class AtomicLongService implements SpiService {
         }
 
         final int partitionId = partitionService.getPartitionId(name);
-        final LongSector partition = sectors[partitionId];
-        final long id = partition.createCell();
-        return new AtomicLongProxy(partition, name, id);
+        final LongSector sector = sectors[partitionId];
+        final long id = sector.createCell();
+        return new AtomicLongProxy(sector, name, id);
     }
 
     @Override
-    public void schedule(final byte[] invocationBytes) {
+    public void dispatch(final byte[] invocationBytes) {
         final int partitionId = getPartitionId(invocationBytes);
         final LongSector sector = sectors[partitionId];
         sector.schedule(invocationBytes);

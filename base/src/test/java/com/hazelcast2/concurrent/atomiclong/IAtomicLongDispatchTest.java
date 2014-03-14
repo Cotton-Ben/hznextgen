@@ -35,6 +35,7 @@ public class IAtomicLongDispatchTest extends HazelcastTestSupport {
         b.putInt(atomicLong.getSector().getPartitionId());
         b.putShort(GeneratedLongSector.FUNCTION_doInc0);
         b.putLong(atomicLong.getId());
+        b.putLong(Long.MIN_VALUE);//call-id
 
         byte[] array = b.array();
         hz.dispatch(array);
@@ -56,6 +57,7 @@ public class IAtomicLongDispatchTest extends HazelcastTestSupport {
         b.putInt(atomicLong.getSector().getPartitionId());
         b.putShort(GeneratedLongSector.FUNCTION_doSet1);
         b.putLong(atomicLong.getId());
+        b.putLong(Long.MIN_VALUE);//call-id
         b.putLong(10);
 
         byte[] array = b.array();

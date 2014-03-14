@@ -1,10 +1,9 @@
 package com.hazelcast2.concurrent.lock;
 
-import com.hazelcast2.concurrent.atomicboolean.BooleanSector;
 import com.hazelcast2.core.ILock;
 import com.hazelcast2.nio.IOUtils;
 import com.hazelcast2.partition.PartitionService;
-import com.hazelcast2.spi.SpiService;
+import com.hazelcast2.spi.PartitionAwareSpiService;
 import com.hazelcast2.spi.SpiServiceSettings;
 
 import java.lang.reflect.Constructor;
@@ -12,7 +11,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import static com.hazelcast2.util.ReflectionUtils.getConstructor;
 
-public final class LockService implements SpiService {
+public final class LockService implements PartitionAwareSpiService {
 
     private static final String CLASS_NAME = "com.hazelcast2.concurrent.lock.GeneratedLockSector";
     private static final Constructor<LockSector> CONSTRUCTOR = getConstructor(CLASS_NAME, LockSectorSettings.class);
@@ -36,6 +35,7 @@ public final class LockService implements SpiService {
         LockSectorSettings sectorSettings = new LockSectorSettings();
         sectorSettings.service = this;
         sectorSettings.serializationService = serviceSettings.serializationService;
+        sectorSettings.invocationCompletionService = serviceSettings.invocationCompletionService;
         sectorSettings.serviceId = serviceSettings.serviceId;
         sectorSettings.scheduler = partitionService.getScheduler();
         sectorSettings.partitionId = partitionId;
@@ -57,13 +57,13 @@ public final class LockService implements SpiService {
         }
 
         final int partitionId = partitionService.getPartitionId(name);
-        final LockSector partition = sectors[partitionId];
-        final long id = partition.createCell();
-        return new ILockProxy(partition, name, id);
+        final LockSector sector = sectors[partitionId];
+        final long id = sector.createCell();
+        return new ILockProxy(sector, name, id);
     }
 
     @Override
-    public void schedule(final byte[] invocationBytes) {
+    public void dispatch(final byte[] invocationBytes) {
         final int partitionId = getPartitionId(invocationBytes);
         final LockSector sector = sectors[partitionId];
         sector.schedule(invocationBytes);

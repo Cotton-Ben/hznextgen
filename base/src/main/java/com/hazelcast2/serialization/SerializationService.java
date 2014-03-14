@@ -1,6 +1,7 @@
 package com.hazelcast2.serialization;
 
 import com.hazelcast2.nio.ByteArrayObjectDataOutput;
+import com.hazelcast2.spi.InvocationCompletionService;
 
 public class SerializationService {
 

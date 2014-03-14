@@ -1,11 +1,10 @@
 package com.hazelcast2.map;
 
-import com.hazelcast2.concurrent.atomicboolean.BooleanSector;
 import com.hazelcast2.core.Config;
 import com.hazelcast2.core.IMap;
 import com.hazelcast2.core.MapConfig;
 import com.hazelcast2.partition.PartitionService;
-import com.hazelcast2.spi.SpiService;
+import com.hazelcast2.spi.PartitionAwareSpiService;
 import com.hazelcast2.spi.SpiServiceSettings;
 
 import java.lang.reflect.Constructor;
@@ -13,7 +12,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import static com.hazelcast2.util.ReflectionUtils.getConstructor;
 
-public class MapService implements SpiService {
+public class MapService implements PartitionAwareSpiService {
 
     public static final String CLASS_NAME = "com.hazelcast2.map.GeneratedMapSector";
 
@@ -45,6 +44,7 @@ public class MapService implements SpiService {
             sectorSettings.scheduler = partitionService.getScheduler();
             sectorSettings.partitionService = serviceSettings.partitionService;
             sectorSettings.serializationService = serviceSettings.serializationService;
+            sectorSettings.invocationCompletionService = serviceSettings.invocationCompletionService;
             sectorSettings.serviceId = serviceSettings.serviceId;
             sectorSettings.partitionId = partitionId;
             sectorSettings.mapConfig = mapConfig;
@@ -59,7 +59,7 @@ public class MapService implements SpiService {
     }
 
     @Override
-    public void schedule(byte[] invocationBytes) {
+    public void dispatch(byte[] invocationBytes) {
         throw new UnsupportedOperationException();
     }
 
@@ -70,6 +70,6 @@ public class MapService implements SpiService {
         //    sector.lock();
         //} else {
         //    sector.unlock();
-       // }
+        // }
     }
 }

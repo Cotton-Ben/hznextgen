@@ -107,11 +107,12 @@ public final class ${class.name} extends ${class.superName} {
     private void deserializeAndInvoke_${method.uniqueMethodName}(final byte[] bytes) throws Exception{
         final long id = IOUtils.readLong(bytes, 8);
         final ${class.cellName} cell = loadCell(id);
+        final long callId = IOUtils.readLong(bytes, 16);
 
     <#if method.hasOneArgOrMore>
         ///todo: if a method only has 'simple' types like string, primitive etc. We should not need to create
         //the ByteArrayObjectDataInput, but we can directly read from the bytes.
-        final ByteArrayObjectDataInput in = new ByteArrayObjectDataInput(bytes, 16, serializationService);
+        final ByteArrayObjectDataInput in = new ByteArrayObjectDataInput(bytes, 24, serializationService);
     </#if>
     <#if method.voidReturnType>
         ${method.targetMethod}(cell${method.trailingComma} ${method.deserializedInvocationToArgs});
@@ -124,15 +125,16 @@ public final class ${class.name} extends ${class.superName} {
     private InvocationFuture remoteInvoke_${method.name}(final long id${method.trailingComma}${method.formalArguments}) {
         InvocationFuture invocationFuture = new InvocationFuture();
         try{
+            long callId = invocationCompletionService.register(invocationFuture);
             ByteArrayObjectDataOutput out = new ByteArrayObjectDataOutput(serializationService);
             out.writeShort(serviceId);
             out.writeInt(partitionId);
             out.writeShort(${method.functionConstantName});
             out.writeLong(id);
+            out.writeLong(callId);
             ${method.argsToSerialize}
             InvocationEndpoint endpoint = endpoints[0];
             endpoint.invoke(out.toByteArray());
-            //todo: we need to register the future. We also need to generate a call id.
         }catch(Exception e){
             invocationFuture.setResponseException(e);
         }

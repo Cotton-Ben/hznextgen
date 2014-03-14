@@ -26,6 +26,7 @@ public abstract class Sector {
     public final int partitionId;
     public final SectorScheduler scheduler;
     public final SerializationService serializationService;
+    public final InvocationCompletionService invocationCompletionService;
 
     /**
      * The endpoints for a sector. So a sector can be in multiple states:
@@ -58,6 +59,7 @@ public abstract class Sector {
         this.partitionId = settings.partitionId;
         this.scheduler = settings.scheduler;
         this.serializationService = settings.serializationService;
+        this.invocationCompletionService = settings.invocationCompletionService;
         this.ringbufferSize = settings.ringbufferSize;
         this.ringbuffer = new Invocation[ringbufferSize];
         for (int k = 0; k < ringbuffer.length; k++) {

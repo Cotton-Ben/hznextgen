@@ -13,6 +13,8 @@ import com.hazelcast2.nio.impl.ConnectionManagerImpl;
 import com.hazelcast2.partition.PartitionService;
 import com.hazelcast2.partition.impl.PartitionServiceImpl;
 import com.hazelcast2.serialization.SerializationService;
+import com.hazelcast2.spi.InvocationCompletionService;
+import com.hazelcast2.spi.PartitionAwareSpiService;
 import com.hazelcast2.spi.SpiService;
 import com.hazelcast2.spi.SpiServiceSettings;
 
@@ -32,22 +34,23 @@ public class HazelcastInstanceImpl implements HazelcastInstance, Gateway {
     private final Config config;
     private final SpiService[] services;
 
+    private final InvocationCompletionService invocationCompletionService;
     private final AtomicLongService atomicLongService;
     private final AtomicBooleanService atomicBooleanService;
     private final AtomicReferenceService atomicReferenceService;
     private final LockService lockService;
     private final MapService mapService;
-    private final ConnectionManager connectionManager;
 
     public HazelcastInstanceImpl(Config config) {
         this.config = config;
-        this.connectionManager = new ConnectionManagerImpl();
         this.partitionService = new PartitionServiceImpl(config.getPartitionCount());
         this.serializationService = new SerializationService();
+        this.invocationCompletionService = new InvocationCompletionService((short)0);
 
-        this.services = new SpiService[5];
+        this.services = new SpiService[6];
+        services[0]=invocationCompletionService;
 
-        short serviceId = 0;
+        short serviceId = 1;
         this.atomicLongService = new AtomicLongService(newSpiServiceSettings(serviceId));
         services[serviceId] = atomicLongService;
 
@@ -92,6 +95,7 @@ public class HazelcastInstanceImpl implements HazelcastInstance, Gateway {
         SpiServiceSettings dependencies = new SpiServiceSettings();
         dependencies.partitionService = partitionService;
         dependencies.serializationService = serializationService;
+        dependencies.invocationCompletionService = invocationCompletionService;
         dependencies.config = config;
         dependencies.serviceId = serviceId;
         return dependencies;
@@ -147,7 +151,10 @@ public class HazelcastInstanceImpl implements HazelcastInstance, Gateway {
 
     private void enablePartition(int partitionId, boolean enable) {
         for (SpiService service : services) {
-            service.enablePartition(partitionId, enable);
+            if(service instanceof PartitionAwareSpiService){
+                PartitionAwareSpiService partitionAwareSpiService = (PartitionAwareSpiService)service;
+                partitionAwareSpiService.enablePartition(partitionId, enable);
+            }
         }
     }
 
@@ -156,7 +163,7 @@ public class HazelcastInstanceImpl implements HazelcastInstance, Gateway {
         final short serviceId = getServiceId(bytes);
         final SpiService spiService = services[serviceId];
         //here we have a polymorphic method call
-        spiService.schedule(bytes);
+        spiService.dispatch(bytes);
     }
 
     private short getServiceId(byte[] bytes) {
