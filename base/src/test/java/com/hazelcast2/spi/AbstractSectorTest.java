@@ -25,7 +25,7 @@ public class AbstractSectorTest {
         assertTrue(sector.isSystemLocked());
 
         //for (int k = 0; k < sector.getSegmentLength(); k++) {
-        //    Invocation invocation = sector.getInvocation(k);
+        //    InvocationSlot invocation = sector.getInvocation(k);
         //    assertNotNull(invocation);
         //    assertTrue(invocation instanceof Sector.LockedInvocation);
         //}

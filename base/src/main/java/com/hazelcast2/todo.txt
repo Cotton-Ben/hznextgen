@@ -1,19 +1,13 @@
 TODO
 
-- completion token for calls with a response.
-    - for a completion token, we need to have an id (callid). This call id can be unique within a hz-instance,
-    but if a serviceid is attached, it needs to be unique within a service. The advantage of having mulitple
-    id-generators is that you have less contention. But how many id generators should you have. And should
-    it be a striped id-generator, or should each service have its own id generator.
+- some kind of backup policy when there is no place in the sector.
+
+- performance: currently the system is mostly yielding
+
+- the completion service should deal with exception. Currently it only knows about a normal value, but
+  it could be that it is an exception
 
 - the create cell function should be a remote call if needed.
-
-- research:
-    http://en.wikipedia.org/wiki/Open_addressing
-    http://www.coverfire.com/articles/queueing-in-the-linux-network-stack/
-
-- the function-id needs to have readonly setting encoded in it. This is needed to figure out when an operation
-comes in, that replication needs to be done.
 
 - cell: there are 2 parts of storing 'cell' based data. One is the actual storage of the cell. The other is the
 object that is used during an operation on that cell. It could contain flags like isDirty; something not needed
@@ -46,7 +40,7 @@ because a user thread would like to return 'asap'.
 
     - we need to check during the execution of pending work if the segment is locked.
 
-- when lock is acquired on a segment, there is currently no way to know when all threads have completed and
+- when lock is acquired on a sector, there is currently no way to know when all threads have completed and
 the segment is exclusively owned
 
 - deadlock: we need to make sure that if an operation on a segment is executed while already executing from
@@ -76,7 +70,20 @@ a single long field.
 
 - calls to the HazelcastInstance.getFoo methods will always return a new instance.
 
+RESEARCH:
+
+    http://en.wikipedia.org/wiki/Open_addressing
+    http://www.coverfire.com/articles/queueing-in-the-linux-network-stack/
+
 DONE
+
+- rename invocation to invocationslot.
+
+- completion token for calls with a response.
+    - for a completion token, we need to have an id (callid). This call id can be unique within a hz-instance,
+    but if a serviceid is attached, it needs to be unique within a service. The advantage of having mulitple
+    id-generators is that you have less contention. But how many id generators should you have. And should
+    it be a striped id-generator, or should each service have its own id generator.
 
 - dealing with double
 

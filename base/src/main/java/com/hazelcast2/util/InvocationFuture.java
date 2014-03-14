@@ -61,7 +61,7 @@ public class InvocationFuture implements Future {
         }
 
         if(value instanceof byte[]){
-
+            //here we need to deserialize based on the type
         }
 
         if (value instanceof Failure) {

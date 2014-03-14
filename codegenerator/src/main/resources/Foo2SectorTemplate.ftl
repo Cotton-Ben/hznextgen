@@ -40,7 +40,7 @@ public final class ${class.name} extends ${class.superName} {
         final InvocationFuture future = new InvocationFuture();
 
         final long prodSeq = getSequence(sequenceAndStatus);
-        final Invocation invocation = getSlot(prodSeq);
+        final InvocationSlot invocation = getSlot(prodSeq);
         invocation.invocationFuture = future;
         //invocation.id = id;
         invocation.functionId = ${method.functionConstantName};
@@ -58,7 +58,7 @@ public final class ${class.name} extends ${class.superName} {
             final long prodSeq = getSequence(sequenceAndStatus);
             //todo: this sucks, we don't want to create new instances.
             final InvocationFuture future = new InvocationFuture();
-            final Invocation invocation = getSlot(prodSeq);
+            final InvocationSlot invocation = getSlot(prodSeq);
             invocation.invocationFuture = future;
             //invocation.id = id;
             invocation.functionId = ${method.functionConstantName};
@@ -108,7 +108,7 @@ public final class ${class.name} extends ${class.superName} {
                     return;
                 }
             } else {
-                final Invocation invocation = getSlot(consumerSeq);
+                final InvocationSlot invocation = getSlot(consumerSeq);
                 invocation.awaitPublication(consumerSeq);
                 dispatch(invocation);
                 invocation.clear();
@@ -118,7 +118,7 @@ public final class ${class.name} extends ${class.superName} {
         }
     }
 
-    public void dispatch(Invocation invocation) {
+    public void dispatch(InvocationSlot invocation) {
         try{
             switch (invocation.functionId) {
 <#list class.methods as method>

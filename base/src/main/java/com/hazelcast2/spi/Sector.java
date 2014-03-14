@@ -44,7 +44,7 @@ public abstract class Sector {
     public final Sequence prodSeq = new Sequence(INITIAL_VALUE);
     public final Sequence conSeq = new Sequence(0);
 
-    public final Invocation[] ringbuffer;
+    public final InvocationSlot[] ringbuffer;
     public final int ringbufferSize;
     public final short serviceId;
 
@@ -61,9 +61,9 @@ public abstract class Sector {
         this.serializationService = settings.serializationService;
         this.invocationCompletionService = settings.invocationCompletionService;
         this.ringbufferSize = settings.ringbufferSize;
-        this.ringbuffer = new Invocation[ringbufferSize];
+        this.ringbuffer = new InvocationSlot[ringbufferSize];
         for (int k = 0; k < ringbuffer.length; k++) {
-            ringbuffer[k] = new Invocation();
+            ringbuffer[k] = new InvocationSlot();
         }
     }
 
@@ -173,7 +173,7 @@ public abstract class Sector {
         return (int) (seq % ringbufferSize);
     }
 
-    public final Invocation getSlot(final long seq) {
+    public final InvocationSlot getSlot(final long seq) {
         return ringbuffer[toIndex(seq)];
     }
 

@@ -42,7 +42,7 @@ public final class ${class.name} extends ${class.superName} {
             final long prodSeq = getSequence(sequenceAndStatus);
             //todo: this sucks, we don't want to create new instances.
             final InvocationFuture future = new InvocationFuture(serializationService);
-            final Invocation invocation = getSlot(prodSeq);
+            final InvocationSlot invocation = getSlot(prodSeq);
             invocation.invocationFuture = future;
             invocation.id = id;
             invocation.functionId = ${method.functionConstantName};
@@ -93,7 +93,7 @@ public final class ${class.name} extends ${class.superName} {
         final InvocationFuture future = new InvocationFuture(serializationService);
 
         final long prodSeq = getSequence(sequenceAndStatus);
-        final Invocation invocation = getSlot(prodSeq);
+        final InvocationSlot invocation = getSlot(prodSeq);
         invocation.invocationFuture = future;
         invocation.id = id;
         invocation.functionId = ${method.functionConstantName};
@@ -104,7 +104,7 @@ public final class ${class.name} extends ${class.superName} {
         return future;
     }
 
-    private void deserializeAndInvoke_${method.uniqueMethodName}(final Invocation invocation) throws Exception{
+    private void deserializeAndInvoke_${method.uniqueMethodName}(final InvocationSlot invocation) throws Exception{
         final byte[] bytes = invocation.bytes;
         final long id = IOUtils.readLong(bytes, 8);
         final ${class.cellName} cell = loadCell(id);
@@ -198,7 +198,7 @@ public final class ${class.name} extends ${class.superName} {
                     return;
                 }
             } else {
-                final Invocation invocation = getSlot(consumerSeq);
+                final InvocationSlot invocation = getSlot(consumerSeq);
                 invocation.awaitPublication(consumerSeq);
                 if(invocation.bytes == null){
                     invoke(invocation);
@@ -212,7 +212,7 @@ public final class ${class.name} extends ${class.superName} {
         }
     }
 
-    private void invoke(final Invocation invocation) {
+    private void invoke(final InvocationSlot invocation) {
         final ${class.cellName} cell = loadCell(invocation.id);
         try{
             switch (invocation.functionId) {
@@ -237,7 +237,7 @@ public final class ${class.name} extends ${class.superName} {
         }
     }
 
-    private void deserializeAndInvoke(final Invocation invocation){
+    private void deserializeAndInvoke(final InvocationSlot invocation){
         final short functionId = IOUtils.readShort(invocation.bytes, 6);
 
         try{
@@ -271,7 +271,7 @@ public final class ${class.name} extends ${class.superName} {
         final boolean schedule = isScheduled(sequenceAndStatus);
 
         final long prodSeq = getSequence(sequenceAndStatus);
-        final Invocation invocation = getSlot(prodSeq);
+        final InvocationSlot invocation = getSlot(prodSeq);
         invocation.bytes = invocationBytes;
         invocation.source = source;
         invocation.publish(prodSeq);

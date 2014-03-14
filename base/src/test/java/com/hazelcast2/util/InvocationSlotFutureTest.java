@@ -5,7 +5,7 @@ import org.junit.Test;
 
 import java.util.concurrent.ExecutionException;
 
-public class InvocationFutureTest {
+public class InvocationSlotFutureTest {
 
     @Test
     @Ignore
