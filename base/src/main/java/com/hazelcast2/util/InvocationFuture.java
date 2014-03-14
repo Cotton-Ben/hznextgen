@@ -40,7 +40,6 @@ public class InvocationFuture implements Future {
         }
 
         synchronized (this) {
-
             while (value == NO_RESPONSE) {
                 try {
                     //todo: instead of waiting, try to see if there is work that can be done.

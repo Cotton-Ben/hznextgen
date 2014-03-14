@@ -14,7 +14,10 @@ public final class Invocation {
     public Object reference1;
     public Object reference2;
     public InvocationFuture invocationFuture;
+
+    //for remote calls. Bytes contains the call content. The source so you can do a return.
     public byte[] bytes;
+    public InvocationEndpoint source;
 
     public final void clear() {
         //todo: is doing a null check if fields are not null cheaper?
@@ -22,6 +25,7 @@ public final class Invocation {
         reference2 = null;
         invocationFuture = null;
         bytes = null;
+        source = null;
     }
 
     public final void publish(final long sequence) {

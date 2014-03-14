@@ -38,7 +38,7 @@ public class IAtomicLongDispatchTest extends HazelcastTestSupport {
         b.putLong(Long.MIN_VALUE);//call-id
 
         byte[] array = b.array();
-        hz.dispatch(array);
+        hz.dispatch(null,array);
 
         assertTrueEventually(new AssertTask() {
             @Override
@@ -61,7 +61,7 @@ public class IAtomicLongDispatchTest extends HazelcastTestSupport {
         b.putLong(10);
 
         byte[] array = b.array();
-        hz.dispatch(array);
+        hz.dispatch(null,array);
 
         assertTrueEventually(new AssertTask() {
             @Override

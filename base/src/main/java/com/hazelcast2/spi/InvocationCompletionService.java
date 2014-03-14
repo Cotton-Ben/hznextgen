@@ -48,13 +48,16 @@ public class InvocationCompletionService implements SpiService {
 
     public InvocationCompletionService(short serviceId) {
         this.serviceId = serviceId;
+    }
+
+    public void sendResponse(long callid, byte[] response){
 
     }
 
     @Override
-    public void dispatch(byte[] invocationBytes) {
+    public void dispatch(InvocationEndpoint source, byte[] invocationBytes) {
         long callId = IOUtils.readLong(invocationBytes, 2);
-        InvocationFuture f = calls.get(calls);
+        InvocationFuture f = calls.get(callId);
         //f.setResponse();
     }
 

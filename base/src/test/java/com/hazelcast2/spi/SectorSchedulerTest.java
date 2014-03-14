@@ -24,7 +24,7 @@ public class SectorSchedulerTest {
         }
 
         @Override
-        public void schedule(byte[] bytes) {
+        public void schedule(InvocationEndpoint source, byte[] bytes) {
             throw new UnsupportedOperationException();
         }
     }

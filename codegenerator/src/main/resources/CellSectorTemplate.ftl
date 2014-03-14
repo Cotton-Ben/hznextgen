@@ -216,7 +216,7 @@ public final class ${class.name} extends ${class.superName} {
     }
 
     //todo: do we need this method in this subclass or can we move it to sector?
-    public void schedule(final byte[] invocationBytes){
+    public void schedule(final InvocationEndpoint source, final byte[] invocationBytes){
         final long sequenceAndStatus = claimSlotAndReturnStatus();
 
         if (sequenceAndStatus == CLAIM_SLOT_REMOTE) {
@@ -232,6 +232,7 @@ public final class ${class.name} extends ${class.superName} {
         final long prodSeq = getSequence(sequenceAndStatus);
         final Invocation invocation = getSlot(prodSeq);
         invocation.bytes = invocationBytes;
+        invocation.source = source;
         invocation.publish(prodSeq);
 
         if(schedule) scheduler.schedule(this);

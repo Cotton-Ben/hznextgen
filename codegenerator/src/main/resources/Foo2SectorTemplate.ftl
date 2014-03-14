@@ -1,8 +1,7 @@
 package ${class.packageName};
 
-import com.hazelcast2.spi.Invocation;
-import com.hazelcast2.spi.SectorSettings;
-import com.hazelcast2.util.InvocationFuture;
+import com.hazelcast2.spi.*;
+import com.hazelcast2.util.*;
 
 import java.util.concurrent.Future;
 
@@ -144,7 +143,7 @@ public final class ${class.name} extends ${class.superName} {
         }
     }
 
-    public void schedule(byte[] invocationBytes){
+    public void schedule(InvocationEndpoint source, byte[] invocationBytes){
     }
 }
 

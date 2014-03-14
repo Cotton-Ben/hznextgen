@@ -4,6 +4,7 @@ import com.hazelcast2.core.Config;
 import com.hazelcast2.core.IMap;
 import com.hazelcast2.core.MapConfig;
 import com.hazelcast2.partition.PartitionService;
+import com.hazelcast2.spi.InvocationEndpoint;
 import com.hazelcast2.spi.PartitionAwareSpiService;
 import com.hazelcast2.spi.SpiServiceSettings;
 
@@ -59,7 +60,7 @@ public class MapService implements PartitionAwareSpiService {
     }
 
     @Override
-    public void dispatch(byte[] invocationBytes) {
+    public void dispatch(final InvocationEndpoint source, byte[] invocationBytes) {
         throw new UnsupportedOperationException();
     }
 

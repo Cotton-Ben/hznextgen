@@ -247,7 +247,8 @@ public abstract class Sector {
     /**
      * The schedule wants to schedule a operation invocation on this sector.
      *
+     * @param source
      * @param bytes
      */
-    public abstract void schedule(byte[] bytes);
+    public abstract void schedule(InvocationEndpoint source, byte[] bytes);
 }

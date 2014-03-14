@@ -14,6 +14,6 @@ public interface SpiService {
      *
      * @param invocationBytes
      */
-    void dispatch(byte[] invocationBytes);
+    void dispatch(InvocationEndpoint source, byte[] invocationBytes);
 
 }

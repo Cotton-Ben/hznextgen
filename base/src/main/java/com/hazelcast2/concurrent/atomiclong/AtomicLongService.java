@@ -3,6 +3,7 @@ package com.hazelcast2.concurrent.atomiclong;
 import com.hazelcast2.core.IAtomicLong;
 import com.hazelcast2.nio.IOUtils;
 import com.hazelcast2.partition.PartitionService;
+import com.hazelcast2.spi.InvocationEndpoint;
 import com.hazelcast2.spi.PartitionAwareSpiService;
 import com.hazelcast2.spi.SpiServiceSettings;
 
@@ -63,10 +64,10 @@ public final class AtomicLongService implements PartitionAwareSpiService {
     }
 
     @Override
-    public void dispatch(final byte[] invocationBytes) {
+    public void dispatch(final InvocationEndpoint source, final byte[] invocationBytes) {
         final int partitionId = getPartitionId(invocationBytes);
         final LongSector sector = sectors[partitionId];
-        sector.schedule(invocationBytes);
+        sector.schedule(source, invocationBytes);
     }
 
     private int getPartitionId(byte[] bytes) {

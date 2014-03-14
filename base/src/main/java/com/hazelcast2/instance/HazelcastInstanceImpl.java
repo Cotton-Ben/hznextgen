@@ -13,10 +13,7 @@ import com.hazelcast2.nio.impl.ConnectionManagerImpl;
 import com.hazelcast2.partition.PartitionService;
 import com.hazelcast2.partition.impl.PartitionServiceImpl;
 import com.hazelcast2.serialization.SerializationService;
-import com.hazelcast2.spi.InvocationCompletionService;
-import com.hazelcast2.spi.PartitionAwareSpiService;
-import com.hazelcast2.spi.SpiService;
-import com.hazelcast2.spi.SpiServiceSettings;
+import com.hazelcast2.spi.*;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -159,11 +156,11 @@ public class HazelcastInstanceImpl implements HazelcastInstance, Gateway {
     }
 
     @Override
-    public void dispatch(final byte[] bytes) {
+    public void dispatch(final InvocationEndpoint source, final byte[] bytes) {
         final short serviceId = getServiceId(bytes);
         final SpiService spiService = services[serviceId];
         //here we have a polymorphic method call
-        spiService.dispatch(bytes);
+        spiService.dispatch(source, bytes);
     }
 
     private short getServiceId(byte[] bytes) {
