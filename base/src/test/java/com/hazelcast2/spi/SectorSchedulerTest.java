@@ -9,8 +9,6 @@ public class SectorSchedulerTest {
         SectorScheduler scheduler = new SectorScheduler(1024,1);
         Sector sector = new DummySector(new SectorSettings(1,scheduler));
         scheduler.schedule(sector);
-
-
     }
 
     class DummySector extends Sector{

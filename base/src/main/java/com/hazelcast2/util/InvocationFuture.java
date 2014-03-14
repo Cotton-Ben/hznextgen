@@ -1,5 +1,7 @@
 package com.hazelcast2.util;
 
+import com.hazelcast2.serialization.SerializationService;
+
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -13,7 +15,17 @@ public class InvocationFuture implements Future {
         }
     };
 
+    private final SerializationService serializationService;
+
     public volatile Object value = NO_RESPONSE;
+
+    public InvocationFuture(){
+        this(null);
+    }
+
+    public InvocationFuture(SerializationService serializationService){
+        this.serializationService = serializationService;
+    }
 
     public void cancel() {
         throw new UnsupportedOperationException();
@@ -46,6 +58,10 @@ public class InvocationFuture implements Future {
                     }
                 }
             }
+        }
+
+        if(value instanceof byte[]){
+
         }
 
         if (value instanceof Failure) {

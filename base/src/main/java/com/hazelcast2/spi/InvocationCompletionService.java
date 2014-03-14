@@ -53,7 +53,7 @@ public class InvocationCompletionService implements SpiService {
     @Override
     public void dispatch(InvocationEndpoint source, byte[] invocationBytes) {
         final long callId = IOUtils.readLong(invocationBytes, 2);
-        final InvocationFuture f = calls.get(callId);
+        final InvocationFuture f = calls.remove(callId);
         if (f == null) {
             System.out.println("No invocation found for callid:" + callId);
             return;
@@ -69,7 +69,7 @@ public class InvocationCompletionService implements SpiService {
 
     public long register(InvocationFuture future) {
         long callId = callIdGenerator.incrementAndGet();
-        calls.putIfAbsent(callId, future);
+        calls.put(callId, future);
         return callId;
     }
 

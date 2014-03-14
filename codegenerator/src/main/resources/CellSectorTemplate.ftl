@@ -41,7 +41,7 @@ public final class ${class.name} extends ${class.superName} {
         if (!isScheduled(sequenceAndStatus)) {
             final long prodSeq = getSequence(sequenceAndStatus);
             //todo: this sucks, we don't want to create new instances.
-            final InvocationFuture future = new InvocationFuture();
+            final InvocationFuture future = new InvocationFuture(serializationService);
             final Invocation invocation = getSlot(prodSeq);
             invocation.invocationFuture = future;
             invocation.id = id;
@@ -90,7 +90,7 @@ public final class ${class.name} extends ${class.superName} {
         final boolean schedule = isScheduled(sequenceAndStatus);
 
         //we need to create a new instance because we are exposing this object to the outside world and can't pool it.
-        final InvocationFuture future = new InvocationFuture();
+        final InvocationFuture future = new InvocationFuture(serializationService);
 
         final long prodSeq = getSequence(sequenceAndStatus);
         final Invocation invocation = getSlot(prodSeq);

@@ -17,7 +17,22 @@ public class Main {
         System.out.println(ref.get());
 
         IAtomicLong ref2 = hz2.getAtomicLong("foo");
+
         ref2.set(10);
+
+        long startMs = System.currentTimeMillis();
+        int iterations = 1000 * 1000 * 10;
+        for (int k = 0; k < iterations; k++) {
+            ref2.set(20);
+            if(k % 100000 == 0){
+                System.out.println("At k:"+k);
+            }
+        }
+        long durationMs = System.currentTimeMillis() - startMs;
+        double performance = (iterations * 1000d) / durationMs;
+        System.out.println("Performance: " + performance);
+
+
         System.out.println(ref2.get());
     }
 

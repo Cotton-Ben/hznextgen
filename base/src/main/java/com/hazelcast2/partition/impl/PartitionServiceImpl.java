@@ -13,7 +13,7 @@ public class PartitionServiceImpl implements PartitionService {
         }
         this.partitionCount = partitionCount;
         //todo: very small scheduler, needs to be made configurable.
-        int threadCount = Runtime.getRuntime().availableProcessors();
+        int threadCount = 1;//Runtime.getRuntime().availableProcessors();
         int schedulerBufferSize = 1024;
         this.sectorScheduler = new SectorScheduler(schedulerBufferSize, threadCount);
         this.sectorScheduler.start();
