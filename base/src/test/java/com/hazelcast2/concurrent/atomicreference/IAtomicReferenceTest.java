@@ -1,5 +1,6 @@
 package com.hazelcast2.concurrent.atomicreference;
 
+import com.hazelcast2.concurrent.atomicboolean.IAtomicBoolean;
 import com.hazelcast2.core.Hazelcast;
 import com.hazelcast2.core.HazelcastInstance;
 import com.hazelcast2.test.HazelcastTestSupport;
@@ -46,6 +47,29 @@ public class IAtomicReferenceTest extends HazelcastTestSupport {
         ref1.set("foo");
         IAtomicReference ref2 = hz.getAtomicReference(name);
         assertEquals("foo",ref2.get());
+    }
+
+    @Test
+    public void destroy_whenNotDestroyed() {
+        IAtomicReference ref = hz.getAtomicReference(randomString());
+        ref.destroy();
+        assertTrue(ref.isDestroyed());
+    }
+
+    @Test
+    public void destroy_whenAlreadyDestroyed() {
+        IAtomicReference ref = hz.getAtomicReference(randomString());
+        ref.destroy();
+
+        ref.destroy();
+
+        assertTrue(ref.isDestroyed());
+    }
+
+    @Test
+    public void isDestroyed_whenNotDestroyed() {
+        IAtomicReference ref = hz.getAtomicReference(randomString());
+        assertFalse(ref.isDestroyed());
     }
 
     @Test

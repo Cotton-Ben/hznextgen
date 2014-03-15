@@ -41,6 +41,29 @@ public class IAtomicBooleanTest extends HazelcastTestSupport {
     }
 
     @Test
+    public void destroy_whenNotDestroyed() {
+        IAtomicBoolean ref = hz.getAtomicBoolean(randomString());
+        ref.destroy();
+        assertTrue(ref.isDestroyed());
+    }
+
+    @Test
+    public void destroy_whenAlreadyDestroyed() {
+        IAtomicBoolean ref = hz.getAtomicBoolean(randomString());
+        ref.destroy();
+
+        ref.destroy();
+
+        assertTrue(ref.isDestroyed());
+    }
+
+    @Test
+    public void isDestroyed_whenNotDestroyed() {
+        IAtomicBoolean ref = hz.getAtomicBoolean(randomString());
+        assertFalse(ref.isDestroyed());
+    }
+
+    @Test
     public void getAtomicBoolean_duplicateRetrieval(){
         String  name = randomString();
         IAtomicBoolean boolean1 = hz.getAtomicBoolean(name);
