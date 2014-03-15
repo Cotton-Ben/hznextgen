@@ -2,14 +2,14 @@ package com.hazelcast2.concurrent.atomicboolean.impl;
 
 import com.hazelcast2.concurrent.atomicboolean.AtomicBooleanConfig;
 import com.hazelcast2.spi.Sector;
-import com.hazelcast2.spi.cellbased.CellBasedSector;
-import com.hazelcast2.spi.cellbased.SectorOperation;
+import com.hazelcast2.spi.SectorClass;
+import com.hazelcast2.spi.SectorOperation;
 
 import java.util.HashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLong;
 
-@CellBasedSector
+@SectorClass
 public abstract class BooleanSector extends Sector {
 
     //todo: very inefficient structure.

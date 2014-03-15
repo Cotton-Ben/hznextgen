@@ -1,7 +1,5 @@
-package com.hazelcast2.spi.foo2.codegenerator;
+package com.hazelcast2.spi;
 
-import com.hazelcast2.spi.foo2.Foo2OperationMethod;
-import com.hazelcast2.spi.foo2.Foo2SectorAnnotation;
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -9,7 +7,6 @@ import freemarker.template.Template;
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.*;
-import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -17,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-@SupportedAnnotationTypes("com.hazelcast2.spi.foo2.Foo2SectorAnnotation")
+@SupportedAnnotationTypes("com.hazelcast2.spi.SectorClass")
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
 public class SectorCodeGenerator extends AbstractProcessor {
 
@@ -33,7 +30,7 @@ public class SectorCodeGenerator extends AbstractProcessor {
         Configuration cfg = new Configuration();
         cfg.setTemplateLoader(new ClassTemplateLoader(getClass(), "/"));
         try {
-            template = cfg.getTemplate("Foo2SectorTemplate.ftl");
+            template = cfg.getTemplate("SectorTemplate.ftl");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -41,7 +38,7 @@ public class SectorCodeGenerator extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> elements, RoundEnvironment env) {
-        for (Element element : env.getElementsAnnotatedWith(Foo2SectorAnnotation.class)) {
+        for (Element element : env.getElementsAnnotatedWith(SectorClass.class)) {
             generate((TypeElement) element);
         }
 
@@ -57,42 +54,46 @@ public class SectorCodeGenerator extends AbstractProcessor {
     }
 
     private SectorClassModel generateClassModel(TypeElement classElement) {
-        final SectorClassModel clazz = new SectorClassModel();
+        SectorClassModel clazz = new SectorClassModel();
         clazz.name = "Generated" + classElement.getSimpleName();
         clazz.superName = classElement.getSimpleName().toString();
         clazz.packageName = getPackageNameFromQualifiedName(classElement.getQualifiedName().toString());
 
         for (Element enclosedElement : classElement.getEnclosedElements()) {
-            if (enclosedElement.getKind().equals(ElementKind.METHOD)) {
-                ExecutableElement methodElement = (ExecutableElement) enclosedElement;
+            if (!enclosedElement.getKind().equals(ElementKind.METHOD)) {
+                continue;
+            }
+            ExecutableElement methodElement = (ExecutableElement) enclosedElement;
+            SectorOperation operationAnnotation = methodElement.getAnnotation(SectorOperation.class);
 
-                Foo2OperationMethod operationAnnotation = methodElement.getAnnotation(Foo2OperationMethod.class);
+            if (operationAnnotation != null) {
+                String methodName = methodElement.getSimpleName().toString();
 
-                if (operationAnnotation != null) {
-                    String methodName = methodElement.getSimpleName().toString();
+                int argCount = methodElement.getParameters().size();
 
-                    int argCount = methodElement.getParameters().size();
+                SectorMethodModel method = new SectorMethodModel();
+                clazz.methods.add(method);
 
-                    SectorMethodModel method = new SectorMethodModel();
-                    clazz.methods.add(method);
+                boolean cellbased = operationAnnotation.cellbased();
+                method.cellbased = cellbased;
+                method.name = "do" + capitalizeFirstLetter(methodName);
+                method.returnType = methodElement.getReturnType().toString();
+                method.invocationClassName = capitalizeFirstLetter(methodName) + argCount + "Invocation";
+                method.targetMethod = methodName;
+                method.readonly = operationAnnotation.readonly();
+                method.functionId =clazz.methods.size();
 
-                    method.name = "do" + capitalizeFirstLetter(methodName);
-                    method.returnType = methodElement.getReturnType().toString();
-                    method.invocationClassName = capitalizeFirstLetter(methodName) + argCount + "Invocation";
-                    method.targetMethod = methodName;
-                    method.readonly = operationAnnotation.readonly();
-                    method.functionId = clazz.methods.size();
-
-                    for (VariableElement variableElement : methodElement.getParameters()) {
+                int k = 0;
+                for (VariableElement variableElement : methodElement.getParameters()) {
+                    if (k > 0 || !cellbased) {
                         method.args.add(variableElement.asType().toString());
                     }
-
-
-                    this.messager.printMessage(Diagnostic.Kind.WARNING, methodName + " " + method.args);
-
-                } else if (methodElement.getSimpleName().toString().equals("loadCell")) {
-                    clazz.cellName = methodElement.getReturnType().toString();
+                    k++;
                 }
+
+
+            } else if (methodElement.getSimpleName().toString().equals("loadCell")) {
+                clazz.cellName = methodElement.getReturnType().toString();
             }
         }
         return clazz;
