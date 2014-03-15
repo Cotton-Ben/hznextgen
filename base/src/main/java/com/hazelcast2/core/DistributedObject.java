@@ -5,4 +5,5 @@ public interface DistributedObject {
     String getName();
 
     long getId();
+
 }

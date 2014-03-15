@@ -44,6 +44,28 @@ public abstract class LongSector extends Sector {
         return cells.get(id);
     }
 
+
+    // ==================================================================================
+    //                      destroy
+    // ==================================================================================
+
+
+    @CellSectorOperation(constructor = true)
+    public void destroy(long id) {
+        LongCell cell = cells.remove(id);
+        if (cell == null) {
+            return;
+        }
+
+        cellsId.remove(cell.config.name);
+    }
+
+    @CellSectorOperation(constructor = true)
+    public long isDestroyed(long id) {
+        return cells.containsKey(id)?1:0;
+    }
+
+
     // ==================================================================================
     //                      get
     // ==================================================================================
@@ -131,4 +153,5 @@ public abstract class LongSector extends Sector {
     public void alter(LongCell cell, LongFunction f) {
         cell.value = f.apply(cell.value);
     }
+
 }

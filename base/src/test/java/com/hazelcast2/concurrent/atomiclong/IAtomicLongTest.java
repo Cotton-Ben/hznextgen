@@ -11,8 +11,7 @@ import org.junit.Test;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 public class IAtomicLongTest extends HazelcastTestSupport {
 
@@ -25,30 +24,53 @@ public class IAtomicLongTest extends HazelcastTestSupport {
     }
 
     @After
-    public void tearDown(){
+    public void tearDown() {
         hz.shutdown();
     }
 
     @Test
-    public void getAtomicLong_duplicateRetrieval(){
-        String  name = randomString();
+    public void getAtomicLong_duplicateRetrieval() {
+        String name = randomString();
         IAtomicLong long1 = hz.getAtomicLong(name);
         long1.set(20);
         IAtomicLong long2 = hz.getAtomicLong(name);
-        assertEquals(20,long2.get());
+        assertEquals(20, long2.get());
     }
 
     @Test
-    public void construction_withConfigAndNullName(){
+    public void construction_withConfigAndNullName() {
         AtomicLongConfig config = new AtomicLongConfig();
-        config.asyncBackupCount=1;
-        config.backupCount=0;
+        config.asyncBackupCount = 1;
+        config.backupCount = 0;
 
         IAtomicLong atomicLong = hz.getAtomicLong(config);
         assertNotNull(config.name);
 
         IAtomicLong found = hz.getAtomicLong(config.name);
         assertEquals(atomicLong.getId(), found.getId());
+    }
+
+    @Test
+    public void destroy_whenNotDestroyed() {
+        IAtomicLong atomicLong = hz.getAtomicLong(randomString());
+        atomicLong.destroy();
+        assertTrue(atomicLong.isDestroyed());
+    }
+
+    @Test
+    public void destroy_whenAlreadyDestroyed() {
+        IAtomicLong atomicLong = hz.getAtomicLong(randomString());
+        atomicLong.destroy();
+
+        atomicLong.destroy();
+
+        assertTrue(atomicLong.isDestroyed());
+    }
+
+    @Test
+    public void isDestroyed_whenNotDestroyed() {
+        IAtomicLong atomicLong = hz.getAtomicLong(randomString());
+        assertFalse(atomicLong.isDestroyed());
     }
 
     @Test
@@ -103,7 +125,7 @@ public class IAtomicLongTest extends HazelcastTestSupport {
         long result = atomicLong.apply(new LongFunction() {
             @Override
             public long apply(long arg) {
-                return arg+1;
+                return arg + 1;
             }
         });
 

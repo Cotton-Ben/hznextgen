@@ -74,7 +74,11 @@ public final class ${class.name} extends ${class.superName} {
     </#if>
         try{
     <#if method.voidReturnType>
+        <#if method.constructor>
+            super.${method.targetMethod}(${method.actualArguments});
+        <#else>
             ${method.targetMethod}(cell ${method.trailingComma}${method.actualArguments});
+        </#if>
             success = true;
             process();
     <#else>
@@ -136,7 +140,11 @@ public final class ${class.name} extends ${class.superName} {
         final ByteArrayObjectDataInput in = new ByteArrayObjectDataInput(bytes, 24, serializationService);
     </#if>
     <#if method.voidReturnType>
+        <#if method.constructor>
+        super.${method.targetMethod}(${method.deserializedInvocationToArgs});
+        <#else>
         ${method.targetMethod}(cell${method.trailingComma} ${method.deserializedInvocationToArgs});
+        </#if>
     <#else>
         <#if method.constructor>
         final ${method.returnType} result = super.${method.targetMethod}(${method.deserializedInvocationToArgs});
@@ -251,19 +259,23 @@ public final class ${class.name} extends ${class.superName} {
             switch (invocation.functionId) {
 <#list class.methods as method>
                 case ${method.functionConstantName}:{
-    <#if !method.constructor>
+    <#if method.constructor>
+        <#if method.voidReturnType>
+                        ${method.targetMethod}(${method.invocationToArgs});
+                        invocation.invocationFuture.setVoidResponse();
+        <#else>
+                        final ${method.returnType} result = super.${method.targetMethod}(${method.invocationToArgs});
+                        invocation.invocationFuture.setResponse(result);
+        </#if>
+    <#else>
                         final ${class.cellName} cell = loadCell(invocation.id);
-    </#if>
-    <#if method.voidReturnType>
+        <#if method.voidReturnType>
                         ${method.targetMethod}(cell ${method.trailingComma}${method.invocationToArgs});
                         invocation.invocationFuture.setVoidResponse();
-    <#else>
-        <#if method.constructor>
-                        final ${method.returnType} result = super.${method.targetMethod}(${method.invocationToArgs});
         <#else>
                         final ${method.returnType} result = ${method.targetMethod}(cell ${method.trailingComma}${method.invocationToArgs});
-        </#if>
                         invocation.invocationFuture.setResponse(result);
+        </#if>
     </#if>
                     }
                     break;

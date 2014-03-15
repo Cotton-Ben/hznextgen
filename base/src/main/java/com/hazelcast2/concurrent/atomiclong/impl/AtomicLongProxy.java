@@ -92,6 +92,16 @@ public class AtomicLongProxy implements IAtomicLong {
     }
 
     @Override
+    public void destroy() {
+        sector.destroy(id);
+    }
+
+    @Override
+    public boolean isDestroyed() {
+        return sector.isDestroyed(id)!=1;
+    }
+
+    @Override
     public String toString() {
         return "IAtomicLong{" +
                 "id=" + id +

@@ -30,4 +30,10 @@ public interface IAtomicLong extends DistributedObject {
     void alter(LongFunction f);
 
     Future<Void> asyncAlter(LongFunction f);
+
+    //todo: needs to be moved to distributed object
+    void destroy();
+
+    //todo: needs to be moved to distributed object
+    boolean isDestroyed();
 }
