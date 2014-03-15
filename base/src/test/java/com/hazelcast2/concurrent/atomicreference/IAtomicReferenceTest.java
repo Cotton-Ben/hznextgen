@@ -67,6 +67,15 @@ public class IAtomicReferenceTest extends HazelcastTestSupport {
     }
 
     @Test
+    public void asyncIsNull_whenNull() throws ExecutionException, InterruptedException {
+        IAtomicReference<String> atomicReference = hz.getAtomicReference(randomString());
+
+        boolean result = atomicReference.asyncIsNull().get();
+
+        assertTrue(result);
+    }
+
+    @Test
     public void isNull_whenNotNull() {
         IAtomicReference<String> atomicReference = hz.getAtomicReference(randomString());
         atomicReference.set("foo");
