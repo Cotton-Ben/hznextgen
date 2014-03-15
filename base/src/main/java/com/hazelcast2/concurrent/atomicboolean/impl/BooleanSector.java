@@ -29,6 +29,7 @@ public abstract class BooleanSector extends Sector {
         }
 
         BooleanCell cell = new BooleanCell();
+        cell.config = config;
         id = idGenerator.incrementAndGet();
         cells.put(id, cell);
         cellsId.put(config.name, id);

@@ -30,6 +30,7 @@ public abstract class ReferenceSector extends Sector {
         }
 
         ReferenceCell cell = new ReferenceCell();
+        cell.config = config;
         id = idGenerator.incrementAndGet();
         cells.put(id, cell);
         cellsId.put(config.name, id);

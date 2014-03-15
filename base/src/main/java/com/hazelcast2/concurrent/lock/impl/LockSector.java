@@ -29,6 +29,7 @@ public abstract class LockSector extends Sector {
         }
 
         LockCell cell = new LockCell();
+        cell.config = config;
         id = idGenerator.incrementAndGet();
         cells.put(id, cell);
         cellsId.put(config.name, id);

@@ -1,5 +1,8 @@
 package com.hazelcast2.concurrent.lock.impl;
 
+import com.hazelcast2.concurrent.lock.LockConfig;
+
 public class LockCell {
-    long lockOwnerThreadId = -1;
+    public long lockOwnerThreadId = -1;
+    public LockConfig config;
 }

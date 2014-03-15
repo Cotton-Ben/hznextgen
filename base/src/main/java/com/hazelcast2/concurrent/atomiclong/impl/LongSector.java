@@ -31,6 +31,7 @@ public abstract class LongSector extends Sector {
         }
 
         LongCell cell = new LongCell();
+        cell.config = config;
         id = idGenerator.incrementAndGet();
         cells.put(id, cell);
         cellsId.put(config.name, id);
