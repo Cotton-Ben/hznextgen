@@ -25,6 +25,11 @@ public class LockProxy implements ILock {
     }
 
     @Override
+    public void lock() throws InterruptedException {
+        return sector.doLock(id, LockUtil.getThreadId());
+    }
+
+    @Override
     public boolean tryLock() {
         return sector.doTryLock(id, LockUtil.getThreadId());
     }

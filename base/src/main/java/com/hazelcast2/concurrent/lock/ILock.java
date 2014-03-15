@@ -8,6 +8,8 @@ public interface ILock extends DistributedObject {
 
     boolean isLocked();
 
+    void lock() throws InterruptedException;
+
     void unlock();
 
     long getId();

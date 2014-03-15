@@ -109,4 +109,20 @@ public abstract class LockSector extends Sector {
 
         cell.lockOwnerThreadId = -1;
     }
+
+    public abstract void doLock(long id, long threadId);
+
+    @SectorOperation(cellbased = true)
+    public void lock(LockCell cell, long threadId){
+        if(cell.lockOwnerThreadId == 0){
+            cell.lockOwnerThreadId = threadId;
+            return;
+        }
+
+        //todo:
+        //we need to have the call id, so we can notify
+        //we need to have the endpoint, so we can notify
+        //we need to prevent that the doLock method is going to signal the caller
+        throw new UnsupportedOperationException();
+    }
 }
