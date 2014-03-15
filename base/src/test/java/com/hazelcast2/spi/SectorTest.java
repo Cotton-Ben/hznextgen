@@ -1,7 +1,7 @@
 package com.hazelcast2.spi;
 
-import com.hazelcast2.concurrent.atomiclong.GeneratedLongSector;
-import com.hazelcast2.concurrent.atomiclong.LongSectorSettings;
+import com.hazelcast2.concurrent.atomiclong.impl.GeneratedLongSector;
+import com.hazelcast2.concurrent.atomiclong.impl.LongSectorSettings;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

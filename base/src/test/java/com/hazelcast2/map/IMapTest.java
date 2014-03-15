@@ -2,7 +2,6 @@ package com.hazelcast2.map;
 
 import com.hazelcast2.core.Hazelcast;
 import com.hazelcast2.core.HazelcastInstance;
-import com.hazelcast2.core.IMap;
 import com.hazelcast2.test.HazelcastTestSupport;
 import org.junit.After;
 import org.junit.Before;

@@ -1,6 +1,5 @@
 package com.hazelcast2.core;
 
-import com.hazelcast2.core.config.Config;
 import com.hazelcast2.instance.HazelcastInstanceImpl;
 
 public class Hazelcast {

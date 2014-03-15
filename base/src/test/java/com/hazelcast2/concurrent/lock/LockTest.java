@@ -2,7 +2,6 @@ package com.hazelcast2.concurrent.lock;
 
 import com.hazelcast2.core.Hazelcast;
 import com.hazelcast2.core.HazelcastInstance;
-import com.hazelcast2.core.ILock;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

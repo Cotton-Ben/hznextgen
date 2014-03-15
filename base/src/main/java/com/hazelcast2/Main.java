@@ -2,7 +2,7 @@ package com.hazelcast2;
 
 import com.hazelcast2.core.Hazelcast;
 import com.hazelcast2.core.HazelcastInstance;
-import com.hazelcast2.core.IAtomicLong;
+import com.hazelcast2.concurrent.atomiclong.IAtomicLong;
 import com.hazelcast2.instance.HazelcastInstanceImpl;
 
 import java.util.LinkedList;

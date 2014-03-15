@@ -1,6 +1,15 @@
 package com.hazelcast2.core;
 
-import com.hazelcast2.core.config.*;
+import com.hazelcast2.concurrent.atomicboolean.AtomicBooleanConfig;
+import com.hazelcast2.concurrent.atomicboolean.IAtomicBoolean;
+import com.hazelcast2.concurrent.atomiclong.AtomicLongConfig;
+import com.hazelcast2.concurrent.atomiclong.IAtomicLong;
+import com.hazelcast2.concurrent.atomicreference.AtomicReferenceConfig;
+import com.hazelcast2.concurrent.atomicreference.IAtomicReference;
+import com.hazelcast2.concurrent.lock.ILock;
+import com.hazelcast2.concurrent.lock.LockConfig;
+import com.hazelcast2.map.IMap;
+import com.hazelcast2.map.MapConfig;
 
 public interface HazelcastInstance {
 

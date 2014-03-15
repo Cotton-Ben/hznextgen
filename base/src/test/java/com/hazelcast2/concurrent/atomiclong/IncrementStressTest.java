@@ -2,7 +2,6 @@ package com.hazelcast2.concurrent.atomiclong;
 
 import com.hazelcast2.core.Hazelcast;
 import com.hazelcast2.core.HazelcastInstance;
-import com.hazelcast2.core.IAtomicLong;
 import com.hazelcast2.test.HazelcastTestSupport;
 import org.junit.After;
 import org.junit.Before;

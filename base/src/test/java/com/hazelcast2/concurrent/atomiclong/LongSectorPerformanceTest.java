@@ -1,5 +1,8 @@
 package com.hazelcast2.concurrent.atomiclong;
 
+import com.hazelcast2.concurrent.atomiclong.impl.GeneratedLongSector;
+import com.hazelcast2.concurrent.atomiclong.impl.LongSector;
+import com.hazelcast2.concurrent.atomiclong.impl.LongSectorSettings;
 import com.hazelcast2.spi.SectorScheduler;
 import org.junit.Test;
 
