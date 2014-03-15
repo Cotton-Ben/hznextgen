@@ -1,6 +1,5 @@
 package com.hazelcast2.concurrent.atomicreference;
 
-import com.hazelcast2.concurrent.atomiclong.IAtomicLong;
 import com.hazelcast2.core.Hazelcast;
 import com.hazelcast2.core.HazelcastInstance;
 import com.hazelcast2.test.HazelcastTestSupport;
@@ -12,7 +11,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
 
 public class IAtomicReferenceTest extends HazelcastTestSupport {
     private HazelcastInstance hz;
@@ -29,7 +27,7 @@ public class IAtomicReferenceTest extends HazelcastTestSupport {
     }
 
     @Test
-    public void getAtomicLong_duplicateRetrieval(){
+    public void getAtomicReference_duplicateRetrieval(){
         String  name = randomString();
         IAtomicReference<String> ref1 = hz.getAtomicReference(name);
         ref1.set("foo");
