@@ -67,6 +67,16 @@ public class AtomicReferenceProxy<E> implements IAtomicReference<E> {
     }
 
     @Override
+    public void destroy() {
+        sector.doDestroy(id);
+    }
+
+    @Override
+    public boolean isDestroyed() {
+        return sector.doIsDestroyed(id) != 1;
+    }
+
+    @Override
     public String toString() {
         return "IAtomicLong{" +
                 "id=" + id +

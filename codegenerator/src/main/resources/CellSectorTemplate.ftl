@@ -77,7 +77,7 @@ public final class ${class.name} extends ${class.superName} {
         <#if method.cellbased>
             ${method.targetMethod}(cell ${method.trailingComma}${method.actualArguments});
         <#else>
-            super.${method.targetMethod}(${method.actualArguments});
+            ${method.targetMethod}(${method.actualArguments});
         </#if>
             success = true;
             process();
@@ -85,7 +85,7 @@ public final class ${class.name} extends ${class.superName} {
             <#if method.cellbased>
             ${method.returnType} result = ${method.targetMethod}(cell ${method.trailingComma}${method.actualArguments});
             <#else>
-            ${method.returnType} result = super.${method.targetMethod}(${method.actualArguments});
+            ${method.returnType} result = ${method.targetMethod}(${method.actualArguments});
             </#if>
             success = true;
             process();
@@ -143,13 +143,13 @@ public final class ${class.name} extends ${class.superName} {
         <#if method.cellbased>
         ${method.targetMethod}(cell${method.trailingComma} ${method.deserializedInvocationToArgs});
         <#else>
-        super.${method.targetMethod}(${method.deserializedInvocationToArgs});
+        ${method.targetMethod}(${method.deserializedInvocationToArgs});
         </#if>
     <#else>
         <#if method.cellbased>
         final ${method.returnType} result = ${method.targetMethod}(cell${method.trailingComma} ${method.deserializedInvocationToArgs});
         <#else>
-        final ${method.returnType} result = super.${method.targetMethod}(${method.deserializedInvocationToArgs});
+        final ${method.returnType} result = ${method.targetMethod}(${method.deserializedInvocationToArgs});
         </#if>
     </#if>
 
@@ -274,7 +274,7 @@ public final class ${class.name} extends ${class.superName} {
                         ${method.targetMethod}(${method.invocationToArgs});
                         invocation.invocationFuture.setVoidResponse();
         <#else>
-                        final ${method.returnType} result = super.${method.targetMethod}(${method.invocationToArgs});
+                        final ${method.returnType} result = ${method.targetMethod}(${method.invocationToArgs});
                         invocation.invocationFuture.setResponse(result);
         </#if>
     </#if>

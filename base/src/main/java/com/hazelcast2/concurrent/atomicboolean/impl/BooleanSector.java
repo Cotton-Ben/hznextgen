@@ -42,6 +42,30 @@ public abstract class BooleanSector extends Sector {
     }
 
     // ==================================================================================
+    //                      destroy
+    // ==================================================================================
+
+    public abstract void doDestroy(long id);
+
+    @SectorOperation
+    public void destroy(long id) {
+        BooleanCell cell = cells.remove(id);
+        if (cell == null) {
+            return;
+        }
+
+        cellsId.remove(cell.config.name);
+    }
+
+    public abstract long doIsDestroyed(long id);
+
+    @SectorOperation(readonly = true)
+    public long isDestroyed(long id) {
+        return cells.containsKey(id) ? 1 : 0;
+    }
+
+
+    // ==================================================================================
     //                      get
     // ==================================================================================
 

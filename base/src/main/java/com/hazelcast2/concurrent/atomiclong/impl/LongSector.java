@@ -24,6 +24,12 @@ public abstract class LongSector extends Sector {
         super(settings);
     }
 
+    public LongCell loadCell(long id) {
+        return cells.get(id);
+    }
+
+    public abstract long doCreateCell(AtomicLongConfig config);
+
     @SectorOperation
     public long createCell(AtomicLongConfig config) {
         Long id = cellsId.get(config.name);
@@ -39,16 +45,11 @@ public abstract class LongSector extends Sector {
         return id;
     }
 
-
-    public LongCell loadCell(long id) {
-        return cells.get(id);
-    }
-
-
     // ==================================================================================
     //                      destroy
     // ==================================================================================
 
+    public abstract void doDestroy(long id);
 
     @SectorOperation
     public void destroy(long id) {
@@ -59,6 +60,8 @@ public abstract class LongSector extends Sector {
 
         cellsId.remove(cell.config.name);
     }
+
+    public abstract long doIsDestroyed(long id);
 
     @SectorOperation(readonly = true)
     public long isDestroyed(long id) {

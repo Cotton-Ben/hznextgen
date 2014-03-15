@@ -2,13 +2,13 @@ package com.hazelcast2.concurrent.lock.impl;
 
 import com.hazelcast2.concurrent.lock.ILock;
 
-public class ILockProxy implements ILock {
+public class LockProxy implements ILock {
 
     private final LockSector sector;
     private final long id;
     private final String name;
 
-    public ILockProxy(LockSector sector, String name, long id) {
+    public LockProxy(LockSector sector, String name, long id) {
         this.sector = sector;
         this.name = name;
         this.id = id;
@@ -37,6 +37,16 @@ public class ILockProxy implements ILock {
     @Override
     public void unlock() {
         sector.doUnlock(id, LockUtil.getThreadId());
+    }
+
+    @Override
+    public void destroy() {
+        sector.doDestroy(id);
+    }
+
+    @Override
+    public boolean isDestroyed() {
+        return sector.doIsDestroyed(id) != 1;
     }
 
     @Override

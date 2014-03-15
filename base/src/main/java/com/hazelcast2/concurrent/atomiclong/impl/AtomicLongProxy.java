@@ -93,12 +93,12 @@ public class AtomicLongProxy implements IAtomicLong {
 
     @Override
     public void destroy() {
-        sector.destroy(id);
+        sector.doDestroy(id);
     }
 
     @Override
     public boolean isDestroyed() {
-        return sector.isDestroyed(id)!=1;
+        return sector.doIsDestroyed(id)!=1;
     }
 
     @Override

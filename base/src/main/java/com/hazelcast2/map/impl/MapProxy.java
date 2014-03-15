@@ -45,6 +45,16 @@ public class MapProxy implements IMap {
         return mapStore.getSector(partitionId);
     }
 
+    @Override
+    public void destroy() {
+        throw new UnsupportedOperationException("todo");
+    }
+
+    @Override
+    public boolean isDestroyed() {
+        throw new UnsupportedOperationException("todo");
+    }
+
     private int getPartitionId(String key) {
         //todo: needs to be forwarded to another system instead of doing here.
         int hash = key.hashCode();

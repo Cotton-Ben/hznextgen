@@ -42,6 +42,29 @@ public abstract class ReferenceSector extends Sector {
         return cells.get(id);
     }
 
+    // ==================================================================================
+    //                      destroy
+    // ==================================================================================
+
+    public abstract void doDestroy(long id);
+
+    @SectorOperation
+    public void destroy(long id) {
+        ReferenceCell cell = cells.remove(id);
+        if (cell == null) {
+            return;
+        }
+
+        cellsId.remove(cell.config.name);
+    }
+
+    public abstract long doIsDestroyed(long id);
+
+    @SectorOperation(readonly = true)
+    public long isDestroyed(long id) {
+        return cells.containsKey(id) ? 1 : 0;
+    }
+
     // ==================== get ================================================
 
     public abstract Object doGet(long id);
@@ -59,9 +82,9 @@ public abstract class ReferenceSector extends Sector {
 
     public abstract Future<Boolean> asyncDoIsNull(long id);
 
-    @SectorOperation(cellbased =true,readonly = true)
+    @SectorOperation(cellbased = true, readonly = true)
     public boolean isNull(ReferenceCell cell) {
-        return cell.value==null;
+        return cell.value == null;
     }
 
     // ==================== set ================================================

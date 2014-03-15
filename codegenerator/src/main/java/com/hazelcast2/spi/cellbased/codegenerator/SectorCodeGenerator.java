@@ -78,12 +78,7 @@ public class SectorCodeGenerator extends AbstractProcessor {
 
                 boolean cellbased = operationAnnotation.cellbased();
                 method.cellbased = cellbased;
-
-                if(cellbased){
-                    method.name = "do" + capitalizeFirstLetter(methodName);
-                }else{
-                    method.name = methodName;
-                }
+                method.name = "do" + capitalizeFirstLetter(methodName);
                 method.returnType = methodElement.getReturnType().toString();
                 method.invocationClassName = capitalizeFirstLetter(methodName) + argCount + "Invocation";
                 method.targetMethod = methodName;
