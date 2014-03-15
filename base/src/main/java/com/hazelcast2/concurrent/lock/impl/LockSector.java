@@ -3,7 +3,7 @@ package com.hazelcast2.concurrent.lock.impl;
 import com.hazelcast2.concurrent.lock.LockConfig;
 import com.hazelcast2.spi.Sector;
 import com.hazelcast2.spi.cellbased.CellBasedSector;
-import com.hazelcast2.spi.cellbased.CellSectorOperation;
+import com.hazelcast2.spi.cellbased.SectorOperation;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,6 +22,7 @@ public abstract class LockSector extends Sector {
         super(settings);
     }
 
+    @SectorOperation
     public long createCell(LockConfig config) {
         Long id = cellsId.get(config.name);
         if (id != null) {
@@ -46,7 +47,7 @@ public abstract class LockSector extends Sector {
 
     public abstract boolean doIsLocked(long id, long threadId);
 
-    @CellSectorOperation
+    @SectorOperation(cellbased = true, readonly = true)
     public boolean isLocked(LockCell cell, long threadId) {
         return cell.lockOwnerThreadId != -1;
     }
@@ -58,7 +59,7 @@ public abstract class LockSector extends Sector {
 
     public abstract boolean doTryLock(long id, long threadId);
 
-    @CellSectorOperation
+    @SectorOperation(cellbased = true)
     public boolean tryLock(LockCell cell, long threadId) {
         if (cell.lockOwnerThreadId != -1) {
             return false;
@@ -74,7 +75,7 @@ public abstract class LockSector extends Sector {
 
     public abstract void doUnlock(long id, long threadId);
 
-    @CellSectorOperation
+    @SectorOperation(cellbased = true)
     public void unlock(LockCell cell, long threadId) {
         if (cell.lockOwnerThreadId == -1) {
             throw new IllegalMonitorStateException();

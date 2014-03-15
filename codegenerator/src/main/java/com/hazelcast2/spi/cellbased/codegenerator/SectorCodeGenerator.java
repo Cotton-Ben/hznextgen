@@ -1,7 +1,7 @@
 package com.hazelcast2.spi.cellbased.codegenerator;
 
 import com.hazelcast2.spi.cellbased.CellBasedSector;
-import com.hazelcast2.spi.cellbased.CellSectorOperation;
+import com.hazelcast2.spi.cellbased.SectorOperation;
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -66,7 +66,7 @@ public class SectorCodeGenerator extends AbstractProcessor {
                 continue;
             }
             ExecutableElement methodElement = (ExecutableElement) enclosedElement;
-            CellSectorOperation operationAnnotation = methodElement.getAnnotation(CellSectorOperation.class);
+            SectorOperation operationAnnotation = methodElement.getAnnotation(SectorOperation.class);
 
             if (operationAnnotation != null) {
                 String methodName = methodElement.getSimpleName().toString();
@@ -76,13 +76,13 @@ public class SectorCodeGenerator extends AbstractProcessor {
                 SectorMethodModel method = new SectorMethodModel();
                 clazz.methods.add(method);
 
-                boolean isConstructor = operationAnnotation.constructor();
-                method.constructor = isConstructor;
+                boolean cellbased = operationAnnotation.cellbased();
+                method.cellbased = cellbased;
 
-                if(isConstructor){
-                    method.name = methodName;
-                }else{
+                if(cellbased){
                     method.name = "do" + capitalizeFirstLetter(methodName);
+                }else{
+                    method.name = methodName;
                 }
                 method.returnType = methodElement.getReturnType().toString();
                 method.invocationClassName = capitalizeFirstLetter(methodName) + argCount + "Invocation";
@@ -92,7 +92,7 @@ public class SectorCodeGenerator extends AbstractProcessor {
 
                 int k = 0;
                 for (VariableElement variableElement : methodElement.getParameters()) {
-                    if (k > 0 || isConstructor) {
+                    if (k > 0 || !cellbased) {
                         method.args.add(variableElement.asType().toString());
                     }
                     k++;

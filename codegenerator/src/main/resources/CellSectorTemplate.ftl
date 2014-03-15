@@ -21,18 +21,18 @@ public final class ${class.name} extends ${class.superName} {
     //                      ${method.name}
     // ===================================================================================================
 
-    <#if method.constructor>
-    public ${method.returnType} ${method.name}(${method.formalArguments}) {
-    <#else>
+    <#if method.cellbased>
     public ${method.returnType} ${method.name}(final long id${method.trailingComma}${method.formalArguments}) {
+    <#else>
+    public ${method.returnType} ${method.name}(${method.formalArguments}) {
     </#if>
         final long sequenceAndStatus = claimSlotAndReturnStatus();
 
         if (sequenceAndStatus == CLAIM_SLOT_REMOTE) {
-            <#if method.constructor>
-            InvocationFuture future = remoteInvoke_${method.name}(${method.actualArguments});
-            <#else>
+            <#if method.cellbased>
             InvocationFuture future = remoteInvoke_${method.name}(id${method.trailingComma}${method.actualArguments});
+            <#else>
+            InvocationFuture future = remoteInvoke_${method.name}(${method.actualArguments});
             </#if>
     <#if method.voidReturnType>
             future.getSafely();
@@ -52,7 +52,7 @@ public final class ${class.name} extends ${class.superName} {
             final InvocationFuture future = new InvocationFuture(serializationService);
             final InvocationSlot invocation = getSlot(prodSeq);
             invocation.invocationFuture = future;
-    <#if !method.constructor>
+    <#if method.cellbased>
             invocation.id = id;
     </#if>
             invocation.functionId = ${method.functionConstantName};
@@ -69,23 +69,23 @@ public final class ${class.name} extends ${class.superName} {
         //we didn't actually use the slot since we are going to do a direct call.
         conSeq.inc();
         boolean success = false;
-    <#if !method.constructor>
+    <#if method.cellbased>
         final ${class.cellName} cell = loadCell(id);
     </#if>
         try{
     <#if method.voidReturnType>
-        <#if method.constructor>
-            super.${method.targetMethod}(${method.actualArguments});
-        <#else>
+        <#if method.cellbased>
             ${method.targetMethod}(cell ${method.trailingComma}${method.actualArguments});
+        <#else>
+            super.${method.targetMethod}(${method.actualArguments});
         </#if>
             success = true;
             process();
     <#else>
-            <#if method.constructor>
-            ${method.returnType} result = super.${method.targetMethod}(${method.actualArguments});
-            <#else>
+            <#if method.cellbased>
             ${method.returnType} result = ${method.targetMethod}(cell ${method.trailingComma}${method.actualArguments});
+            <#else>
+            ${method.returnType} result = super.${method.targetMethod}(${method.actualArguments});
             </#if>
             success = true;
             process();
@@ -96,7 +96,7 @@ public final class ${class.name} extends ${class.superName} {
         }
     }
 
-    <#if !method.constructor>
+    <#if method.cellbased>
     public InvocationFuture ${method.asyncName}(final long id${method.trailingComma}${method.formalArguments}) {
         final long sequenceAndStatus = claimSlotAndReturnStatus();
 
@@ -128,7 +128,7 @@ public final class ${class.name} extends ${class.superName} {
     </#if>
     private void deserializeAndInvoke_${method.uniqueMethodName}(final InvocationSlot invocation) throws Exception{
         final byte[] bytes = invocation.bytes;
-    <#if !method.constructor>
+    <#if method.cellbased>
         final long id = IOUtils.readLong(bytes, 8);
         final ${class.cellName} cell = loadCell(id);
     </#if>
@@ -140,16 +140,16 @@ public final class ${class.name} extends ${class.superName} {
         final ByteArrayObjectDataInput in = new ByteArrayObjectDataInput(bytes, 24, serializationService);
     </#if>
     <#if method.voidReturnType>
-        <#if method.constructor>
-        super.${method.targetMethod}(${method.deserializedInvocationToArgs});
-        <#else>
+        <#if method.cellbased>
         ${method.targetMethod}(cell${method.trailingComma} ${method.deserializedInvocationToArgs});
+        <#else>
+        super.${method.targetMethod}(${method.deserializedInvocationToArgs});
         </#if>
     <#else>
-        <#if method.constructor>
-        final ${method.returnType} result = super.${method.targetMethod}(${method.deserializedInvocationToArgs});
-        <#else>
+        <#if method.cellbased>
         final ${method.returnType} result = ${method.targetMethod}(cell${method.trailingComma} ${method.deserializedInvocationToArgs});
+        <#else>
+        final ${method.returnType} result = super.${method.targetMethod}(${method.deserializedInvocationToArgs});
         </#if>
     </#if>
 
@@ -195,26 +195,26 @@ public final class ${class.name} extends ${class.superName} {
         }
     }
 
-    <#if method.constructor>
-    private InvocationFuture remoteInvoke_${method.name}(${method.formalArguments}) {
-    <#else>
+    <#if method.cellbased>
     private InvocationFuture remoteInvoke_${method.name}(final long id${method.trailingComma}${method.formalArguments}) {
+    <#else>
+    private InvocationFuture remoteInvoke_${method.name}(${method.formalArguments}) {
     </#if>
         InvocationFuture invocationFuture = new InvocationFuture();
         try{
-            long callId = invocationCompletionService.register(invocationFuture);
+            final long callId = invocationCompletionService.register(invocationFuture);
             //todo: we don't like this.
             ByteArrayObjectDataOutput out = new ByteArrayObjectDataOutput(serializationService);
             out.writeShort(serviceId);
             out.writeInt(partitionId);
             out.writeShort(${method.functionConstantName});
-   <#if !method.constructor>
+   <#if method.cellbased>
             out.writeLong(id);
    <#else>
             //todo: temporary hack to make sure we can deserialize
             out.writeLong(0);
    </#if>
-       out.writeLong(callId);
+            out.writeLong(callId);
             ${method.argsToSerialize}
             InvocationEndpoint endpoint = endpoints[0];
             endpoint.send(out.toByteArray());
@@ -259,21 +259,22 @@ public final class ${class.name} extends ${class.superName} {
             switch (invocation.functionId) {
 <#list class.methods as method>
                 case ${method.functionConstantName}:{
-    <#if method.constructor>
-        <#if method.voidReturnType>
-                        ${method.targetMethod}(${method.invocationToArgs});
-                        invocation.invocationFuture.setVoidResponse();
-        <#else>
-                        final ${method.returnType} result = super.${method.targetMethod}(${method.invocationToArgs});
-                        invocation.invocationFuture.setResponse(result);
-        </#if>
-    <#else>
+    <#if method.cellbased>
                         final ${class.cellName} cell = loadCell(invocation.id);
         <#if method.voidReturnType>
                         ${method.targetMethod}(cell ${method.trailingComma}${method.invocationToArgs});
                         invocation.invocationFuture.setVoidResponse();
         <#else>
                         final ${method.returnType} result = ${method.targetMethod}(cell ${method.trailingComma}${method.invocationToArgs});
+                        invocation.invocationFuture.setResponse(result);
+        </#if>
+    <#else>
+
+        <#if method.voidReturnType>
+                        ${method.targetMethod}(${method.invocationToArgs});
+                        invocation.invocationFuture.setVoidResponse();
+        <#else>
+                        final ${method.returnType} result = super.${method.targetMethod}(${method.invocationToArgs});
                         invocation.invocationFuture.setResponse(result);
         </#if>
     </#if>

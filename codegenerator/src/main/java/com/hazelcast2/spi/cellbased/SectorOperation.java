@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.SOURCE)
 @Target({ElementType.METHOD})
-public @interface CellSectorOperation {
+public @interface SectorOperation {
     boolean readonly() default false;
-    boolean constructor() default false;
+    boolean cellbased() default false;
 }

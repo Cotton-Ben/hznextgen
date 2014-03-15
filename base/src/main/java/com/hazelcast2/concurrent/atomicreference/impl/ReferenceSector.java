@@ -3,7 +3,7 @@ package com.hazelcast2.concurrent.atomicreference.impl;
 import com.hazelcast2.concurrent.atomicreference.AtomicReferenceConfig;
 import com.hazelcast2.spi.Sector;
 import com.hazelcast2.spi.cellbased.CellBasedSector;
-import com.hazelcast2.spi.cellbased.CellSectorOperation;
+import com.hazelcast2.spi.cellbased.SectorOperation;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,6 +23,7 @@ public abstract class ReferenceSector extends Sector {
         super(settings);
     }
 
+    @SectorOperation
     public long createCell(AtomicReferenceConfig config) {
         Long id = cellsId.get(config.name);
         if (id != null) {
@@ -47,7 +48,7 @@ public abstract class ReferenceSector extends Sector {
 
     public abstract Future<Object> asyncDoGet(long id);
 
-    @CellSectorOperation(readonly = true)
+    @SectorOperation(cellbased = true, readonly = true)
     public Object get(ReferenceCell cell) {
         return cell.value;
     }
@@ -58,7 +59,7 @@ public abstract class ReferenceSector extends Sector {
 
     public abstract Future<Boolean> asyncDoIsNull(long id);
 
-    @CellSectorOperation(readonly = true)
+    @SectorOperation(cellbased =true,readonly = true)
     public boolean isNull(ReferenceCell cell) {
         return cell.value==null;
     }
@@ -69,7 +70,7 @@ public abstract class ReferenceSector extends Sector {
 
     public abstract Future<Void> asyncDoSet(long id, Object update);
 
-    @CellSectorOperation
+    @SectorOperation(cellbased = true)
     public void set(ReferenceCell cell, Object update) {
         cell.value = update;
     }
@@ -80,7 +81,7 @@ public abstract class ReferenceSector extends Sector {
 
     public abstract Future<Boolean> asyncDoCompareAndSet(long id, Object expect, Object update);
 
-    @CellSectorOperation
+    @SectorOperation(cellbased = true)
     public boolean compareAndSet(ReferenceCell cell, Object expect, Object update) {
         if (cell.value != expect) {
             return false;

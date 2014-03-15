@@ -3,7 +3,7 @@ package com.hazelcast2.concurrent.atomicboolean.impl;
 import com.hazelcast2.concurrent.atomicboolean.AtomicBooleanConfig;
 import com.hazelcast2.spi.Sector;
 import com.hazelcast2.spi.cellbased.CellBasedSector;
-import com.hazelcast2.spi.cellbased.CellSectorOperation;
+import com.hazelcast2.spi.cellbased.SectorOperation;
 
 import java.util.HashMap;
 import java.util.concurrent.Future;
@@ -22,6 +22,7 @@ public abstract class BooleanSector extends Sector {
         super(sectorSettings);
     }
 
+    @SectorOperation
     public long createCell(AtomicBooleanConfig config) {
         Long id = cellsId.get(config.name);
         if (id != null) {
@@ -48,7 +49,7 @@ public abstract class BooleanSector extends Sector {
 
     public abstract Future<Boolean> asyncDoGet(long id);
 
-    @CellSectorOperation(readonly = true)
+    @SectorOperation(readonly = true,cellbased = true)
     public boolean get(BooleanCell cell) {
         return cell.value;
     }
@@ -61,7 +62,7 @@ public abstract class BooleanSector extends Sector {
 
     public abstract Future<Boolean> asyncDoSet(long id, boolean update);
 
-    @CellSectorOperation
+    @SectorOperation(cellbased = true)
     public boolean set(BooleanCell cell, boolean update) {
         boolean oldValue = cell.value;
         cell.value = update;
@@ -76,7 +77,7 @@ public abstract class BooleanSector extends Sector {
 
     public abstract Future<Boolean> asyncDoCompareAndSet(long id, boolean old, boolean update);
 
-    @CellSectorOperation
+    @SectorOperation(cellbased = true)
     public boolean compareAndSet(BooleanCell cell, boolean old, boolean update) {
         if (cell.value != old) {
             return false;

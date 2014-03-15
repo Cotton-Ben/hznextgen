@@ -4,7 +4,7 @@ import com.hazelcast2.concurrent.atomiclong.AtomicLongConfig;
 import com.hazelcast2.core.LongFunction;
 import com.hazelcast2.spi.Sector;
 import com.hazelcast2.spi.cellbased.CellBasedSector;
-import com.hazelcast2.spi.cellbased.CellSectorOperation;
+import com.hazelcast2.spi.cellbased.SectorOperation;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,7 +24,7 @@ public abstract class LongSector extends Sector {
         super(settings);
     }
 
-    @CellSectorOperation(constructor = true)
+    @SectorOperation
     public long createCell(AtomicLongConfig config) {
         Long id = cellsId.get(config.name);
         if (id != null) {
@@ -50,7 +50,7 @@ public abstract class LongSector extends Sector {
     // ==================================================================================
 
 
-    @CellSectorOperation(constructor = true)
+    @SectorOperation
     public void destroy(long id) {
         LongCell cell = cells.remove(id);
         if (cell == null) {
@@ -60,9 +60,9 @@ public abstract class LongSector extends Sector {
         cellsId.remove(cell.config.name);
     }
 
-    @CellSectorOperation(constructor = true)
+    @SectorOperation(readonly = true)
     public long isDestroyed(long id) {
-        return cells.containsKey(id)?1:0;
+        return cells.containsKey(id) ? 1 : 0;
     }
 
 
@@ -75,7 +75,7 @@ public abstract class LongSector extends Sector {
 
     public abstract Future<Long> asyncDoGet(long id);
 
-    @CellSectorOperation(readonly = true)
+    @SectorOperation(readonly = true,cellbased = true)
     public long get(LongCell cell) {
         return cell.value;
     }
@@ -89,7 +89,7 @@ public abstract class LongSector extends Sector {
 
     public abstract Future<Void> asyncDoSet(long id, long update);
 
-    @CellSectorOperation
+    @SectorOperation(cellbased = true)
     public void set(LongCell cell, long update) {
         cell.value = update;
     }
@@ -104,7 +104,7 @@ public abstract class LongSector extends Sector {
 
     public abstract Future<Void> asyncDoInc(long id);
 
-    @CellSectorOperation
+    @SectorOperation(cellbased = true)
     public void inc(LongCell cell) {
         cell.value++;
     }
@@ -118,7 +118,7 @@ public abstract class LongSector extends Sector {
 
     public abstract Future<Boolean> asyncDoCompareAndSet(long id, long expect, long update);
 
-    @CellSectorOperation
+    @SectorOperation(cellbased = true)
     public boolean compareAndSet(LongCell cell, long expect, long update) {
         if (cell.value != expect) {
             return false;
@@ -136,7 +136,7 @@ public abstract class LongSector extends Sector {
 
     public abstract Future<Long> asyncDoApply(long id, LongFunction f);
 
-    @CellSectorOperation(readonly = true)
+    @SectorOperation(cellbased = true, readonly = true)
     public long apply(LongCell cell, LongFunction f) {
         return f.apply(cell.value);
     }
@@ -149,7 +149,7 @@ public abstract class LongSector extends Sector {
 
     public abstract Future<Void> asyncDoAlter(long id, LongFunction f);
 
-    @CellSectorOperation
+    @SectorOperation(cellbased = true)
     public void alter(LongCell cell, LongFunction f) {
         cell.value = f.apply(cell.value);
     }

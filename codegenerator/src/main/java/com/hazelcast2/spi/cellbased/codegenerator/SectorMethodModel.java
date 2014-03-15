@@ -10,7 +10,7 @@ public class SectorMethodModel {
     public String returnType;
     public final List<String> args = new LinkedList<>();
     public boolean readonly = false;
-    public boolean constructor = false;
+    public boolean cellbased = false;
     //useful while generating code. Has no other meaning then to be able to display some text in generated code.
     public String debug = "";
 
@@ -32,8 +32,8 @@ public class SectorMethodModel {
         return args.size()>0;
     }
 
-    public boolean isConstructor(){
-        return constructor;
+    public boolean isCellbased(){
+        return cellbased;
     }
 
     public String getMapArgsToInvocation() {
