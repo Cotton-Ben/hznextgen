@@ -1,14 +1,13 @@
 package com.hazelcast2.map;
 
-import com.hazelcast2.core.Config;
+import com.hazelcast2.core.config.Config;
 import com.hazelcast2.core.IMap;
-import com.hazelcast2.core.MapConfig;
+import com.hazelcast2.core.config.MapConfig;
 import com.hazelcast2.partition.PartitionService;
 import com.hazelcast2.spi.InvocationEndpoint;
 import com.hazelcast2.spi.PartitionAwareSpiService;
 import com.hazelcast2.spi.SpiServiceSettings;
 
-import javax.xml.ws.Endpoint;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
@@ -37,9 +36,7 @@ public class MapService implements PartitionAwareSpiService {
         return serviceId;
     }
 
-    public IMap getDistributedObject(String name) {
-        MapConfig mapConfig = config.getMapConfig(name);
-
+    public IMap getDistributedObject(MapConfig mapConfig) {
         MapSector[] sectors = new MapSector[partitionService.getPartitionCount()];
         for (int partitionId = 0; partitionId < sectors.length; partitionId++) {
             MapSectorSettings sectorSettings = new MapSectorSettings();

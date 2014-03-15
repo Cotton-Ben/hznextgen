@@ -1,5 +1,6 @@
 package com.hazelcast2.concurrent.atomiclong;
 
+import com.hazelcast2.core.config.AtomicLongConfig;
 import com.hazelcast2.core.IAtomicLong;
 import com.hazelcast2.nio.IOUtils;
 import com.hazelcast2.partition.PartitionService;
@@ -52,15 +53,15 @@ public final class AtomicLongService implements PartitionAwareSpiService {
         return serviceId;
     }
 
-    public IAtomicLong getDistributedObject(final String name) {
-        if (name == null) {
-            throw new NullPointerException("name can't be null");
+    public IAtomicLong getDistributedObject(final AtomicLongConfig config) {
+        if (config == null) {
+            throw new NullPointerException("config can't be null");
         }
 
-        final int partitionId = partitionService.getPartitionId(name);
+        final int partitionId = partitionService.getPartitionId(config.name);
         final LongSector sector = sectors[partitionId];
         final long id = sector.createCell();
-        return new AtomicLongProxy(sector, name, id);
+        return new AtomicLongProxy(sector, config.name, id);
     }
 
     @Override

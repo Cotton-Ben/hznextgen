@@ -1,5 +1,6 @@
 package com.hazelcast2.concurrent.atomicboolean;
 
+import com.hazelcast2.core.config.AtomicBooleanConfig;
 import com.hazelcast2.core.IAtomicBoolean;
 import com.hazelcast2.nio.IOUtils;
 import com.hazelcast2.partition.PartitionService;
@@ -7,7 +8,6 @@ import com.hazelcast2.spi.InvocationEndpoint;
 import com.hazelcast2.spi.PartitionAwareSpiService;
 import com.hazelcast2.spi.SpiServiceSettings;
 
-import javax.xml.ws.Endpoint;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
@@ -53,15 +53,15 @@ public final class AtomicBooleanService implements PartitionAwareSpiService {
         return serviceId;
     }
 
-    public IAtomicBoolean getDistributedObject(final String name) {
-        if (name == null) {
-            throw new NullPointerException("name can't be null");
+    public IAtomicBoolean getDistributedObject(final AtomicBooleanConfig config) {
+        if (config == null) {
+            throw new NullPointerException("config can't be null");
         }
 
-        final int partitionId = partitionService.getPartitionId(name);
+        final int partitionId = partitionService.getPartitionId(config.name);
         final BooleanSector sector = sectors[partitionId];
         final long id = sector.createCell();
-        return new AtomicBooleanProxy(sector, name, id);
+        return new AtomicBooleanProxy(sector, config.name, id);
     }
 
     @Override

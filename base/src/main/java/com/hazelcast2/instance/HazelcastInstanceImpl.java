@@ -7,6 +7,7 @@ import com.hazelcast2.concurrent.atomiclong.AtomicLongService;
 import com.hazelcast2.concurrent.atomicreference.AtomicReferenceService;
 import com.hazelcast2.concurrent.lock.LockService;
 import com.hazelcast2.core.*;
+import com.hazelcast2.core.config.*;
 import com.hazelcast2.map.MapService;
 import com.hazelcast2.nio.Gateway;
 import com.hazelcast2.nio.IOUtils;
@@ -113,27 +114,57 @@ public class HazelcastInstanceImpl implements HazelcastInstance, Gateway {
 
     @Override
     public ILock getLock(String name) {
-        return lockService.getDistributedObject(name);
+        LockConfig lockConfig = config.getLockConfig(name);
+        return lockService.getDistributedObject(lockConfig);
+    }
+
+    @Override
+    public ILock getLock(LockConfig config) {
+        return lockService.getDistributedObject(config);
     }
 
     @Override
     public IAtomicBoolean getAtomicBoolean(String name) {
-        return atomicBooleanService.getDistributedObject(name);
+        AtomicBooleanConfig booleanConfig = config.getAtomicBooleanConfig(name);
+        return atomicBooleanService.getDistributedObject(booleanConfig);
+    }
+
+    @Override
+    public IAtomicBoolean getAtomicBoolean(AtomicBooleanConfig config) {
+        return atomicBooleanService.getDistributedObject(config);
     }
 
     @Override
     public <E> IAtomicReference<E> getAtomicReference(String name) {
-        return atomicReferenceService.getDistributedObject(name);
+        AtomicReferenceConfig referenceConfig = config.getAtomicReferenceConfig(name);
+        return atomicReferenceService.getDistributedObject(referenceConfig);
+    }
+
+    @Override
+    public <E> IAtomicReference<E> getAtomicReference(AtomicReferenceConfig config) {
+        return atomicReferenceService.getDistributedObject(config);
     }
 
     @Override
     public IAtomicLong getAtomicLong(String name) {
-        return atomicLongService.getDistributedObject(name);
+        AtomicLongConfig longConfig = config.getAtomicLongConfig(name);
+        return atomicLongService.getDistributedObject(longConfig);
+    }
+
+    @Override
+    public IAtomicLong getAtomicLong(AtomicLongConfig config) {
+       return atomicLongService.getDistributedObject(config);
     }
 
     @Override
     public IMap getMap(String name) {
-        return mapService.getDistributedObject(name);
+        MapConfig mapConfig = config.getMapConfig(name);
+        return mapService.getDistributedObject(mapConfig);
+    }
+
+    @Override
+    public IMap getMap(MapConfig config) {
+        return mapService.getDistributedObject(config);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.hazelcast2.concurrent.lock;
 
 import com.hazelcast2.core.ILock;
+import com.hazelcast2.core.config.LockConfig;
 import com.hazelcast2.nio.IOUtils;
 import com.hazelcast2.partition.PartitionService;
 import com.hazelcast2.spi.InvocationEndpoint;
@@ -52,15 +53,15 @@ public final class LockService implements PartitionAwareSpiService {
         return serviceId;
     }
 
-    public ILock getDistributedObject(final String name) {
-        if (name == null) {
-            throw new NullPointerException("name can't be null");
+    public ILock getDistributedObject(final LockConfig config) {
+        if (config == null) {
+            throw new NullPointerException("config can't be null");
         }
 
-        final int partitionId = partitionService.getPartitionId(name);
+        final int partitionId = partitionService.getPartitionId(config.name);
         final LockSector sector = sectors[partitionId];
         final long id = sector.createCell();
-        return new ILockProxy(sector, name, id);
+        return new ILockProxy(sector, config.name, id);
     }
 
     @Override

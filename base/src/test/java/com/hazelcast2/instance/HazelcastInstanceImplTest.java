@@ -1,6 +1,6 @@
 package com.hazelcast2.instance;
 
-import com.hazelcast2.core.Config;
+import com.hazelcast2.core.config.Config;
 import org.junit.Test;
 
 public class HazelcastInstanceImplTest {

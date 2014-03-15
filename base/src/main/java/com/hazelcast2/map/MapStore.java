@@ -1,6 +1,6 @@
 package com.hazelcast2.map;
 
-import com.hazelcast2.core.MapConfig;
+import com.hazelcast2.core.config.MapConfig;
 
 public class MapStore {
 
