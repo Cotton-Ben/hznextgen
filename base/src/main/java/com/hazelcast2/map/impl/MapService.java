@@ -42,7 +42,7 @@ public class MapService implements PartitionAwareSpiService {
             throw new NullPointerException("mapConfig can't be null");
         }
 
-        if(mapConfig.name==null){
+        if (mapConfig.name == null) {
             mapConfig.name = randomString();
         }
 
