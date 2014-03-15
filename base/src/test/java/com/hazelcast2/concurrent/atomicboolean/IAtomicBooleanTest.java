@@ -29,6 +29,15 @@ public class IAtomicBooleanTest extends HazelcastTestSupport {
     }
 
     @Test
+    public void getAtomicBoolean_duplicateRetrieval(){
+        String  name = randomString();
+        IAtomicBoolean boolean1 = hz.getAtomicBoolean(name);
+        boolean1.set(true);
+        IAtomicBoolean boolean2 = hz.getAtomicBoolean(name);
+        assertTrue(boolean2.get());
+    }
+
+    @Test
     public void get() {
         IAtomicBoolean atomicBoolean = hz.getAtomicBoolean("foo");
 

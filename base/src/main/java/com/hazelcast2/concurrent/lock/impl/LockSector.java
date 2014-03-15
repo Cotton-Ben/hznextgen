@@ -15,16 +15,23 @@ public abstract class LockSector extends Sector {
     private final AtomicLong idGenerator = new AtomicLong();
 
     //todo: very inefficient structure.
-    public final Map<Long, LockCell> cells = new HashMap<Long, LockCell>();
+    public final Map<Long, LockCell> cells = new HashMap<>();
+    private final HashMap<String, Long> cellsId = new HashMap<>();
 
     public LockSector(LockSectorSettings settings) {
         super(settings);
     }
 
     public long createCell(LockConfig config) {
+        Long id = cellsId.get(config.name);
+        if (id != null) {
+            return id;
+        }
+
         LockCell cell = new LockCell();
-        long id = idGenerator.incrementAndGet();
+        id = idGenerator.incrementAndGet();
         cells.put(id, cell);
+        cellsId.put(config.name, id);
         return id;
     }
 

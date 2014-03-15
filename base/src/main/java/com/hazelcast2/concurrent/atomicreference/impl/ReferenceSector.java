@@ -16,16 +16,23 @@ public abstract class ReferenceSector extends Sector {
     private final AtomicLong idGenerator = new AtomicLong();
 
     //todo: very inefficient structure.
-    private final Map<Long, ReferenceCell> cells = new HashMap<Long, ReferenceCell>();
+    private final Map<Long, ReferenceCell> cells = new HashMap<>();
+    private final HashMap<String, Long> cellsId = new HashMap<>();
 
     public ReferenceSector(ReferenceSectorSettings settings) {
         super(settings);
     }
 
     public long createCell(AtomicReferenceConfig config) {
+        Long id = cellsId.get(config.name);
+        if (id != null) {
+            return id;
+        }
+
         ReferenceCell cell = new ReferenceCell();
-        long id = idGenerator.incrementAndGet();
+        id = idGenerator.incrementAndGet();
         cells.put(id, cell);
+        cellsId.put(config.name, id);
         return id;
     }
 

@@ -17,18 +17,26 @@ public abstract class LongSector extends Sector {
     private final AtomicLong idGenerator = new AtomicLong();
 
     //todo: very inefficient structure.
-    private final Map<Long, LongCell> cells = new HashMap<Long, LongCell>();
+    private final Map<Long, LongCell> cells = new HashMap<>();
+    private final HashMap<String, Long> cellsId = new HashMap<>();
 
     public LongSector(LongSectorSettings settings) {
         super(settings);
     }
 
     public long createCell(AtomicLongConfig config) {
+        Long id = cellsId.get(config.name);
+        if (id != null) {
+            return id;
+        }
+
         LongCell cell = new LongCell();
-        long id = idGenerator.incrementAndGet();
+        id = idGenerator.incrementAndGet();
         cells.put(id, cell);
+        cellsId.put(config.name, id);
         return id;
     }
+
 
     public LongCell loadCell(long id) {
         return cells.get(id);

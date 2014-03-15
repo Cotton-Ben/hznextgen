@@ -3,6 +3,7 @@ package com.hazelcast2.concurrent.atomiclong;
 import com.hazelcast2.core.Hazelcast;
 import com.hazelcast2.core.HazelcastInstance;
 import com.hazelcast2.core.LongFunction;
+import com.hazelcast2.test.HazelcastTestSupport;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,7 +13,7 @@ import java.util.concurrent.Future;
 
 import static org.junit.Assert.assertEquals;
 
-public class IAtomicLongTest {
+public class IAtomicLongTest extends HazelcastTestSupport {
 
     private HazelcastInstance hz;
 
@@ -25,6 +26,15 @@ public class IAtomicLongTest {
     @After
     public void tearDown(){
         hz.shutdown();
+    }
+
+    @Test
+    public void getAtomicLong_duplicateRetrieval(){
+        String  name = randomString();
+        IAtomicLong long1 = hz.getAtomicLong(name);
+        long1.set(20);
+        IAtomicLong long2 = hz.getAtomicLong(name);
+        assertEquals(20,long2.get());
     }
 
     @Test

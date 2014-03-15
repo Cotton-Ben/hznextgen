@@ -14,6 +14,7 @@ public abstract class BooleanSector extends Sector {
 
     //todo: very inefficient structure.
     private final HashMap<Long, BooleanCell> cells = new HashMap<>();
+    private final HashMap<String, Long> cellsId = new HashMap<>();
 
     private final AtomicLong idGenerator = new AtomicLong();
 
@@ -22,9 +23,15 @@ public abstract class BooleanSector extends Sector {
     }
 
     public long createCell(AtomicBooleanConfig config) {
+        Long id = cellsId.get(config.name);
+        if (id != null) {
+            return id;
+        }
+
         BooleanCell cell = new BooleanCell();
-        long id = idGenerator.incrementAndGet();
+        id = idGenerator.incrementAndGet();
         cells.put(id, cell);
+        cellsId.put(config.name, id);
         return id;
     }
 
