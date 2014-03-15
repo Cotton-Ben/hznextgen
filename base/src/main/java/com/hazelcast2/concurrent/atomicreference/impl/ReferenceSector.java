@@ -52,6 +52,17 @@ public abstract class ReferenceSector extends Sector {
         return cell.value;
     }
 
+    // ==================== isNull ================================================
+
+    public abstract boolean doIsNull(long id);
+
+    public abstract Future<Boolean> asyncDoIsNull(long id);
+
+    @CellSectorOperation(readonly = true)
+    public boolean isNull(ReferenceCell cell) {
+        return cell.value==null;
+    }
+
     // ==================== set ================================================
 
     public abstract void doSet(long id, Object update);

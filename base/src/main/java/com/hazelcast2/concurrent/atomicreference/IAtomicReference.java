@@ -8,6 +8,10 @@ public interface IAtomicReference<E> extends DistributedObject {
 
     E get();
 
+    boolean isNull();
+
+    Future<Boolean> asyncIsNull();
+
     Future<E> asyncGet();
 
     void set(E update);

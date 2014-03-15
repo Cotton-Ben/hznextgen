@@ -32,6 +32,16 @@ public class AtomicReferenceProxy<E> implements IAtomicReference<E> {
     }
 
     @Override
+    public boolean isNull() {
+        return sector.doIsNull(id);
+    }
+
+    @Override
+    public Future<Boolean> asyncIsNull() {
+        return sector.asyncDoIsNull(id);
+    }
+
+    @Override
     public void set(E update) {
         sector.doSet(id, update);
     }

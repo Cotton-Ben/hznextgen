@@ -1,6 +1,5 @@
 package com.hazelcast2.concurrent.atomicreference;
 
-import com.hazelcast2.concurrent.atomicboolean.IAtomicBoolean;
 import com.hazelcast2.core.Hazelcast;
 import com.hazelcast2.core.HazelcastInstance;
 import com.hazelcast2.test.HazelcastTestSupport;
@@ -56,6 +55,25 @@ public class IAtomicReferenceTest extends HazelcastTestSupport {
         String result = atomicReference.get();
 
         assertNull(result);
+    }
+
+    @Test
+    public void isNull_whenNull() {
+        IAtomicReference<String> atomicReference = hz.getAtomicReference(randomString());
+
+        boolean result = atomicReference.isNull();
+
+        assertTrue(result);
+    }
+
+    @Test
+    public void isNull_whenNotNull() {
+        IAtomicReference<String> atomicReference = hz.getAtomicReference(randomString());
+        atomicReference.set("foo");
+
+        boolean result = atomicReference.isNull();
+
+        assertFalse(result);
     }
 
     @Test
