@@ -1,4 +1,4 @@
-package com.hazelcast2.internal.utils;
+package com.hazelcast2.internal.util;
 
 import sun.misc.Unsafe;
 

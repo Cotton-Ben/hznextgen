@@ -12,6 +12,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 import static com.hazelcast2.internal.util.ReflectionUtils.getConstructor;
+import static com.hazelcast2.internal.util.StringUtils.randomString;
 
 public final class LockService implements PartitionAwareSpiService {
 
@@ -56,6 +57,10 @@ public final class LockService implements PartitionAwareSpiService {
     public ILock getDistributedObject(final LockConfig config) {
         if (config == null) {
             throw new NullPointerException("config can't be null");
+        }
+
+        if(config.name == null){
+            config.name = randomString();
         }
 
         final int partitionId = partitionService.getPartitionId(config.name);

@@ -12,6 +12,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 import static com.hazelcast2.internal.util.ReflectionUtils.getConstructor;
+import static com.hazelcast2.internal.util.StringUtils.randomString;
 
 public final class AtomicReferenceService implements PartitionAwareSpiService {
 
@@ -56,6 +57,10 @@ public final class AtomicReferenceService implements PartitionAwareSpiService {
     public IAtomicReference getDistributedObject(final AtomicReferenceConfig config) {
         if (config == null) {
             throw new NullPointerException("name can't be null");
+        }
+
+        if(config.name == null){
+            config.name = randomString();
         }
 
         final int partitionId = partitionService.getPartitionId(config.name);

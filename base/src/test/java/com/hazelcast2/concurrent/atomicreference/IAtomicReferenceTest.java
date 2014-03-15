@@ -1,5 +1,6 @@
 package com.hazelcast2.concurrent.atomicreference;
 
+import com.hazelcast2.concurrent.atomicboolean.IAtomicBoolean;
 import com.hazelcast2.core.Hazelcast;
 import com.hazelcast2.core.HazelcastInstance;
 import com.hazelcast2.test.HazelcastTestSupport;
@@ -24,6 +25,19 @@ public class IAtomicReferenceTest extends HazelcastTestSupport {
     @After
     public void tearDown() {
         hz.shutdown();
+    }
+
+    @Test
+    public void construction_withConfigAndNullName(){
+        AtomicReferenceConfig config = new AtomicReferenceConfig();
+        config.asyncBackupCount=1;
+        config.backupCount=0;
+
+        IAtomicReference atomicReference = hz.getAtomicReference(config);
+        assertNotNull(config.name);
+
+        IAtomicReference found = hz.getAtomicReference(config.name);
+        assertEquals(atomicReference.getId(), found.getId());
     }
 
     @Test

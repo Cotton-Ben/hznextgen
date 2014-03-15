@@ -10,8 +10,7 @@ import org.junit.Test;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class IAtomicBooleanTest extends HazelcastTestSupport {
 
@@ -26,6 +25,19 @@ public class IAtomicBooleanTest extends HazelcastTestSupport {
     @After
     public void tearDown() {
         hz.shutdown();
+    }
+
+    @Test
+    public void construction_withConfigAndNullName(){
+        AtomicBooleanConfig config = new AtomicBooleanConfig();
+        config.asyncBackupCount=1;
+        config.backupCount=0;
+
+        IAtomicBoolean atomicBoolean = hz.getAtomicBoolean(config);
+        assertNotNull(config.name);
+
+        IAtomicBoolean found = hz.getAtomicBoolean(config.name);
+        assertEquals(atomicBoolean.getId(), found.getId());
     }
 
     @Test

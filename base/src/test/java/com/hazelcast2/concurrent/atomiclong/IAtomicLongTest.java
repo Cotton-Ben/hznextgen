@@ -12,6 +12,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class IAtomicLongTest extends HazelcastTestSupport {
 
@@ -35,6 +36,19 @@ public class IAtomicLongTest extends HazelcastTestSupport {
         long1.set(20);
         IAtomicLong long2 = hz.getAtomicLong(name);
         assertEquals(20,long2.get());
+    }
+
+    @Test
+    public void construction_withConfigAndNullName(){
+        AtomicLongConfig config = new AtomicLongConfig();
+        config.asyncBackupCount=1;
+        config.backupCount=0;
+
+        IAtomicLong atomicLong = hz.getAtomicLong(config);
+        assertNotNull(config.name);
+
+        IAtomicLong found = hz.getAtomicLong(config.name);
+        assertEquals(atomicLong.getId(), found.getId());
     }
 
     @Test
