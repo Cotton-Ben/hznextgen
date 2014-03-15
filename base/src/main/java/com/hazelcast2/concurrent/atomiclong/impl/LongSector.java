@@ -24,6 +24,7 @@ public abstract class LongSector extends Sector {
         super(settings);
     }
 
+    @CellSectorOperation(constructor = true)
     public long createCell(AtomicLongConfig config) {
         Long id = cellsId.get(config.name);
         if (id != null) {

@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import java.io.Serializable;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
@@ -21,13 +22,23 @@ public class SerializationServiceTest {
     }
 
     @Test
-    public void test() {
+    public void testNotNull() {
         DummyObject o = new DummyObject();
         ByteArrayObjectDataOutput out = new ByteArrayObjectDataOutput(serializationService);
         serializationService.writeObject(out, o);
         ByteArrayObjectDataInput in = new ByteArrayObjectDataInput(out.toByteArray(), 0, serializationService);
         DummyObject found = serializationService.readObject(in);
         assertNotNull(found);
+    }
+
+    @Test
+    public void testString() {
+        String o = "foo";
+        ByteArrayObjectDataOutput out = new ByteArrayObjectDataOutput(serializationService);
+        serializationService.writeObject(out, o);
+        ByteArrayObjectDataInput in = new ByteArrayObjectDataInput(out.toByteArray(), 0, serializationService);
+        String found = serializationService.readObject(in);
+        assertEquals(o, found);
     }
 
     @Test

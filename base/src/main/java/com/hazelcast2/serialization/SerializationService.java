@@ -10,10 +10,11 @@ import java.io.*;
  */
 public class SerializationService {
 
+
+
     public <E> E readObject(ByteArrayObjectDataInput input) {
         try {
-
-            ByteArrayInputStream i = new ByteArrayInputStream(input.getBuffer());
+            ByteArrayInputStream i = new ByteArrayInputStream(input.getBuffer(), input.position(),input.size());
             ObjectInputStream in = new ObjectInputStream(i);
             Object result = in.readObject();
             if (result instanceof Null) {
@@ -24,6 +25,12 @@ public class SerializationService {
         } catch (IOException | ClassNotFoundException e) {
             throw new HazelcastSerializationException(e);
         }
+    }
+
+    public byte[] serialize(Object object){
+        ByteArrayObjectDataOutput out = new ByteArrayObjectDataOutput(this);
+        writeObject(out,object);
+        return out.toByteArray();
     }
 
     public void writeObject(ByteArrayObjectDataOutput output, Object object) {

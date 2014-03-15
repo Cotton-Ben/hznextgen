@@ -63,4 +63,8 @@ public class AtomicReferenceProxy<E> implements IAtomicReference<E> {
                 ", name='" + name + '\'' +
                 '}';
     }
+
+    public ReferenceSector getSector() {
+        return sector;
+    }
 }

@@ -76,8 +76,14 @@ public class SectorCodeGenerator extends AbstractProcessor {
                 SectorMethodModel method = new SectorMethodModel();
                 clazz.methods.add(method);
 
+                boolean isConstructor = operationAnnotation.constructor();
+                method.constructor = isConstructor;
 
-                method.name = "do" + capitalizeFirstLetter(methodName);
+                if(isConstructor){
+                    method.name = methodName;
+                }else{
+                    method.name = "do" + capitalizeFirstLetter(methodName);
+                }
                 method.returnType = methodElement.getReturnType().toString();
                 method.invocationClassName = capitalizeFirstLetter(methodName) + argCount + "Invocation";
                 method.targetMethod = methodName;
@@ -86,7 +92,7 @@ public class SectorCodeGenerator extends AbstractProcessor {
 
                 int k = 0;
                 for (VariableElement variableElement : methodElement.getParameters()) {
-                    if (k > 0) {
+                    if (k > 0 || isConstructor) {
                         method.args.add(variableElement.asType().toString());
                     }
                     k++;

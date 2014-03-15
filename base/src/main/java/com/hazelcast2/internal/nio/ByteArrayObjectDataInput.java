@@ -506,4 +506,8 @@ public class ByteArrayObjectDataInput  {
         sb.append('}');
         return sb.toString();
     }
+
+    public int size() {
+        return size;
+    }
 }

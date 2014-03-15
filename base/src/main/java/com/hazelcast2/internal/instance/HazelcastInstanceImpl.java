@@ -244,4 +244,8 @@ public class HazelcastInstanceImpl implements HazelcastInstance, Gateway {
     private short getServiceId(byte[] bytes) {
         return IOUtils.readShort(bytes, 0);
     }
+
+    public SerializationService getSerializationService() {
+        return serializationService;
+    }
 }
