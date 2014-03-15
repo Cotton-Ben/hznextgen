@@ -1,19 +1,18 @@
 package com.hazelcast2.concurrent.lock.impl;
 
 import com.hazelcast2.concurrent.lock.LockConfig;
+import com.hazelcast2.spi.IdGenerator;
 import com.hazelcast2.spi.Sector;
 import com.hazelcast2.spi.SectorClass;
 import com.hazelcast2.spi.SectorOperation;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
 
 @SectorClass
 public abstract class LockSector extends Sector {
 
-    private final AtomicLong idGenerator = new AtomicLong();
-
+    private final IdGenerator idGenerator = new IdGenerator();
     //todo: very inefficient structure.
     public final Map<Long, LockCell> cells = new HashMap<>();
     private final HashMap<String, Long> cellsId = new HashMap<>();
@@ -24,14 +23,14 @@ public abstract class LockSector extends Sector {
 
     @SectorOperation
     public long createCell(LockConfig config) {
-        Long id = cellsId.get(config.name);
-        if (id != null) {
-            return id;
+        Long found = cellsId.get(config.name);
+        if (found != null) {
+            return found;
         }
 
         LockCell cell = new LockCell();
         cell.config = config;
-        id = idGenerator.incrementAndGet();
+        Long id = idGenerator.nextId();
         cells.put(id, cell);
         cellsId.put(config.name, id);
         return id;

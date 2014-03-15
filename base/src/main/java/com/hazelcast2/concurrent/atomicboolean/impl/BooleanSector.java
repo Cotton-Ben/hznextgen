@@ -1,13 +1,13 @@
 package com.hazelcast2.concurrent.atomicboolean.impl;
 
 import com.hazelcast2.concurrent.atomicboolean.AtomicBooleanConfig;
+import com.hazelcast2.spi.IdGenerator;
 import com.hazelcast2.spi.Sector;
 import com.hazelcast2.spi.SectorClass;
 import com.hazelcast2.spi.SectorOperation;
 
 import java.util.HashMap;
 import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicLong;
 
 @SectorClass
 public abstract class BooleanSector extends Sector {
@@ -16,7 +16,7 @@ public abstract class BooleanSector extends Sector {
     private final HashMap<Long, BooleanCell> cells = new HashMap<>();
     private final HashMap<String, Long> cellsId = new HashMap<>();
 
-    private final AtomicLong idGenerator = new AtomicLong();
+    private final IdGenerator idGenerator = new IdGenerator();
 
     public BooleanSector(BooleanSectorSettings sectorSettings) {
         super(sectorSettings);
@@ -24,14 +24,14 @@ public abstract class BooleanSector extends Sector {
 
     @SectorOperation
     public long createCell(AtomicBooleanConfig config) {
-        Long id = cellsId.get(config.name);
-        if (id != null) {
-            return id;
+        Long found = cellsId.get(config.name);
+        if (found != null) {
+            return found;
         }
 
         BooleanCell cell = new BooleanCell();
         cell.config = config;
-        id = idGenerator.incrementAndGet();
+        long id = idGenerator.nextId();
         cells.put(id, cell);
         cellsId.put(config.name, id);
         return id;

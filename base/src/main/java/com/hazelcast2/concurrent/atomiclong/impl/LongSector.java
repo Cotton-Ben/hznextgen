@@ -2,6 +2,7 @@ package com.hazelcast2.concurrent.atomiclong.impl;
 
 import com.hazelcast2.concurrent.atomiclong.AtomicLongConfig;
 import com.hazelcast2.core.LongFunction;
+import com.hazelcast2.spi.IdGenerator;
 import com.hazelcast2.spi.Sector;
 import com.hazelcast2.spi.SectorClass;
 import com.hazelcast2.spi.SectorOperation;
@@ -9,12 +10,11 @@ import com.hazelcast2.spi.SectorOperation;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicLong;
 
 @SectorClass
 public abstract class LongSector extends Sector {
 
-    private final AtomicLong idGenerator = new AtomicLong();
+    private final IdGenerator idGenerator = new IdGenerator();
 
     //todo: very inefficient structure.
     private final Map<Long, LongCell> cells = new HashMap<>();
@@ -32,14 +32,14 @@ public abstract class LongSector extends Sector {
 
     @SectorOperation
     public long createCell(AtomicLongConfig config) {
-        Long id = cellsId.get(config.name);
-        if (id != null) {
-            return id;
+        Long found = cellsId.get(config.name);
+        if (found != null) {
+            return found;
         }
 
         LongCell cell = new LongCell();
         cell.config = config;
-        id = idGenerator.incrementAndGet();
+        long id = idGenerator.nextId();
         cells.put(id, cell);
         cellsId.put(config.name, id);
         return id;
