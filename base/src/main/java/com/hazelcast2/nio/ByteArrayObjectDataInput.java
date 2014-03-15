@@ -15,24 +15,19 @@ package com.hazelcast2.nio;
  * limitations under the License.
  */
 
+import com.hazelcast2.serialization.SerializationService;
+
 import java.io.EOFException;
 import java.io.IOException;
 import java.nio.ByteOrder;
 
-
-import com.hazelcast2.serialization.SerializationService;
-
 public class ByteArrayObjectDataInput  {
 
-    byte buffer[];
-
-    final int size;
-
-    int pos = 0;
-
-    int mark = 0;
-
-    final SerializationService service;
+    private byte buffer[];
+    private final int size;
+    private int pos = 0;
+    private int mark = 0;
+    private final SerializationService service;
 
 //    private final byte[] utfBuffer = new byte[1024];
 
@@ -421,8 +416,7 @@ public class ByteArrayObjectDataInput  {
     }
 
     public <E> E readObject() throws IOException {
-        //return service.readObject(this);
-        throw new RuntimeException();
+        return service.readObject(this);
     }
 
     //@Override

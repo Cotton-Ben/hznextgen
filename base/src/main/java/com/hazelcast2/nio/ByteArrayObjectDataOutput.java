@@ -23,13 +23,10 @@ import java.nio.ByteOrder;
 
 public class ByteArrayObjectDataOutput{
 
-    final int initialSize;
-
-    byte buffer[];
-
-    int pos = 0;
-
-    final SerializationService service;
+    private final int initialSize;
+    private byte buffer[];
+    private int pos = 0;
+    private final SerializationService service;
 
     private final byte[] utfBuffer = new byte[1024];
 

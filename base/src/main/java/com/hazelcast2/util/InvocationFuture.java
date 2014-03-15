@@ -6,6 +6,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.locks.LockSupport;
 
 public class InvocationFuture implements Future {
 
@@ -18,12 +19,13 @@ public class InvocationFuture implements Future {
     private final SerializationService serializationService;
 
     public volatile Object value = NO_RESPONSE;
+    private volatile boolean waiters;
 
-    public InvocationFuture(){
+    public InvocationFuture() {
         this(null);
     }
 
-    public InvocationFuture(SerializationService serializationService){
+    public InvocationFuture(SerializationService serializationService) {
         this.serializationService = serializationService;
     }
 
@@ -36,9 +38,18 @@ public class InvocationFuture implements Future {
     }
 
     public void setResponse(Object value) {
-        synchronized (this) {
+        if (!waiters) {
             this.value = value;
-            notifyAll();
+            if(waiters){
+                synchronized (this){
+                    notifyAll();
+                }
+            }
+        } else {
+            synchronized (this) {
+                this.value = value;
+                notifyAll();
+            }
         }
     }
 
@@ -47,6 +58,17 @@ public class InvocationFuture implements Future {
     }
 
     public Object getSafely() {
+        if (value == NO_RESPONSE) {
+            waiters = true;
+
+            for (int k = 0; k < 1000; k++) {
+                LockSupport.parkNanos(100);
+                if (value != NO_RESPONSE) {
+                    break;
+                }
+            }
+        }
+
         if (value == NO_RESPONSE) {
             synchronized (this) {
                 while (value == NO_RESPONSE) {
@@ -60,7 +82,7 @@ public class InvocationFuture implements Future {
             }
         }
 
-        if(value instanceof byte[]){
+        if (value instanceof byte[]) {
             //here we need to deserialize based on the type
         }
 
