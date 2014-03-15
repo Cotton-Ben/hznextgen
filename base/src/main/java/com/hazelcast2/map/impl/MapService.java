@@ -12,6 +12,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 import static com.hazelcast2.internal.util.ReflectionUtils.getConstructor;
+import static com.hazelcast2.internal.util.StringUtils.randomString;
 
 public class MapService implements PartitionAwareSpiService {
 
@@ -37,6 +38,14 @@ public class MapService implements PartitionAwareSpiService {
     }
 
     public IMap getDistributedObject(MapConfig mapConfig) {
+        if (mapConfig == null) {
+            throw new NullPointerException("mapConfig can't be null");
+        }
+
+        if(mapConfig.name==null){
+            mapConfig.name = randomString();
+        }
+
         MapSector[] sectors = new MapSector[partitionService.getPartitionCount()];
         for (int partitionId = 0; partitionId < sectors.length; partitionId++) {
             MapSectorSettings sectorSettings = new MapSectorSettings();
@@ -54,7 +63,7 @@ public class MapService implements PartitionAwareSpiService {
             }
         }
         MapStore mapStore = new MapStore(sectors, mapConfig);
-        return new MapProxy(mapStore);
+        return new MapProxy(mapStore, -1, mapConfig.name);
     }
 
     @Override

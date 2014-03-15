@@ -68,7 +68,7 @@ public class AtomicBooleanProxy implements IAtomicBoolean {
 
     @Override
     public String toString() {
-        return "IAtomicLong{" +
+        return "IAtomicBoolean{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 '}';

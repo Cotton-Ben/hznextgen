@@ -16,6 +16,10 @@ public class AtomicReferenceProxy<E> implements IAtomicReference<E> {
         this.id = id;
     }
 
+    public ReferenceSector getSector() {
+        return sector;
+    }
+
     @Override
     public String getName() {
         return name;
@@ -78,13 +82,9 @@ public class AtomicReferenceProxy<E> implements IAtomicReference<E> {
 
     @Override
     public String toString() {
-        return "IAtomicLong{" +
+        return "IAtomicReference{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 '}';
-    }
-
-    public ReferenceSector getSector() {
-        return sector;
     }
 }

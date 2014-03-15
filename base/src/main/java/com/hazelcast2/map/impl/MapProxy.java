@@ -5,19 +5,23 @@ import com.hazelcast2.map.IMap;
 public class MapProxy implements IMap {
 
     private final MapStore mapStore;
+    private final String name;
+    private final long id;
 
-    public MapProxy(MapStore mapStore) {
+    public MapProxy(MapStore mapStore, long id, String name) {
         this.mapStore = mapStore;
+        this.id = id;
+        this.name = name;
     }
 
     @Override
     public long getId() {
-        return -1;
+        return id;
     }
 
     @Override
     public String getName() {
-        return null;
+        return name;
     }
 
     @Override
@@ -65,5 +69,13 @@ public class MapProxy implements IMap {
         }
 
         return hash % mapStore.getPartitionCount();
+    }
+
+    @Override
+    public String toString() {
+        return "IMap{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
     }
 }
