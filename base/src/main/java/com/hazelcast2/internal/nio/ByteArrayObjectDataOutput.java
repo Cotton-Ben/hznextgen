@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.hazelcast2.nio;
+package com.hazelcast2.internal.nio;
 
 import com.hazelcast2.serialization.SerializationService;
 

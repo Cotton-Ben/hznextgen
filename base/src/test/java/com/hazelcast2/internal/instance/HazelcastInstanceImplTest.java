@@ -1,4 +1,4 @@
-package com.hazelcast2.instance;
+package com.hazelcast2.internal.instance;
 
 import com.hazelcast2.core.Config;
 import org.junit.Test;

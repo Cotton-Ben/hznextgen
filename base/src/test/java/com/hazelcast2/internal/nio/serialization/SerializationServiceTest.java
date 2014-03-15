@@ -1,7 +1,7 @@
-package com.hazelcast2.nio.serialization;
+package com.hazelcast2.internal.nio.serialization;
 
-import com.hazelcast2.nio.ByteArrayObjectDataInput;
-import com.hazelcast2.nio.ByteArrayObjectDataOutput;
+import com.hazelcast2.internal.nio.ByteArrayObjectDataInput;
+import com.hazelcast2.internal.nio.ByteArrayObjectDataOutput;
 import com.hazelcast2.serialization.SerializationService;
 import org.junit.Before;
 import org.junit.Test;

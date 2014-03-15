@@ -1,6 +1,6 @@
-package com.hazelcast2.util;
+package com.hazelcast2.internal.util;
 
-import com.hazelcast2.utils.UnsafeHelper;
+import com.hazelcast2.internal.utils.UnsafeHelper;
 import sun.misc.Unsafe;
 
 /**

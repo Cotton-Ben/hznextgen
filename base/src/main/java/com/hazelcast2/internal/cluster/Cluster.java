@@ -1,4 +1,4 @@
-package com.hazelcast2.cluster;
+package com.hazelcast2.internal.cluster;
 
 import com.hazelcast2.serialization.SerializationService;
 import com.hazelcast2.spi.InvocationEndpoint;

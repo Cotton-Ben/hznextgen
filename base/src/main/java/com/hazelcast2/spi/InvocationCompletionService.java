@@ -1,7 +1,7 @@
 package com.hazelcast2.spi;
 
-import com.hazelcast2.nio.IOUtils;
-import com.hazelcast2.util.InvocationFuture;
+import com.hazelcast2.internal.nio.IOUtils;
+import com.hazelcast2.internal.util.InvocationFuture;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;

@@ -1,8 +1,8 @@
 package ${class.packageName};
 
 import com.hazelcast2.spi.*;
-import com.hazelcast2.util.*;
-import com.hazelcast2.nio.*;
+import com.hazelcast2.internal.util.*;
+import com.hazelcast2.internal.nio.*;
 
 import java.util.concurrent.Future;
 

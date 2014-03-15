@@ -1,4 +1,4 @@
-package com.hazelcast2.util;
+package com.hazelcast2.internal.util;
 
 import com.hazelcast2.serialization.SerializationService;
 

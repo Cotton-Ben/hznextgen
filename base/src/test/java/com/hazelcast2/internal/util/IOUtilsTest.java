@@ -1,12 +1,12 @@
-package com.hazelcast2.util;
+package com.hazelcast2.internal.util;
 
 import org.junit.Test;
 
 import java.nio.ByteBuffer;
 
-import static com.hazelcast2.nio.IOUtils.readInt;
-import static com.hazelcast2.nio.IOUtils.readLong;
-import static com.hazelcast2.nio.IOUtils.readShort;
+import static com.hazelcast2.internal.nio.IOUtils.readInt;
+import static com.hazelcast2.internal.nio.IOUtils.readLong;
+import static com.hazelcast2.internal.nio.IOUtils.readShort;
 import static org.junit.Assert.assertEquals;
 
 public class IOUtilsTest {

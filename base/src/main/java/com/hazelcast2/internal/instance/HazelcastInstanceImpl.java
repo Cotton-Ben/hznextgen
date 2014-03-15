@@ -1,7 +1,7 @@
-package com.hazelcast2.instance;
+package com.hazelcast2.internal.instance;
 
-import com.hazelcast2.cluster.Cluster;
-import com.hazelcast2.cluster.ClusterSettings;
+import com.hazelcast2.internal.cluster.Cluster;
+import com.hazelcast2.internal.cluster.ClusterSettings;
 import com.hazelcast2.concurrent.atomicboolean.AtomicBooleanConfig;
 import com.hazelcast2.concurrent.atomicboolean.IAtomicBoolean;
 import com.hazelcast2.concurrent.atomicboolean.impl.AtomicBooleanService;
@@ -18,8 +18,8 @@ import com.hazelcast2.core.*;
 import com.hazelcast2.map.IMap;
 import com.hazelcast2.map.MapConfig;
 import com.hazelcast2.map.impl.MapService;
-import com.hazelcast2.nio.Gateway;
-import com.hazelcast2.nio.IOUtils;
+import com.hazelcast2.internal.nio.Gateway;
+import com.hazelcast2.internal.nio.IOUtils;
 import com.hazelcast2.partition.PartitionService;
 import com.hazelcast2.partition.impl.PartitionServiceImpl;
 import com.hazelcast2.serialization.SerializationService;

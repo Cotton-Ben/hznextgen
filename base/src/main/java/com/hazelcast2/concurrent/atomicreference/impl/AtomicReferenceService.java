@@ -2,7 +2,7 @@ package com.hazelcast2.concurrent.atomicreference.impl;
 
 import com.hazelcast2.concurrent.atomicreference.IAtomicReference;
 import com.hazelcast2.concurrent.atomicreference.AtomicReferenceConfig;
-import com.hazelcast2.nio.IOUtils;
+import com.hazelcast2.internal.nio.IOUtils;
 import com.hazelcast2.partition.PartitionService;
 import com.hazelcast2.spi.InvocationEndpoint;
 import com.hazelcast2.spi.PartitionAwareSpiService;
@@ -11,7 +11,7 @@ import com.hazelcast2.spi.SpiServiceSettings;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-import static com.hazelcast2.util.ReflectionUtils.getConstructor;
+import static com.hazelcast2.internal.util.ReflectionUtils.getConstructor;
 
 public final class AtomicReferenceService implements PartitionAwareSpiService {
 

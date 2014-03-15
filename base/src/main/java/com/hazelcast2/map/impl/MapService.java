@@ -11,7 +11,7 @@ import com.hazelcast2.spi.SpiServiceSettings;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-import static com.hazelcast2.util.ReflectionUtils.getConstructor;
+import static com.hazelcast2.internal.util.ReflectionUtils.getConstructor;
 
 public class MapService implements PartitionAwareSpiService {
 
