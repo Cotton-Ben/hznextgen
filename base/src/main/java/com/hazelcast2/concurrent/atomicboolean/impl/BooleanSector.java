@@ -1,5 +1,6 @@
 package com.hazelcast2.concurrent.atomicboolean.impl;
 
+import com.hazelcast2.concurrent.atomicboolean.AtomicBooleanConfig;
 import com.hazelcast2.spi.Sector;
 import com.hazelcast2.spi.cellbased.CellBasedSector;
 import com.hazelcast2.spi.cellbased.CellSectorOperation;
@@ -20,7 +21,7 @@ public abstract class BooleanSector extends Sector {
         super(sectorSettings);
     }
 
-    public long createCell() {
+    public long createCell(AtomicBooleanConfig config) {
         BooleanCell cell = new BooleanCell();
         long id = idGenerator.incrementAndGet();
         cells.put(id, cell);

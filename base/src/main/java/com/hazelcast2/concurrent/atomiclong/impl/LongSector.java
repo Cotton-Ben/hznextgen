@@ -1,5 +1,6 @@
 package com.hazelcast2.concurrent.atomiclong.impl;
 
+import com.hazelcast2.concurrent.atomiclong.AtomicLongConfig;
 import com.hazelcast2.core.LongFunction;
 import com.hazelcast2.spi.Sector;
 import com.hazelcast2.spi.cellbased.CellBasedSector;
@@ -22,7 +23,7 @@ public abstract class LongSector extends Sector {
         super(settings);
     }
 
-    public long createCell() {
+    public long createCell(AtomicLongConfig config) {
         LongCell cell = new LongCell();
         long id = idGenerator.incrementAndGet();
         cells.put(id, cell);

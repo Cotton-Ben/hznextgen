@@ -1,5 +1,6 @@
 package com.hazelcast2.concurrent.atomicreference.impl;
 
+import com.hazelcast2.concurrent.atomicreference.AtomicReferenceConfig;
 import com.hazelcast2.spi.Sector;
 import com.hazelcast2.spi.cellbased.CellBasedSector;
 import com.hazelcast2.spi.cellbased.CellSectorOperation;
@@ -21,7 +22,7 @@ public abstract class ReferenceSector extends Sector {
         super(settings);
     }
 
-    public long createCell() {
+    public long createCell(AtomicReferenceConfig config) {
         ReferenceCell cell = new ReferenceCell();
         long id = idGenerator.incrementAndGet();
         cells.put(id, cell);

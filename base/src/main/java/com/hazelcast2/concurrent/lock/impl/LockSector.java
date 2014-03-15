@@ -1,5 +1,6 @@
 package com.hazelcast2.concurrent.lock.impl;
 
+import com.hazelcast2.concurrent.lock.LockConfig;
 import com.hazelcast2.spi.Sector;
 import com.hazelcast2.spi.cellbased.CellBasedSector;
 import com.hazelcast2.spi.cellbased.CellSectorOperation;
@@ -20,7 +21,7 @@ public abstract class LockSector extends Sector {
         super(settings);
     }
 
-    public long createCell() {
+    public long createCell(LockConfig config) {
         LockCell cell = new LockCell();
         long id = idGenerator.incrementAndGet();
         cells.put(id, cell);

@@ -60,7 +60,7 @@ public final class AtomicLongService implements PartitionAwareSpiService {
 
         final int partitionId = partitionService.getPartitionId(config.name);
         final LongSector sector = sectors[partitionId];
-        final long id = sector.createCell();
+        final long id = sector.createCell(config);
         return new AtomicLongProxy(sector, config.name, id);
     }
 

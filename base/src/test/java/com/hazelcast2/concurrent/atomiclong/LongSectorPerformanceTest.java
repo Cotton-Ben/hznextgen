@@ -14,7 +14,7 @@ public class LongSectorPerformanceTest {
     @Test
     public void testSet() {
         LongSector sector = createLongSector();
-        long id = sector.createCell();
+        long id = sector.createCell(new AtomicLongConfig());
         long startMs = System.currentTimeMillis();
         int iterations  = 1000 * 1000 * 100;
         for (int k = 0; k < iterations; k++) {
@@ -40,7 +40,7 @@ public class LongSectorPerformanceTest {
     @Test
     public void testInc() {
         LongSector longPartition = createLongSector();
-        long id = longPartition.createCell();
+        long id = longPartition.createCell(new AtomicLongConfig());
         int iterations  = 1000 * 1000 * 100;
         long startMs = System.currentTimeMillis();
         for (int k = 0; k < iterations ; k++) {
@@ -56,7 +56,7 @@ public class LongSectorPerformanceTest {
     @Test
     public void testGet() {
         LongSector longPartition = createLongSector();
-        long id = longPartition.createCell();
+        long id = longPartition.createCell(new AtomicLongConfig());
         int iterations  = 1000 * 1000 * 100;
         long startMs = System.currentTimeMillis();
         for (int k = 0; k < iterations ; k++) {
