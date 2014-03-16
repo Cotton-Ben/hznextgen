@@ -90,7 +90,7 @@ public final class AtomicReferenceService implements PartitionAwareSpiService {
     @Override
     public void enablePartition(int partitionId, boolean enable, InvocationEndpoint[] endpoints) {
         ReferenceSector sector = sectors[partitionId];
-        sector.endpoints = endpoints;
+        sector.replicaSet = endpoints;
         if (enable) {
             sector.unlock();
         } else {

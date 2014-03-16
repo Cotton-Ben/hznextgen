@@ -180,8 +180,8 @@ public final class ${class.name} extends ${class.superName} {
     </#if>
             out.writeLong(callId);
             ${method.serializeArgs}
-            InvocationEndpoint endpoint = endpoints[0];
-            endpoint.send(out.toByteArray());
+            InvocationEndpoint primary = replicaSet[0];
+            primary.send(out.toByteArray());
         }catch(Exception e){
             invocationFuture.setResponseException(e);
         }

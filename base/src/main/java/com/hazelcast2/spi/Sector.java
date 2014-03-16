@@ -29,18 +29,18 @@ public abstract class Sector {
     public final InvocationCompletionService invocationCompletionService;
 
     /**
-     * The endpoints for a sector. So a sector can be in multiple states:
+     * The replicaSet for a sector. So a sector can be in multiple states:
      * - it is the master
      * - it is a backup
      * - none of the above
-     * In this endpoints you can find on the first position the master and after that you
-     * get the replicas. These endpoints will be updated when partitions are moving around.
+     * In this replicaSet you can find on the first position the master and after that you
+     * get the replicas. These replicaSet will be updated when partitions are moving around.
      * <p/>
      * The advantage of this approach instead of first looking up the replica index, and then
-     * retrieving the connection, you immediately have the endpoints available without needing
+     * retrieving the connection, you immediately have the replicaSet available without needing
      * to do any lookup.
      */
-    public volatile InvocationEndpoint[] endpoints;
+    public volatile InvocationEndpoint[] replicaSet;
     public final Sequence prodSeq = new Sequence(INITIAL_VALUE);
     public final Sequence conSeq = new Sequence(0);
 

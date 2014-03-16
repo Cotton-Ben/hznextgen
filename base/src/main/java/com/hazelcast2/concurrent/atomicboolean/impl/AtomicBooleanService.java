@@ -91,7 +91,7 @@ public final class AtomicBooleanService implements PartitionAwareSpiService {
     @Override
     public void enablePartition(int partitionId, boolean enable, InvocationEndpoint[] endpoints) {
         BooleanSector sector = sectors[partitionId];
-        sector.endpoints = endpoints;
+        sector.replicaSet = endpoints;
         if (enable) {
             sector.unlock();
         } else {
