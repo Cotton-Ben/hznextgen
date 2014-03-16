@@ -160,40 +160,76 @@ public final class ${class.name} extends ${class.superName} {
 
         final InvocationEndpoint source = invocation.source;
         if(source != null){
+    <#switch method.returnType>
+        <#case "void">
+            final byte[] buffer = new byte[10];
+            IOUtils.writeShort(invocationCompletionService.getServiceId(), buffer, 0);
+            IOUtils.writeLong(callId, buffer, 2);
+            source.send(buffer);
+            <#break>
+        <#case "boolean">
+            final byte[] buffer = new byte[11];
+            IOUtils.writeShort(invocationCompletionService.getServiceId(), buffer, 0);
+            IOUtils.writeLong(callId, buffer, 2);
+            IOUtils.writeBoolean(result, buffer, 10);
+            source.send(buffer);
+            <#break>
+        <#case "byte">
+            final byte[] buffer = new byte[11];
+            IOUtils.writeShort(invocationCompletionService.getServiceId(), buffer, 0);
+            IOUtils.writeLong(callId, buffer, 2);
+            IOUtils.writeByte(result, buffer, 10);
+            source.send(buffer);
+            <#break>
+        <#case "char">
+            final byte[] buffer = new byte[12];
+            IOUtils.writeShort(invocationCompletionService.getServiceId(), buffer, 0);
+            IOUtils.writeLong(callId, buffer, 2);
+            IOUtils.writeChar(result, buffer, 10);
+            source.send(buffer);
+            <#break>
+        <#case "short">
+            final byte[] buffer = new byte[12];
+            IOUtils.writeShort(invocationCompletionService.getServiceId(), buffer, 0);
+            IOUtils.writeLong(callId, buffer, 2);
+            IOUtils.writeShort(result, buffer, 10);
+            source.send(buffer);
+            <#break>
+        <#case "int">
+            final byte[] buffer = new byte[14];
+            IOUtils.writeShort(invocationCompletionService.getServiceId(), buffer, 0);
+            IOUtils.writeLong(callId, buffer, 2);
+            IOUtils.writeInt(result, buffer, 10);
+            source.send(buffer);
+            <#break>
+        <#case "float">
+            final byte[] buffer = new byte[14];
+            IOUtils.writeShort(invocationCompletionService.getServiceId(), buffer, 0);
+            IOUtils.writeLong(callId, buffer, 2);
+            IOUtils.writeFloat(result, buffer, 10);
+            source.send(buffer);
+            <#break>
+        <#case "long">
+            final byte[] buffer = new byte[18];
+            IOUtils.writeShort(invocationCompletionService.getServiceId(), buffer, 0);
+            IOUtils.writeLong(callId, buffer, 2);
+            IOUtils.writeLong(result, buffer, 10);
+            source.send(buffer);
+            <#break>
+        <#case "double">
+            final byte[] buffer = new byte[18];
+            IOUtils.writeShort(invocationCompletionService.getServiceId(), buffer, 0);
+            IOUtils.writeLong(callId, buffer, 2);
+            IOUtils.writeLong(result, buffer, 10);
+            source.send(buffer);
+            <#break>
+        <#default>
             final ByteArrayObjectDataOutput out = new ByteArrayObjectDataOutput(serializationService);
             out.writeShort(invocationCompletionService.getServiceId());
             out.writeLong(callId);
-    <#switch method.returnType>
-        <#case "void">
-            <#break>
-        <#case "long">
-            out.writeLong(result);
-            <#break>
-        <#case "boolean">
-            out.writeBoolean(result);
-            <#break>
-        <#case "int">
-            out.writeInt(result);
-            <#break>
-        <#case "byte">
-            out.writeByte(result);
-            <#break>
-        <#case "float">
-            out.writeFloat(result);
-            <#break>
-        <#case "double">
-            out.writeDouble(result);
-            <#break>
-        <#case "char">
-            out.writeChar(result);
-            <#break>
-        <#case "short">
-            out.writeShort(result);
-            <#break>
-        <#default>
             out.writeObject(result);
-    </#switch>
             source.send(out.toByteArray());
+    </#switch>
         }
     }
 

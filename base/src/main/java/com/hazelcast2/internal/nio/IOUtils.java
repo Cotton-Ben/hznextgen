@@ -2,10 +2,53 @@ package com.hazelcast2.internal.nio;
 
 public class IOUtils {
 
-    public static short readShort(byte[] buffer, int offset) {
-        byte high = buffer[offset];
-        byte low = buffer[offset + 1];
+    public static void writeBoolean(boolean update, byte[] buffer, int position) {
+        buffer[position] = (byte) (update ? 1 : 0);
+    }
+
+    public static boolean readBoolean(byte[] buffer, int position) {
+        return buffer[position] == 1;
+    }
+
+    public static byte readByte(byte[] buffer, int position) {
+        return buffer[position];
+    }
+
+    public static void writeByte(byte update, byte[] buffer, int position) {
+        buffer[position] = update;
+    }
+
+    public static short readShort(byte[] buffer, int position) {
+        byte high = buffer[position];
+        byte low = buffer[position + 1];
         return (short) (((high & 0xFF) << 8) | (low & 0xFF));
+    }
+
+    public static void writeShort(short v, byte[] buffer, int pos) {
+        buffer[pos++] = (byte) (v >>> 8);
+        buffer[pos] = (byte) (v);
+    }
+
+    public static char readChar(byte[] buffer, int position) {
+        throw new RuntimeException();
+    }
+
+    public static void writeChar(char update, byte[] buffer, int position) {
+        throw new RuntimeException();
+    }
+
+    public static int readInt(byte[] buffer, int position) {
+        return +((buffer[position] & 255) << 24)
+                + ((buffer[position + 1] & 255) << 16)
+                + ((buffer[position + 2] & 255) << 8)
+                + ((buffer[position + 3] & 255));
+    }
+
+    public static void writeInt(int update, byte[] buffer, int position) {
+        buffer[position] = (byte) ((update >>> 24) & 255);
+        buffer[position + 1] = (byte) ((update >>> 16) & 255);
+        buffer[position + 2] = (byte) ((update >>> 8) & 255);
+        buffer[position + 3] = (byte) ((update) & 255);
     }
 
     public static long readLong(byte[] buffer, int position) {
@@ -20,15 +63,29 @@ public class IOUtils {
 
     }
 
-    public static int readInt(byte[] buffer, int position) {
-        return  + ((buffer[position] & 255) << 24)
-                + ((buffer[position + 1] & 255) << 16)
-                + ((buffer[position + 2] & 255) << 8)
-                + ((buffer[position + 3] & 255));
+    public static void writeLong(long v, byte[] buffer, int pos) {
+        buffer[pos++] = (byte) (v >>> 56);
+        buffer[pos++] = (byte) (v >>> 48);
+        buffer[pos++] = (byte) (v >>> 40);
+        buffer[pos++] = (byte) (v >>> 32);
+        buffer[pos++] = (byte) (v >>> 24);
+        buffer[pos++] = (byte) (v >>> 16);
+        buffer[pos++] = (byte) (v >>> 8);
+        buffer[pos] = (byte) (v);
+    }
+
+    public static void writeDouble(double update, byte[] buffer, int position) {
+        long longBits = Double.doubleToLongBits(update);
+        writeLong(longBits, buffer, position);
+    }
+
+    public static double readDouble(byte[] buffer, int position) {
+        long longBits = readLong(buffer, position);
+        return Double.longBitsToDouble(longBits);
     }
 
     public static String readString(byte[] buffer, int position) {
-        int size = readInt(buffer,position);
+        int size = readInt(buffer, position);
         throw new UnsupportedOperationException();
     }
 }
