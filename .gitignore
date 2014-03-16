@@ -11,6 +11,7 @@ target/
 .DS_Store
 reports/
 .directory
+benchmarks/results.json
 atlassian-ide-plugin.xml
 hazelcast-ra/*.log
 hazelcast-ra/*.epoch

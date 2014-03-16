@@ -161,6 +161,7 @@ public final class SectorScheduler {
         public SectorThread(Ringbuffer ringbuffer, int id) {
             super("SectorThread-" + id);
             this.ringbuffer = ringbuffer;
+            setDaemon(true);
         }
 
         @Override

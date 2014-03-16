@@ -2,45 +2,43 @@ package com.hazelcast2.map;
 
 import com.hazelcast2.core.Hazelcast;
 import com.hazelcast2.core.HazelcastInstance;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.openjdk.jmh.annotations.*;
 
-import static org.junit.Assert.assertEquals;
-
-//very naive performance test
-public class IMapPerformanceTest {
+@State(value = Scope.Thread)
+public class UncontendedMapBenchmark {
 
     private HazelcastInstance hz;
 
-    @Before
+    @Setup
     public void setUp() {
         hz = Hazelcast.newHazelcastInstance();
         hz.startMaster();
     }
 
-    @After
-    public void tearDown(){
+    @TearDown
+    public void tearDown() {
         hz.shutdown();
     }
 
-    @Test
+    @GenerateMicroBenchmark
+    @OperationsPerInvocation(100000000)
     public void testSet() {
         IMap map = hz.getMap("foo");
         long startMs = System.currentTimeMillis();
         int iterations = 1000 * 1000 * 100;
         for (int k = 0; k < iterations; k++) {
-            map.set("1","2");
+            map.set("1", "2");
         }
         long durationMs = System.currentTimeMillis() - startMs;
         double performance = (iterations * 1000d) / durationMs;
         System.out.println("Performance: " + performance);
     }
 
-    @Test
+    @GenerateMicroBenchmark
+    @OperationsPerInvocation(100000000)
     public void testGet() {
         IMap map = hz.getMap("foo");
-        map.set("foo","bar");
+        map.set("foo", "bar");
         int iterations = 1000 * 1000 * 100;
         long startMs = System.currentTimeMillis();
 

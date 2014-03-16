@@ -26,6 +26,7 @@
     <modules>
         <module>codegenerator</module>
         <module>base</module>
+        <module>benchmarks</module>
     </modules>
 
     <build>

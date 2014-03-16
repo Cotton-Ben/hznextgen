@@ -34,13 +34,13 @@ public class Cluster implements SpiService {
 
     public void start() {
         ClusterThread thread = new ClusterThread();
-        thread.start();
-        future = TIMER.scheduleWithFixedDelay(new TimerTask(), 0, 1, TimeUnit.SECONDS);
+    //    thread.start();
+     //   future = TIMER.scheduleWithFixedDelay(new TimerTask(), 0, 1, TimeUnit.SECONDS);
     }
 
     public void shutdown() {
         mailbox.add(new StopEvent());
-        future.cancel(true);
+       // future.cancel(true);
     }
 
     @Override
