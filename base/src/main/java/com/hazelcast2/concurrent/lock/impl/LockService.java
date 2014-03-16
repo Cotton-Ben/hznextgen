@@ -16,6 +16,8 @@ import static com.hazelcast2.internal.util.StringUtils.randomString;
 
 public final class LockService implements PartitionAwareSpiService {
 
+    public static final String SERVICE_NAME = "hz:impl:lockService";
+
     private static final String CLASS_NAME = "com.hazelcast2.concurrent.lock.impl.GeneratedLockSector";
     private static final Constructor<LockSector> CONSTRUCTOR = getConstructor(CLASS_NAME, LockSectorSettings.class);
 
@@ -34,6 +36,16 @@ public final class LockService implements PartitionAwareSpiService {
         }
     }
 
+    @Override
+    public short getServiceId() {
+        return serviceId;
+    }
+
+    @Override
+    public String getServiceName() {
+        return SERVICE_NAME;
+    }
+
     private LockSector newSector(SpiServiceSettings serviceSettings, int partitionId) {
         LockSectorSettings sectorSettings = new LockSectorSettings();
         sectorSettings.service = this;
@@ -47,11 +59,6 @@ public final class LockService implements PartitionAwareSpiService {
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    @Override
-    public short getServiceId() {
-        return serviceId;
     }
 
     public ILock getDistributedObject(final LockConfig config) {

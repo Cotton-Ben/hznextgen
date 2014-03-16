@@ -16,7 +16,9 @@ import static com.hazelcast2.internal.util.StringUtils.randomString;
 
 public class MapService implements PartitionAwareSpiService {
 
-    public static final String CLASS_NAME = "com.hazelcast2.map.impl.GeneratedMapSector";
+    public static final String SERVICE_NAME = "hz:impl:mapService";
+
+    private static final String CLASS_NAME = "com.hazelcast2.map.impl.GeneratedMapSector";
 
     private final PartitionService partitionService;
     private final Constructor<MapSector> constructor;
@@ -35,6 +37,11 @@ public class MapService implements PartitionAwareSpiService {
     @Override
     public short getServiceId() {
         return serviceId;
+    }
+
+    @Override
+    public String getServiceName() {
+        return SERVICE_NAME;
     }
 
     public IMap getDistributedObject(MapConfig mapConfig) {

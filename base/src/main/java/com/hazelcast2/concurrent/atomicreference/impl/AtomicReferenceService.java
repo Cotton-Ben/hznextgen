@@ -1,7 +1,7 @@
 package com.hazelcast2.concurrent.atomicreference.impl;
 
-import com.hazelcast2.concurrent.atomicreference.IAtomicReference;
 import com.hazelcast2.concurrent.atomicreference.AtomicReferenceConfig;
+import com.hazelcast2.concurrent.atomicreference.IAtomicReference;
 import com.hazelcast2.internal.nio.IOUtils;
 import com.hazelcast2.partition.PartitionService;
 import com.hazelcast2.spi.InvocationEndpoint;
@@ -15,6 +15,8 @@ import static com.hazelcast2.internal.util.ReflectionUtils.getConstructor;
 import static com.hazelcast2.internal.util.StringUtils.randomString;
 
 public final class AtomicReferenceService implements PartitionAwareSpiService {
+
+    public static final String SERVICE_NAME = "hz:impl:atomicReferenceService";
 
     private static final String CLASS_NAME = "com.hazelcast2.concurrent.atomicreference.impl.GeneratedReferenceSector";
     private static final Constructor<ReferenceSector> CONSTRUCTOR = getConstructor(CLASS_NAME, ReferenceSectorSettings.class);
@@ -34,6 +36,16 @@ public final class AtomicReferenceService implements PartitionAwareSpiService {
         }
     }
 
+    @Override
+    public short getServiceId() {
+        return serviceId;
+    }
+
+    @Override
+    public String getServiceName() {
+        return SERVICE_NAME;
+    }
+
     private ReferenceSector newSector(SpiServiceSettings serviceSettings, int partitionId) {
         ReferenceSectorSettings sectorSettings = new ReferenceSectorSettings();
         sectorSettings.scheduler = partitionService.getScheduler();
@@ -49,17 +61,12 @@ public final class AtomicReferenceService implements PartitionAwareSpiService {
         }
     }
 
-    @Override
-    public short getServiceId() {
-        return serviceId;
-    }
-
     public IAtomicReference getDistributedObject(final AtomicReferenceConfig config) {
         if (config == null) {
             throw new NullPointerException("name can't be null");
         }
 
-        if(config.name == null){
+        if (config.name == null) {
             config.name = randomString();
         }
 

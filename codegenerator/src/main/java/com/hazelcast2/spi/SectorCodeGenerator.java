@@ -104,14 +104,8 @@ public class SectorCodeGenerator extends AbstractProcessor {
 
         String content = null;
         try {
-            // Build the data-model
             Map<String, Object> data = new HashMap<String, Object>();
             data.put("class", clazz);
-
-            // // Console output
-            //Writer out = new OutputStreamWriter(System.out);
-            //template.process(data, out);
-            //out.flush();
 
             StringWriter writer = new StringWriter();
             template.process(data, writer);

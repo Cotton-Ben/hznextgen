@@ -42,12 +42,24 @@ import java.util.concurrent.atomic.AtomicLong;
 //todo: very inefficient implementation.
 public class InvocationCompletionService implements SpiService {
 
+    public static final String SERVICE_NAME = "hz:impl:invocationCompletionService";
+
     private final short serviceId;
     private final ConcurrentMap<Long, InvocationFuture> calls = new ConcurrentHashMap<>();
     private final AtomicLong callIdGenerator = new AtomicLong();
 
     public InvocationCompletionService(short serviceId) {
         this.serviceId = serviceId;
+    }
+
+    @Override
+    public String getServiceName() {
+        return SERVICE_NAME;
+    }
+
+    @Override
+    public short getServiceId() {
+        return serviceId;
     }
 
     @Override
@@ -73,8 +85,4 @@ public class InvocationCompletionService implements SpiService {
         return callId;
     }
 
-    @Override
-    public short getServiceId() {
-        return serviceId;
-    }
 }

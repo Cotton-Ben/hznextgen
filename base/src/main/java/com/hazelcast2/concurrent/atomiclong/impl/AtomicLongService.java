@@ -16,6 +16,8 @@ import static com.hazelcast2.internal.util.StringUtils.randomString;
 
 public final class AtomicLongService implements PartitionAwareSpiService {
 
+    public static final String SERVICE_NAME = "hz:impl:atomicLongService";
+
     private static final String CLASS_NAME = "com.hazelcast2.concurrent.atomiclong.impl.GeneratedLongSector";
     private static final Constructor<LongSector> CONSTRUCTOR = getConstructor(CLASS_NAME, LongSectorSettings.class);
 
@@ -34,6 +36,16 @@ public final class AtomicLongService implements PartitionAwareSpiService {
         }
     }
 
+    @Override
+    public short getServiceId() {
+        return serviceId;
+    }
+
+    @Override
+    public String getServiceName() {
+        return SERVICE_NAME;
+    }
+
     private LongSector newSector(SpiServiceSettings serviceSettings, int partitionId) {
         LongSectorSettings sectorSettings = new LongSectorSettings();
         sectorSettings.scheduler = partitionService.getScheduler();
@@ -47,11 +59,6 @@ public final class AtomicLongService implements PartitionAwareSpiService {
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    @Override
-    public short getServiceId() {
-        return serviceId;
     }
 
     public IAtomicLong getDistributedObject(final AtomicLongConfig config) {

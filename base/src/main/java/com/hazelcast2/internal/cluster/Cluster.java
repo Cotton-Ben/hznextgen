@@ -13,6 +13,9 @@ import java.util.concurrent.*;
  */
 public class Cluster implements SpiService {
 
+    public static final String SERVICE_NAME = "hz:impl:clusterService";
+
+
     public final static ScheduledThreadPoolExecutor TIMER = new ScheduledThreadPoolExecutor(1);
 
     {
@@ -43,6 +46,11 @@ public class Cluster implements SpiService {
     @Override
     public short getServiceId() {
         return serviceId;
+    }
+
+    @Override
+    public String getServiceName() {
+        return SERVICE_NAME;
     }
 
     @Override

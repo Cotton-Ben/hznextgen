@@ -16,6 +16,8 @@ import static com.hazelcast2.internal.util.StringUtils.randomString;
 
 public final class AtomicBooleanService implements PartitionAwareSpiService {
 
+    public static final String SERVICE_NAME = "hz:impl:atomicBooleanService";
+
     private static final String CLASS_NAME = "com.hazelcast2.concurrent.atomicboolean.impl.GeneratedBooleanSector";
     private static final Constructor<BooleanSector> CONSTRUCTOR = getConstructor(CLASS_NAME, BooleanSectorSettings.class);
 
@@ -34,6 +36,16 @@ public final class AtomicBooleanService implements PartitionAwareSpiService {
         }
     }
 
+    @Override
+    public short getServiceId() {
+        return serviceId;
+    }
+
+    @Override
+    public String getServiceName() {
+        return SERVICE_NAME;
+    }
+
     private BooleanSector newSector(SpiServiceSettings serviceSettings, int partitionId) {
         BooleanSectorSettings sectorSettings = new BooleanSectorSettings();
         sectorSettings.scheduler = partitionService.getScheduler();
@@ -49,10 +61,6 @@ public final class AtomicBooleanService implements PartitionAwareSpiService {
         }
     }
 
-    @Override
-    public short getServiceId() {
-        return serviceId;
-    }
 
     public IAtomicBoolean getDistributedObject(final AtomicBooleanConfig config) {
         if (config == null) {
