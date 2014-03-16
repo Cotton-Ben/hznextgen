@@ -249,7 +249,27 @@ public abstract class Sector {
      * The schedule wants to schedule a operation invocation on this sector.
      *
      * @param source
-     * @param bytes
+     * @param invocationBytes
      */
-    public abstract void schedule(InvocationEndpoint source, byte[] bytes);
+    public void schedule(final InvocationEndpoint source, final byte[] invocationBytes){
+        final long sequenceAndStatus = claimSlotAndReturnStatus();
+
+        if (sequenceAndStatus == CLAIM_SLOT_REMOTE) {
+            throw new UnsupportedOperationException();
+        }
+
+        if (sequenceAndStatus == CLAIM_SLOT_NO_CAPACITY) {
+            throw new UnsupportedOperationException();
+        }
+
+        final boolean schedule = isScheduled(sequenceAndStatus);
+
+        final long prodSeq = getSequence(sequenceAndStatus);
+        final InvocationSlot invocation = getSlot(prodSeq);
+        invocation.bytes = invocationBytes;
+        invocation.source = source;
+        invocation.publish(prodSeq);
+
+        if(schedule) scheduler.schedule(this);
+    }
 }

@@ -48,7 +48,6 @@ public final class ${class.name} extends ${class.superName} {
 
         if (!isScheduled(sequenceAndStatus)) {
             final long prodSeq = getSequence(sequenceAndStatus);
-            //todo: this sucks, we don't want to create new instances.
             final InvocationFuture future = new InvocationFuture(serializationService);
             final InvocationSlot invocation = getSlot(prodSeq);
             invocation.invocationFuture = future;
@@ -98,10 +97,17 @@ public final class ${class.name} extends ${class.superName} {
 
     <#if method.cellbased>
     public InvocationFuture ${method.asyncName}(final long id${method.trailingComma}${method.formalArguments}) {
+    <#else>
+    public InvocationFuture ${method.asyncName}(${method.formalArguments}) {
+    </#if>
         final long sequenceAndStatus = claimSlotAndReturnStatus();
 
         if (sequenceAndStatus == CLAIM_SLOT_REMOTE) {
+            <#if method.cellbased>
             return remoteInvoke_${method.name}(id${method.trailingComma}${method.actualArguments});
+            <#else>
+            return remoteInvoke_${method.name}(${method.actualArguments});
+            </#if>
         }
 
         if (sequenceAndStatus == CLAIM_SLOT_NO_CAPACITY) {
@@ -116,7 +122,9 @@ public final class ${class.name} extends ${class.superName} {
         final long prodSeq = getSequence(sequenceAndStatus);
         final InvocationSlot invocation = getSlot(prodSeq);
         invocation.invocationFuture = future;
+    <#if method.cellbased>
         invocation.id = id;
+    </#if>
         invocation.functionId = ${method.functionConstantName};
         ${method.mapArgsToInvocation}
         invocation.publish(prodSeq);
@@ -125,7 +133,6 @@ public final class ${class.name} extends ${class.superName} {
         return future;
     }
 
-    </#if>
     private void deserializeAndInvoke_${method.uniqueMethodName}(final InvocationSlot invocation) throws Exception{
         final byte[] bytes = invocation.bytes;
     <#if method.cellbased>
@@ -135,8 +142,6 @@ public final class ${class.name} extends ${class.superName} {
         final long callId = IOUtils.readLong(bytes, 16);
 
     <#if method.hasOneArgOrMore>
-        ///todo: if a method only has 'simple' types like string, primitive etc. We should not need to create
-        //the ByteArrayObjectDataInput, but we can directly read from the bytes.
         final ByteArrayObjectDataInput in = new ByteArrayObjectDataInput(bytes, 24, serializationService);
     </#if>
     <#if method.voidReturnType>
@@ -155,9 +160,6 @@ public final class ${class.name} extends ${class.superName} {
 
         final InvocationEndpoint source = invocation.source;
         if(source != null){
-            //todo: another object created.
-            //todo: in case of void or primtive, we don't need to create the out object at all. Just create a
-            //byte-array and immediately put the responses on the right place.
             final ByteArrayObjectDataOutput out = new ByteArrayObjectDataOutput(serializationService);
             out.writeShort(invocationCompletionService.getServiceId());
             out.writeLong(callId);
@@ -203,7 +205,6 @@ public final class ${class.name} extends ${class.superName} {
         InvocationFuture invocationFuture = new InvocationFuture();
         try{
             final long callId = invocationCompletionService.register(invocationFuture);
-            //todo: we don't like this.
             ByteArrayObjectDataOutput out = new ByteArrayObjectDataOutput(serializationService);
             out.writeShort(serviceId);
             out.writeInt(partitionId);
@@ -229,9 +230,6 @@ public final class ${class.name} extends ${class.superName} {
     public void process() {
         long consumerSeq = conSeq.get();
         for (; ; ) {
-            //todo: we need to checked the locked flag.
-            //there is batching that can be done, so instead of doing item by item, you know where the producer is.
-
             final long prodSeq = getSequence(this.prodSeq.get());
             final long capacity = prodSeq - consumerSeq;
             if (capacity == 0) {
@@ -285,7 +283,6 @@ public final class ${class.name} extends ${class.superName} {
                     throw new IllegalStateException("Unrecognized function:" + invocation.functionId);
             }
         } catch(Exception e) {
-            //todo: this sucks big time because notification is killing for performance
             invocation.invocationFuture.setResponseException(e);
         }
     }
@@ -304,32 +301,8 @@ public final class ${class.name} extends ${class.superName} {
                     throw new IllegalStateException("Unrecognized function:" + functionId);
             }
         } catch (Exception e){
-            //todo:
             e.printStackTrace();
         }
-    }
-
-    //todo: do we need this method in this subclass or can we move it to sector?
-    public void schedule(final InvocationEndpoint source, final byte[] invocationBytes){
-        final long sequenceAndStatus = claimSlotAndReturnStatus();
-
-        if (sequenceAndStatus == CLAIM_SLOT_REMOTE) {
-            throw new UnsupportedOperationException();
-        }
-
-        if (sequenceAndStatus == CLAIM_SLOT_NO_CAPACITY) {
-            throw new UnsupportedOperationException();
-        }
-
-        final boolean schedule = isScheduled(sequenceAndStatus);
-
-        final long prodSeq = getSequence(sequenceAndStatus);
-        final InvocationSlot invocation = getSlot(prodSeq);
-        invocation.bytes = invocationBytes;
-        invocation.source = source;
-        invocation.publish(prodSeq);
-
-        if(schedule) scheduler.schedule(this);
     }
 }
 
