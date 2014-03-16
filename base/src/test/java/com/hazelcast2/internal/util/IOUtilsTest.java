@@ -108,4 +108,28 @@ public class IOUtilsTest {
 
         assertEquals(value, result);
     }
+
+    @Test
+    public void testDouble() {
+        testDouble(0);
+        testDouble(-1);
+        testDouble(-100);
+        testDouble(-Math.PI);
+        testDouble(Double.MIN_VALUE);
+        testDouble(Double.MAX_VALUE);
+        testDouble(Math.PI);
+        testDouble(100);
+        testDouble(1);
+    }
+
+    public void testDouble(double value) {
+        byte[] buffer = new byte[8];
+        IOUtils.writeDouble(value, buffer, 0);
+
+        double result = IOUtils.readDouble(buffer, 0);
+        long valueLongBits = Double.doubleToLongBits(value);
+        long resultLongBits = Double.doubleToLongBits(result);
+
+        assertEquals(valueLongBits, resultLongBits);
+    }
 }
