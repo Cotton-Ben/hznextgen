@@ -26,32 +26,32 @@ public class LockProxy implements ILock {
 
     @Override
     public void lock() throws InterruptedException {
-         sector.doLock(id, LockUtil.getThreadId());
+         sector.hz_lock(id, LockUtil.getThreadId());
     }
 
     @Override
     public boolean tryLock() {
-        return sector.doTryLock(id, LockUtil.getThreadId());
+        return sector.hz_tryLock(id, LockUtil.getThreadId());
     }
 
     @Override
     public boolean isLocked() {
-        return sector.doIsLocked(id, LockUtil.getThreadId());
+        return sector.hz_isLocked(id, LockUtil.getThreadId());
     }
 
     @Override
     public void unlock() {
-        sector.doUnlock(id, LockUtil.getThreadId());
+        sector.hz_unlock(id, LockUtil.getThreadId());
     }
 
     @Override
     public void destroy() {
-        sector.doDestroy(id);
+        sector.hz_destroy(id);
     }
 
     @Override
     public boolean isDestroyed() {
-        return sector.doIsDestroyed(id) != 1;
+        return sector.hz_isDestroyed(id) != 1;
     }
 
     @Override

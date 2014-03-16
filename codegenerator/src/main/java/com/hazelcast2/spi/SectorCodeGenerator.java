@@ -76,7 +76,8 @@ public class SectorCodeGenerator extends AbstractProcessor {
 
                 boolean cellbased = operationAnnotation.cellbased();
                 method.cellbased = cellbased;
-                method.name = "do" + capitalizeFirstLetter(methodName);
+                method.name = "hz_" + methodName;
+                method.asyncName = "hz_async"+capitalizeFirstLetter(methodName);
                 method.returnType = methodElement.getReturnType().toString();
                 method.invocationClassName = capitalizeFirstLetter(methodName) + argCount + "Invocation";
                 method.targetMethod = methodName;

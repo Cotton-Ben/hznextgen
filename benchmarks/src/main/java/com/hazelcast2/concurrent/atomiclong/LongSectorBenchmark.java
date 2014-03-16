@@ -19,7 +19,7 @@ public class LongSectorBenchmark {
         long id = sector.createCell(new AtomicLongConfig());
         int iterations = 1000 * 1000 * 100;
         for (int k = 0; k < iterations; k++) {
-            sector.doSet(id, 20);
+            sector.hz_set(id, 20);
         }
     }
 
@@ -40,7 +40,7 @@ public class LongSectorBenchmark {
         long id = longPartition.createCell(new AtomicLongConfig());
         int iterations = 1000 * 1000 * 100;
         for (int k = 0; k < iterations; k++) {
-            longPartition.doInc(id);
+            longPartition.hz_inc(id);
         }
     }
 
@@ -51,7 +51,7 @@ public class LongSectorBenchmark {
         long id = longPartition.createCell(new AtomicLongConfig());
         int iterations = 1000 * 1000 * 100;
         for (int k = 0; k < iterations; k++) {
-            longPartition.doGet(id);
+            longPartition.hz_get(id);
         }
     }
 }

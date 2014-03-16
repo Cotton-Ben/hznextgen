@@ -1,6 +1,5 @@
 package com.hazelcast2.concurrent.atomicreference.impl;
 
-import com.hazelcast2.concurrent.atomiclong.impl.LongCell;
 import com.hazelcast2.concurrent.atomicreference.AtomicReferenceConfig;
 import com.hazelcast2.core.IdNotFoundException;
 import com.hazelcast2.spi.IdGenerator;
@@ -25,6 +24,8 @@ public abstract class ReferenceSector extends Sector {
         super(settings);
     }
 
+    public abstract long hz_createCell(AtomicReferenceConfig config);
+
     @SectorOperation
     public long createCell(AtomicReferenceConfig config) {
         Long found = cellsId.get(config.name);
@@ -42,8 +43,8 @@ public abstract class ReferenceSector extends Sector {
 
     public ReferenceCell loadCell(long id) {
         ReferenceCell cell = cells.get(id);
-        if(cell == null){
-            throw new IdNotFoundException("Can't find ReferenceCell for id:"+id+" partition:"+partitionId+". " +
+        if (cell == null) {
+            throw new IdNotFoundException("Can't find ReferenceCell for id:" + id + " partition:" + partitionId + ". " +
                     "It is very likely that the IAtomicReference has been destroyed.");
         }
 
@@ -54,7 +55,7 @@ public abstract class ReferenceSector extends Sector {
     //                      destroy
     // ==================================================================================
 
-    public abstract void doDestroy(long id);
+    public abstract void hz_destroy(long id);
 
     @SectorOperation
     public void destroy(long id) {
@@ -66,7 +67,7 @@ public abstract class ReferenceSector extends Sector {
         cellsId.remove(cell.config.name);
     }
 
-    public abstract long doIsDestroyed(long id);
+    public abstract long hz_isDestroyed(long id);
 
     @SectorOperation(readonly = true)
     public long isDestroyed(long id) {
@@ -75,9 +76,9 @@ public abstract class ReferenceSector extends Sector {
 
     // ==================== get ================================================
 
-    public abstract Object doGet(long id);
+    public abstract Object hz_get(long id);
 
-    public abstract Future<Object> asyncDoGet(long id);
+    public abstract Future<Object> hz_asyncGet(long id);
 
     @SectorOperation(cellbased = true, readonly = true)
     public Object get(ReferenceCell cell) {
@@ -86,9 +87,9 @@ public abstract class ReferenceSector extends Sector {
 
     // ==================== isNull ================================================
 
-    public abstract boolean doIsNull(long id);
+    public abstract boolean hz_isNull(long id);
 
-    public abstract Future<Boolean> asyncDoIsNull(long id);
+    public abstract Future<Boolean> hz_asyncIsNull(long id);
 
     @SectorOperation(cellbased = true, readonly = true)
     public boolean isNull(ReferenceCell cell) {
@@ -97,9 +98,9 @@ public abstract class ReferenceSector extends Sector {
 
     // ==================== set ================================================
 
-    public abstract void doSet(long id, Object update);
+    public abstract void hz_set(long id, Object update);
 
-    public abstract Future<Void> asyncDoSet(long id, Object update);
+    public abstract Future<Void> hz_asyncSet(long id, Object update);
 
     @SectorOperation(cellbased = true)
     public void set(ReferenceCell cell, Object update) {
@@ -108,9 +109,9 @@ public abstract class ReferenceSector extends Sector {
 
     // ==================== compare and set =====================================
 
-    public abstract boolean doCompareAndSet(long id, Object expect, Object update);
+    public abstract boolean hz_compareAndSet(long id, Object expect, Object update);
 
-    public abstract Future<Boolean> asyncDoCompareAndSet(long id, Object expect, Object update);
+    public abstract Future<Boolean> hz_asyncCompareAndSet(long id, Object expect, Object update);
 
     @SectorOperation(cellbased = true)
     public boolean compareAndSet(ReferenceCell cell, Object expect, Object update) {

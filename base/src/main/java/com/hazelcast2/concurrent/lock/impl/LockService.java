@@ -72,7 +72,7 @@ public final class LockService implements PartitionAwareSpiService {
 
         final int partitionId = partitionService.getPartitionId(config.name);
         final LockSector sector = sectors[partitionId];
-        final long id = sector.createCell(config);
+        final long id = sector.hz_createCell(config);
         return new LockProxy(sector, config.name, id);
     }
 

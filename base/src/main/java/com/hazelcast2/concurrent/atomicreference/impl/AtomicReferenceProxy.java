@@ -27,42 +27,42 @@ public class AtomicReferenceProxy<E> implements IAtomicReference<E> {
 
     @Override
     public E get() {
-        return (E) sector.doGet(id);
+        return (E) sector.hz_get(id);
     }
 
     @Override
     public Future<E> asyncGet() {
-        return (Future<E>) sector.asyncDoGet(id);
+        return (Future<E>) sector.hz_asyncGet(id);
     }
 
     @Override
     public boolean isNull() {
-        return sector.doIsNull(id);
+        return sector.hz_isNull(id);
     }
 
     @Override
     public Future<Boolean> asyncIsNull() {
-        return sector.asyncDoIsNull(id);
+        return sector.hz_asyncIsNull(id);
     }
 
     @Override
     public void set(E update) {
-        sector.doSet(id, update);
+        sector.hz_set(id, update);
     }
 
     @Override
     public Future<Void> asyncSet(E update) {
-        return sector.asyncDoSet(id, update);
+        return sector.hz_asyncSet(id, update);
     }
 
     @Override
     public boolean compareAndSet(E expect, E update) {
-        return sector.doCompareAndSet(id, expect, update);
+        return sector.hz_compareAndSet(id, expect, update);
     }
 
     @Override
     public Future<Boolean> asyncCompareAndSet(E expect, E update) {
-        return sector.asyncDoCompareAndSet(id, expect, update);
+        return sector.hz_asyncCompareAndSet(id, expect, update);
     }
 
     @Override
@@ -72,12 +72,12 @@ public class AtomicReferenceProxy<E> implements IAtomicReference<E> {
 
     @Override
     public void destroy() {
-        sector.doDestroy(id);
+        sector.hz_destroy(id);
     }
 
     @Override
     public boolean isDestroyed() {
-        return sector.doIsDestroyed(id) != 1;
+        return sector.hz_isDestroyed(id) != 1;
     }
 
     @Override

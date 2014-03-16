@@ -31,7 +31,7 @@ public class MapProxy implements IMap {
         }
 
         MapSector sector = getSector(key);
-        return sector.doGet(key);
+        return sector.hz_get(key);
     }
 
     @Override
@@ -41,7 +41,7 @@ public class MapProxy implements IMap {
         }
 
         MapSector sector = getSector(key);
-        sector.doSet(key, value);
+        sector.hz_set(key, value);
     }
 
     public MapSector getSector(String key) {

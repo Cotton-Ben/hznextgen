@@ -23,6 +23,8 @@ public abstract class BooleanSector extends Sector {
         super(sectorSettings);
     }
 
+    public abstract long hz_createCell(AtomicBooleanConfig config);
+
     @SectorOperation
     public long createCell(AtomicBooleanConfig config) {
         Long found = cellsId.get(config.name);
@@ -52,7 +54,7 @@ public abstract class BooleanSector extends Sector {
     //                      destroy
     // ==================================================================================
 
-    public abstract void doDestroy(long id);
+    public abstract void hz_destroy(long id);
 
     @SectorOperation
     public void destroy(long id) {
@@ -64,7 +66,7 @@ public abstract class BooleanSector extends Sector {
         cellsId.remove(cell.config.name);
     }
 
-    public abstract long doIsDestroyed(long id);
+    public abstract long hz_isDestroyed(long id);
 
     @SectorOperation(readonly = true)
     public long isDestroyed(long id) {
@@ -76,9 +78,9 @@ public abstract class BooleanSector extends Sector {
     //                      get
     // ==================================================================================
 
-    public abstract boolean doGet(long id);
+    public abstract boolean hz_get(long id);
 
-    public abstract Future<Boolean> asyncDoGet(long id);
+    public abstract Future<Boolean> hz_asyncGet(long id);
 
     @SectorOperation(readonly = true,cellbased = true)
     public boolean get(BooleanCell cell) {
@@ -89,9 +91,9 @@ public abstract class BooleanSector extends Sector {
     //                      set
     // ==================================================================================
 
-    public abstract boolean doSet(long id, boolean update);
+    public abstract boolean hz_set(long id, boolean update);
 
-    public abstract Future<Boolean> asyncDoSet(long id, boolean update);
+    public abstract Future<Boolean> hz_asyncSet(long id, boolean update);
 
     @SectorOperation(cellbased = true)
     public boolean set(BooleanCell cell, boolean update) {
@@ -104,9 +106,9 @@ public abstract class BooleanSector extends Sector {
     //                      compareAndSet
     // ==================================================================================
 
-    public abstract boolean doCompareAndSet(long id, boolean old, boolean update);
+    public abstract boolean hz_compareAndSet(long id, boolean old, boolean update);
 
-    public abstract Future<Boolean> asyncDoCompareAndSet(long id, boolean old, boolean update);
+    public abstract Future<Boolean> hz_asyncCompareAndSet(long id, boolean old, boolean update);
 
     @SectorOperation(cellbased = true)
     public boolean compareAndSet(BooleanCell cell, boolean old, boolean update) {

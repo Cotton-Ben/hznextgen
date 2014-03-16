@@ -28,52 +28,52 @@ public class AtomicLongProxy implements IAtomicLong {
 
     @Override
     public long get() {
-        return sector.doGet(id);
+        return sector.hz_get(id);
     }
 
     @Override
     public Future<Long> asyncGet() {
-        return sector.asyncDoGet(id);
+        return sector.hz_asyncGet(id);
     }
 
     @Override
     public void set(long newValue) {
-        sector.doSet(id, newValue);
+        sector.hz_set(id, newValue);
     }
 
     @Override
     public Future<Void> asyncSet(long update) {
-        return sector.asyncDoSet(id, update);
+        return sector.hz_asyncSet(id, update);
     }
 
     @Override
     public void inc() {
-        sector.doInc(id);
+        sector.hz_inc(id);
     }
 
     @Override
     public Future<Void> asyncInc() {
-        return sector.asyncDoInc(id);
+        return sector.hz_asyncInc(id);
     }
 
     @Override
     public boolean compareAndSet(long expect, long update) {
-        return sector.doCompareAndSet(id, expect, update);
+        return sector.hz_compareAndSet(id, expect, update);
     }
 
     @Override
     public Future<Boolean> asyncCompareAndSet(long expect, long update) {
-        return sector.asyncDoCompareAndSet(id, expect, update);
+        return sector.hz_asyncCompareAndSet(id, expect, update);
     }
 
     @Override
     public long apply(LongFunction f) {
-        return sector.doApply(id, f);
+        return sector.hz_apply(id, f);
     }
 
     @Override
     public Future<Long> asyncApply(LongFunction f) {
-        return sector.asyncDoApply(id, f);
+        return sector.hz_asyncApply(id, f);
     }
 
     @Override
@@ -83,22 +83,22 @@ public class AtomicLongProxy implements IAtomicLong {
 
     @Override
     public void alter(LongFunction f) {
-        sector.doAlter(id, f);
+        sector.hz_alter(id, f);
     }
 
     @Override
     public Future<Void> asyncAlter(LongFunction f) {
-        return sector.asyncDoAlter(id, f);
+        return sector.hz_asyncAlter(id, f);
     }
 
     @Override
     public void destroy() {
-        sector.doDestroy(id);
+        sector.hz_destroy(id);
     }
 
     @Override
     public boolean isDestroyed() {
-        return sector.doIsDestroyed(id)!=1;
+        return sector.hz_isDestroyed(id)!=1;
     }
 
     @Override

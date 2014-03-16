@@ -35,7 +35,7 @@ public abstract class LongSector extends Sector {
         return cell;
     }
 
-    public abstract long doCreateCell(AtomicLongConfig config);
+    public abstract long hz_createCell(AtomicLongConfig config);
 
     @SectorOperation
     public long createCell(AtomicLongConfig config) {
@@ -56,7 +56,7 @@ public abstract class LongSector extends Sector {
     //                      destroy
     // ==================================================================================
 
-    public abstract void doDestroy(long id);
+    public abstract void hz_destroy(long id);
 
     @SectorOperation
     public void destroy(long id) {
@@ -68,7 +68,7 @@ public abstract class LongSector extends Sector {
         cellsId.remove(cell.config.name);
     }
 
-    public abstract long doIsDestroyed(long id);
+    public abstract long hz_isDestroyed(long id);
 
     @SectorOperation(readonly = true)
     public long isDestroyed(long id) {
@@ -81,9 +81,9 @@ public abstract class LongSector extends Sector {
     // ==================================================================================
 
 
-    public abstract long doGet(long id);
+    public abstract long hz_get(long id);
 
-    public abstract Future<Long> asyncDoGet(long id);
+    public abstract Future<Long> hz_asyncGet(long id);
 
     @SectorOperation(readonly = true,cellbased = true)
     public long get(LongCell cell) {
@@ -95,9 +95,9 @@ public abstract class LongSector extends Sector {
     // ==================================================================================
 
 
-    public abstract void doSet(long id, long update);
+    public abstract void hz_set(long id, long update);
 
-    public abstract Future<Void> asyncDoSet(long id, long update);
+    public abstract Future<Void> hz_asyncSet(long id, long update);
 
     @SectorOperation(cellbased = true)
     public void set(LongCell cell, long update) {
@@ -110,9 +110,9 @@ public abstract class LongSector extends Sector {
     // ==================================================================================
 
 
-    public abstract void doInc(long id);
+    public abstract void hz_inc(long id);
 
-    public abstract Future<Void> asyncDoInc(long id);
+    public abstract Future<Void> hz_asyncInc(long id);
 
     @SectorOperation(cellbased = true)
     public void inc(LongCell cell) {
@@ -124,9 +124,9 @@ public abstract class LongSector extends Sector {
     // ==================================================================================
 
 
-    public abstract boolean doCompareAndSet(long id, long expect, long update);
+    public abstract boolean hz_compareAndSet(long id, long expect, long update);
 
-    public abstract Future<Boolean> asyncDoCompareAndSet(long id, long expect, long update);
+    public abstract Future<Boolean> hz_asyncCompareAndSet(long id, long expect, long update);
 
     @SectorOperation(cellbased = true)
     public boolean compareAndSet(LongCell cell, long expect, long update) {
@@ -142,9 +142,9 @@ public abstract class LongSector extends Sector {
     //                      apply
     // ==================================================================================
 
-    public abstract long doApply(long id, LongFunction f);
+    public abstract long hz_apply(long id, LongFunction f);
 
-    public abstract Future<Long> asyncDoApply(long id, LongFunction f);
+    public abstract Future<Long> hz_asyncApply(long id, LongFunction f);
 
     @SectorOperation(cellbased = true, readonly = true)
     public long apply(LongCell cell, LongFunction f) {
@@ -155,9 +155,9 @@ public abstract class LongSector extends Sector {
     //                      alter
     // ==================================================================================
 
-    public abstract void doAlter(long id, LongFunction f);
+    public abstract void hz_alter(long id, LongFunction f);
 
-    public abstract Future<Void> asyncDoAlter(long id, LongFunction f);
+    public abstract Future<Void> hz_asyncAlter(long id, LongFunction f);
 
     @SectorOperation(cellbased = true)
     public void alter(LongCell cell, LongFunction f) {

@@ -21,7 +21,7 @@ public abstract class MapSector extends Sector {
     //                      get
     // ==================================================================================
 
-    public abstract String doGet(String key);
+    public abstract String hz_get(String key);
 
     @SectorOperation(readonly = true)
     public String get(String key) {
@@ -32,7 +32,7 @@ public abstract class MapSector extends Sector {
     //                      set
     // ==================================================================================
 
-    public abstract void doSet(String key, String value);
+    public abstract void hz_set(String key, String value);
 
     @SectorOperation
     public void set(String key, String value) {

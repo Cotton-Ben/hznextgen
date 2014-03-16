@@ -22,6 +22,8 @@ public abstract class LockSector extends Sector {
         super(settings);
     }
 
+    public abstract long hz_createCell(LockConfig config);
+
     @SectorOperation
     public long createCell(LockConfig config) {
         Long found = cellsId.get(config.name);
@@ -51,7 +53,7 @@ public abstract class LockSector extends Sector {
     //                      destroy
     // ==================================================================================
 
-    public abstract void doDestroy(long id);
+    public abstract void hz_destroy(long id);
 
     @SectorOperation
     public void destroy(long id) {
@@ -63,7 +65,7 @@ public abstract class LockSector extends Sector {
         cellsId.remove(cell.config.name);
     }
 
-    public abstract long doIsDestroyed(long id);
+    public abstract long hz_isDestroyed(long id);
 
     @SectorOperation(readonly = true)
     public long isDestroyed(long id) {
@@ -74,7 +76,7 @@ public abstract class LockSector extends Sector {
     //                      isLocked
     // ==================================================================================
 
-    public abstract boolean doIsLocked(long id, long threadId);
+    public abstract boolean hz_isLocked(long id, long threadId);
 
     @SectorOperation(cellbased = true, readonly = true)
     public boolean isLocked(LockCell cell, long threadId) {
@@ -86,7 +88,7 @@ public abstract class LockSector extends Sector {
     //                      tryLock
     // ==================================================================================
 
-    public abstract boolean doTryLock(long id, long threadId);
+    public abstract boolean hz_tryLock(long id, long threadId);
 
     @SectorOperation(cellbased = true)
     public boolean tryLock(LockCell cell, long threadId) {
@@ -102,7 +104,7 @@ public abstract class LockSector extends Sector {
     //                      unlock
     // ==================================================================================
 
-    public abstract void doUnlock(long id, long threadId);
+    public abstract void hz_unlock(long id, long threadId);
 
     @SectorOperation(cellbased = true)
     public void unlock(LockCell cell, long threadId) {
@@ -117,7 +119,7 @@ public abstract class LockSector extends Sector {
         cell.lockOwnerThreadId = -1;
     }
 
-    public abstract void doLock(long id, long threadId);
+    public abstract void hz_lock(long id, long threadId);
 
     @SectorOperation(cellbased = true)
     public void lock(LockCell cell, long threadId){
@@ -129,7 +131,7 @@ public abstract class LockSector extends Sector {
         //todo:
         //we need to have the call id, so we can notify
         //we need to have the endpoint, so we can notify
-        //we need to prevent that the doLock method is going to signal the caller
+        //we need to prevent that the hz_lock method is going to signal the caller
         throw new UnsupportedOperationException();
     }
 }

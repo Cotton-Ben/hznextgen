@@ -72,7 +72,7 @@ public final class AtomicReferenceService implements PartitionAwareSpiService {
 
         final int partitionId = partitionService.getPartitionId(config.name);
         final ReferenceSector sector = sectors[partitionId];
-        final long id = sector.createCell(config);
+        final long id = sector.hz_createCell(config);
         return new AtomicReferenceProxy(sector, config.name, id);
     }
 

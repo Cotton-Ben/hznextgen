@@ -28,42 +28,42 @@ public class AtomicBooleanProxy implements IAtomicBoolean {
 
     @Override
     public boolean get() {
-        return sector.doGet(id);
+        return sector.hz_get(id);
     }
 
     @Override
     public Future<Boolean> asyncGet() {
-        return sector.asyncDoGet(id);
+        return sector.hz_asyncGet(id);
     }
 
     @Override
     public boolean set(boolean update) {
-        return sector.doSet(id, update);
+        return sector.hz_set(id, update);
     }
 
     @Override
     public Future<Boolean> asyncSet(boolean update) {
-        return sector.asyncDoSet(id, update);
+        return sector.hz_asyncSet(id, update);
     }
 
     @Override
     public boolean compareAndSet(boolean old, boolean update) {
-        return sector.doCompareAndSet(id, old, update);
+        return sector.hz_compareAndSet(id, old, update);
     }
 
     @Override
     public Future<Boolean> asyncCompareAndSet(boolean old, boolean update) {
-        return sector.asyncDoCompareAndSet(id, old, update);
+        return sector.hz_asyncCompareAndSet(id, old, update);
     }
 
     @Override
     public void destroy() {
-        sector.doDestroy(id);
+        sector.hz_destroy(id);
     }
 
     @Override
     public boolean isDestroyed() {
-        return sector.doIsDestroyed(id)!=1;
+        return sector.hz_isDestroyed(id)!=1;
     }
 
     @Override

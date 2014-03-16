@@ -73,7 +73,7 @@ public final class AtomicBooleanService implements PartitionAwareSpiService {
 
         final int partitionId = partitionService.getPartitionId(config.name);
         final BooleanSector sector = sectors[partitionId];
-        final long id = sector.createCell(config);
+        final long id = sector.hz_createCell(config);
         return new AtomicBooleanProxy(sector, config.name, id);
     }
 

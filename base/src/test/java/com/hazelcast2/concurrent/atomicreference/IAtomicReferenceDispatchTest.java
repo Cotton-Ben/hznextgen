@@ -39,7 +39,7 @@ public class IAtomicReferenceDispatchTest extends HazelcastTestSupport {
         ByteBuffer b = ByteBuffer.allocate(1000);
         b.putShort(hz.getAtomicReferenceService().getServiceId());
         b.putInt(ref.getSector().getPartitionId());
-        b.putShort(GeneratedReferenceSector.FUNCTION_doSet1);
+        b.putShort(GeneratedReferenceSector.FUNCTION_hz_set1);
         b.putLong(ref.getId());
         b.putLong(0);//call-id
         final String result = "foobar";

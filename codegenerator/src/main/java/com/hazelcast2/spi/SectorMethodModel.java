@@ -13,6 +13,11 @@ public class SectorMethodModel {
     public boolean cellbased = false;
     //useful while generating code. Has no other meaning then to be able to display some text in generated code.
     public String debug = "";
+    public String asyncName;
+
+    public String getAsyncName(){
+        return asyncName;
+    }
 
     public boolean isReadonly() {
         return readonly;
@@ -220,10 +225,6 @@ public class SectorMethodModel {
             }
         }
         return sb.toString();
-    }
-
-    public String getAsyncName() {
-        return "async" + SectorCodeGenerator.capitalizeFirstLetter(getName());
     }
 
     public String getReturnTypeAsObject() {
