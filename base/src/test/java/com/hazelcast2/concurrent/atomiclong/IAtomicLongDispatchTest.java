@@ -35,7 +35,7 @@ public class IAtomicLongDispatchTest extends HazelcastTestSupport {
         ByteBuffer b = ByteBuffer.allocate(1000);
         b.putShort(hz.getAtomicLongService().getServiceId());
         b.putInt(atomicLong.getSector().getPartitionId());
-        b.putShort(GeneratedLongSector.FUNCTION_hz_inc0);
+        b.putShort(GeneratedLongSector.FUNCTION_hz_inc1);
         b.putLong(atomicLong.getId());
         b.putLong(Long.MIN_VALUE);//call-id
 
@@ -57,7 +57,7 @@ public class IAtomicLongDispatchTest extends HazelcastTestSupport {
         ByteBuffer b = ByteBuffer.allocate(1000);
         b.putShort(hz.getAtomicLongService().getServiceId());
         b.putInt(atomicLong.getSector().getPartitionId());
-        b.putShort(GeneratedLongSector.FUNCTION_hz_set1);
+        b.putShort(GeneratedLongSector.FUNCTION_hz_set2);
         b.putLong(atomicLong.getId());
         b.putLong(Long.MIN_VALUE);//call-id
         b.putLong(10);

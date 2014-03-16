@@ -10,9 +10,7 @@ import javax.lang.model.element.*;
 import javax.tools.JavaFileObject;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @SupportedAnnotationTypes("com.hazelcast2.spi.SectorClass")
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
@@ -71,33 +69,71 @@ public class SectorCodeGenerator extends AbstractProcessor {
 
                 int argCount = methodElement.getParameters().size();
 
-                SectorMethodModel method = new SectorMethodModel();
+                SectorMethod method = new SectorMethod();
                 clazz.methods.add(method);
 
                 boolean cellbased = operationAnnotation.cellbased();
                 method.cellbased = cellbased;
                 method.name = "hz_" + methodName;
-                method.asyncName = "hz_async"+capitalizeFirstLetter(methodName);
+
+                AsyncMethod asyncMethod = new AsyncMethod();
+                method.asyncMethod = asyncMethod;
+                method.originalMethod = buildOriginalMethod(methodElement);
+                asyncMethod.name = "hz_async" + capitalizeFirstLetter(methodName);
+                asyncMethod.returnType = "InvocationFuture";
+
+
                 method.returnType = methodElement.getReturnType().toString();
                 method.invocationClassName = capitalizeFirstLetter(methodName) + argCount + "Invocation";
                 method.targetMethod = methodName;
                 method.readonly = operationAnnotation.readonly();
-                method.functionId =clazz.methods.size();
+                method.functionId = clazz.methods.size();
 
-                int k = 0;
+                List<FormalArgument> args = new LinkedList<>();
+
                 for (VariableElement variableElement : methodElement.getParameters()) {
-                    if (k > 0 || !cellbased) {
-                        method.args.add(variableElement.asType().toString());
+                    FormalArgument formalArgument = new FormalArgument();
+                    if (cellbased && args.isEmpty()) {
+                        formalArgument.name = "id";
+                        formalArgument.type = "long";
+                    } else {
+                        formalArgument.name = "arg" + (args.size() + 1);
+                        formalArgument.type = variableElement.asType().toString();
                     }
-                    k++;
+                    args.add(formalArgument);
                 }
 
 
+                method.formalArguments = args;
+
+
+                asyncMethod.formalArguments = args;
             } else if (methodElement.getSimpleName().toString().equals("loadCell")) {
                 clazz.cellName = methodElement.getReturnType().toString();
             }
         }
         return clazz;
+    }
+
+    public OriginalMethod buildOriginalMethod(ExecutableElement methodElement) {
+        OriginalMethod method = new OriginalMethod();
+        method.returnType = methodElement.getReturnType().toString();
+        method.name = methodElement.getSimpleName().toString();
+
+        List<FormalArgument> args = method.formalArguments;
+        SectorOperation operationAnnotation = methodElement.getAnnotation(SectorOperation.class);
+
+        for (VariableElement variableElement : methodElement.getParameters()) {
+            FormalArgument formalArgument = new FormalArgument();
+            if (operationAnnotation.cellbased() && args.isEmpty()) {
+                formalArgument.name = "cell";
+            } else {
+                formalArgument.name = "arg" + (args.size() + 1);
+            }
+            formalArgument.type = variableElement.asType().toString();
+            args.add(formalArgument);
+        }
+        return method;
     }
 
     public void generate(TypeElement classElement) {

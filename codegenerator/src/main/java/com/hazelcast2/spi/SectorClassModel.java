@@ -8,7 +8,7 @@ public class SectorClassModel {
     public String name;
     public String superName;
     public String packageName;
-    public final List<SectorMethodModel> methods = new LinkedList<>();
+    public final List<SectorMethod> methods = new LinkedList<>();
     public String cellName;
 
     public String getCellName() {
@@ -27,7 +27,7 @@ public class SectorClassModel {
         return packageName;
     }
 
-    public List<SectorMethodModel> getMethods() {
+    public List<SectorMethod> getMethods() {
         return methods;
     }
 }

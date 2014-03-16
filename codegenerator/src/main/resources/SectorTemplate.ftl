@@ -19,19 +19,96 @@ public final class ${class.name} extends ${class.superName} {
     //                      ${method.name}
     // ===================================================================================================
 
+    <@renderBaseMethod method/>
+
+    <@renderAsyncMethod method method.asyncMethod/>
+
+    <@renderDeserializeAndInvoke method/>
+
+    <@renderRemoteInvokeMethod method/>
+
+</#list>
+
+    @Override
+    public void process() {
+        long consumerSeq = conSeq.get();
+        for (; ; ) {
+            final long prodSeq = getSequence(this.prodSeq.get());
+            final long capacity = prodSeq - consumerSeq;
+            if (capacity == 0) {
+                if (unschedule()) {
+                    return;
+                }
+            } else {
+                final InvocationSlot invocation = getSlot(consumerSeq);
+                invocation.awaitPublication(consumerSeq);
+                if(invocation.bytes == null){
+                    invoke(invocation);
+                }else{
+                    deserializeAndInvoke(invocation);
+                }
+                invocation.clear();
+                consumerSeq++;
+                this.conSeq.set(consumerSeq);
+            }
+        }
+    }
+
+    private void invoke(final InvocationSlot invocation) {
+        try{
+            switch (invocation.functionId) {
+<#list class.methods as method>
+                case ${method.functionConstantName}:{
     <#if method.cellbased>
-    public ${method.returnType} ${method.name}(final long id${method.trailingComma}${method.formalArguments}) {
-    <#else>
-    public ${method.returnType} ${method.name}(${method.formalArguments}) {
+                        final ${class.cellName} cell = loadCell(invocation.id);
     </#if>
+    <#if method.voidReturnType>
+                        ${method.targetMethod}(${method.invocationToArgs});
+                        invocation.invocationFuture.setVoidResponse();
+     <#else>
+                        final ${method.returnType} result = ${method.targetMethod}(${method.invocationToArgs});
+                        invocation.invocationFuture.setResponse(result);
+    </#if>
+                    }
+                    break;
+</#list>
+                default:
+                    throw new IllegalStateException("Unrecognized function:" + invocation.functionId);
+            }
+        } catch(Exception e) {
+            invocation.invocationFuture.setResponseException(e);
+        }
+    }
+
+    private void deserializeAndInvoke(final InvocationSlot invocation){
+        final short functionId = IOUtils.readShort(invocation.bytes, 6);
+
+        try{
+            switch (functionId) {
+<#list class.methods as method>
+                case ${method.functionConstantName}:
+                    deserializeAndInvoke_${method.uniqueMethodName}(invocation);
+                    break;
+</#list>
+                default:
+                    throw new IllegalStateException("Unrecognized function:" + functionId);
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+}
+
+<#-- ========================================================================== -->
+<#-- macro renderBaseMethod -->
+<#-- ========================================================================== -->
+
+<#macro renderBaseMethod method>
+    public ${method.returnType} ${method.name}(${method.formalArguments}) {
         final long sequenceAndStatus = claimSlotAndReturnStatus();
 
         if (sequenceAndStatus == CLAIM_SLOT_REMOTE) {
-            <#if method.cellbased>
-            InvocationFuture future = remoteInvoke_${method.name}(id${method.trailingComma}${method.actualArguments});
-            <#else>
             InvocationFuture future = remoteInvoke_${method.name}(${method.actualArguments});
-            </#if>
     <#if method.voidReturnType>
             future.getSafely();
             return;
@@ -49,9 +126,6 @@ public final class ${class.name} extends ${class.superName} {
             final InvocationFuture future = new InvocationFuture(serializationService);
             final InvocationSlot invocation = getSlot(prodSeq);
             invocation.invocationFuture = future;
-    <#if method.cellbased>
-            invocation.id = id;
-    </#if>
             invocation.functionId = ${method.functionConstantName};
             ${method.mapArgsToInvocation}
             invocation.publish(prodSeq);
@@ -71,19 +145,11 @@ public final class ${class.name} extends ${class.superName} {
     </#if>
         try{
     <#if method.voidReturnType>
-        <#if method.cellbased>
-            ${method.targetMethod}(cell ${method.trailingComma}${method.actualArguments});
-        <#else>
-            ${method.targetMethod}(${method.actualArguments});
-        </#if>
+            ${method.originalMethod.name}(${method.originalMethod.actualArguments});
             success = true;
             process();
     <#else>
-            <#if method.cellbased>
-            ${method.returnType} result = ${method.targetMethod}(cell ${method.trailingComma}${method.actualArguments});
-            <#else>
-            ${method.returnType} result = ${method.targetMethod}(${method.actualArguments});
-            </#if>
+            ${method.returnType} result = ${method.originalMethod.name}(${method.originalMethod.actualArguments});
             success = true;
             process();
             return result;
@@ -92,20 +158,48 @@ public final class ${class.name} extends ${class.superName} {
             if(!success) scheduler.schedule(this);
         }
     }
+</#macro>
 
+<#-- ========================================================================== -->
+<#-- macro renderRemoteInvokeMethod -->
+<#-- ========================================================================== -->
+
+<#macro renderRemoteInvokeMethod method>
+    private InvocationFuture remoteInvoke_${method.name}(${method.formalArguments}) {
+        InvocationFuture invocationFuture = new InvocationFuture();
+        try{
+            final long callId = invocationCompletionService.register(invocationFuture);
+            final ByteArrayObjectDataOutput out = new ByteArrayObjectDataOutput(serializationService);
+            out.writeShort(serviceId);
+            out.writeInt(partitionId);
+            out.writeShort(${method.functionConstantName});
     <#if method.cellbased>
-    public InvocationFuture ${method.asyncName}(final long id${method.trailingComma}${method.formalArguments}) {
+            out.writeLong(id);
     <#else>
-    public InvocationFuture ${method.asyncName}(${method.formalArguments}) {
+            //todo: temporary hack to make sure we can deserialize
+            out.writeLong(0);
     </#if>
+            out.writeLong(callId);
+            ${method.serializeArgs}
+            InvocationEndpoint endpoint = endpoints[0];
+            endpoint.send(out.toByteArray());
+        }catch(Exception e){
+            invocationFuture.setResponseException(e);
+        }
+        return invocationFuture;
+    }
+</#macro>
+
+<#-- ========================================================================== -->
+<#-- macro renderAsyncMethod -->
+<#-- ========================================================================== -->
+
+<#macro renderAsyncMethod method asyncMethod>
+    public ${asyncMethod.returnType} ${asyncMethod.name}(${asyncMethod.formalArguments}) {
         final long sequenceAndStatus = claimSlotAndReturnStatus();
 
         if (sequenceAndStatus == CLAIM_SLOT_REMOTE) {
-            <#if method.cellbased>
-            return remoteInvoke_${method.name}(id${method.trailingComma}${method.actualArguments});
-            <#else>
             return remoteInvoke_${method.name}(${method.actualArguments});
-            </#if>
         }
 
         if (sequenceAndStatus == CLAIM_SLOT_NO_CAPACITY) {
@@ -120,9 +214,6 @@ public final class ${class.name} extends ${class.superName} {
         final long prodSeq = getSequence(sequenceAndStatus);
         final InvocationSlot invocation = getSlot(prodSeq);
         invocation.invocationFuture = future;
-    <#if method.cellbased>
-        invocation.id = id;
-    </#if>
         invocation.functionId = ${method.functionConstantName};
         ${method.mapArgsToInvocation}
         invocation.publish(prodSeq);
@@ -130,7 +221,13 @@ public final class ${class.name} extends ${class.superName} {
         if(schedule) scheduler.schedule(this);
         return future;
     }
+</#macro>
 
+<#-- ========================================================================== -->
+<#-- macro renderDeserializeAndInvokeMethod -->
+<#-- ========================================================================== -->
+
+<#macro renderDeserializeAndInvoke method>
     private void deserializeAndInvoke_${method.uniqueMethodName}(final InvocationSlot invocation) throws Exception{
         final byte[] bytes = invocation.bytes;
     <#if method.cellbased>
@@ -143,17 +240,9 @@ public final class ${class.name} extends ${class.superName} {
         final ByteArrayObjectDataInput in = new ByteArrayObjectDataInput(bytes, 24, serializationService);
     </#if>
     <#if method.voidReturnType>
-        <#if method.cellbased>
-        ${method.targetMethod}(cell${method.trailingComma} ${method.deserializedInvocationToArgs});
-        <#else>
         ${method.targetMethod}(${method.deserializedInvocationToArgs});
-        </#if>
     <#else>
-        <#if method.cellbased>
-        final ${method.returnType} result = ${method.targetMethod}(cell${method.trailingComma} ${method.deserializedInvocationToArgs});
-        <#else>
         final ${method.returnType} result = ${method.targetMethod}(${method.deserializedInvocationToArgs});
-        </#if>
     </#if>
 
         final InvocationEndpoint source = invocation.source;
@@ -230,111 +319,4 @@ public final class ${class.name} extends ${class.superName} {
     </#switch>
         }
     }
-
-    <#if method.cellbased>
-    private InvocationFuture remoteInvoke_${method.name}(final long id${method.trailingComma}${method.formalArguments}) {
-    <#else>
-    private InvocationFuture remoteInvoke_${method.name}(${method.formalArguments}) {
-    </#if>
-        InvocationFuture invocationFuture = new InvocationFuture();
-        try{
-            final long callId = invocationCompletionService.register(invocationFuture);
-            ByteArrayObjectDataOutput out = new ByteArrayObjectDataOutput(serializationService);
-            out.writeShort(serviceId);
-            out.writeInt(partitionId);
-            out.writeShort(${method.functionConstantName});
-   <#if method.cellbased>
-            out.writeLong(id);
-   <#else>
-            //todo: temporary hack to make sure we can deserialize
-            out.writeLong(0);
-   </#if>
-            out.writeLong(callId);
-            ${method.argsToSerialize}
-            InvocationEndpoint endpoint = endpoints[0];
-            endpoint.send(out.toByteArray());
-        }catch(Exception e){
-            invocationFuture.setResponseException(e);
-        }
-        return invocationFuture;
-    }
-</#list>
-
-    @Override
-    public void process() {
-        long consumerSeq = conSeq.get();
-        for (; ; ) {
-            final long prodSeq = getSequence(this.prodSeq.get());
-            final long capacity = prodSeq - consumerSeq;
-            if (capacity == 0) {
-                if (unschedule()) {
-                    return;
-                }
-            } else {
-                final InvocationSlot invocation = getSlot(consumerSeq);
-                invocation.awaitPublication(consumerSeq);
-                if(invocation.bytes == null){
-                    invoke(invocation);
-                }else{
-                    deserializeAndInvoke(invocation);
-                }
-                invocation.clear();
-                consumerSeq++;
-                this.conSeq.set(consumerSeq);
-            }
-        }
-    }
-
-    private void invoke(final InvocationSlot invocation) {
-        try{
-            switch (invocation.functionId) {
-<#list class.methods as method>
-                case ${method.functionConstantName}:{
-    <#if method.cellbased>
-                        final ${class.cellName} cell = loadCell(invocation.id);
-        <#if method.voidReturnType>
-                        ${method.targetMethod}(cell ${method.trailingComma}${method.invocationToArgs});
-                        invocation.invocationFuture.setVoidResponse();
-        <#else>
-                        final ${method.returnType} result = ${method.targetMethod}(cell ${method.trailingComma}${method.invocationToArgs});
-                        invocation.invocationFuture.setResponse(result);
-        </#if>
-    <#else>
-        <#if method.voidReturnType>
-                        ${method.targetMethod}(${method.invocationToArgs});
-                        invocation.invocationFuture.setVoidResponse();
-        <#else>
-                        final ${method.returnType} result = ${method.targetMethod}(${method.invocationToArgs});
-                        invocation.invocationFuture.setResponse(result);
-        </#if>
-    </#if>
-                    }
-                    break;
-</#list>
-                default:
-                    throw new IllegalStateException("Unrecognized function:" + invocation.functionId);
-            }
-        } catch(Exception e) {
-            invocation.invocationFuture.setResponseException(e);
-        }
-    }
-
-    private void deserializeAndInvoke(final InvocationSlot invocation){
-        final short functionId = IOUtils.readShort(invocation.bytes, 6);
-
-        try{
-            switch (functionId) {
-<#list class.methods as method>
-                case ${method.functionConstantName}:
-                    deserializeAndInvoke_${method.uniqueMethodName}(invocation);
-                    break;
-</#list>
-                default:
-                    throw new IllegalStateException("Unrecognized function:" + functionId);
-            }
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-    }
-}
-
+</#macro>
