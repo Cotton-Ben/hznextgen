@@ -84,6 +84,16 @@ public class IOUtils {
         return Double.longBitsToDouble(longBits);
     }
 
+    public static void writeFloat(float update, byte[] buffer, int position) {
+        int intBits = Float.floatToIntBits(update);
+        writeInt(intBits, buffer, position);
+    }
+
+    public static float readFloat(byte[] buffer, int position) {
+        int intBits = readInt(buffer, position);
+        return Float.intBitsToFloat(intBits);
+    }
+
     public static String readString(byte[] buffer, int position) {
         int size = readInt(buffer, position);
         throw new UnsupportedOperationException();

@@ -132,4 +132,28 @@ public class IOUtilsTest {
 
         assertEquals(valueLongBits, resultLongBits);
     }
+
+    @Test
+    public void testFloat() {
+        testFloat(0);
+        testFloat(-1);
+        testFloat(-100);
+        testFloat(3.1415926f);
+        testFloat(Float.MIN_VALUE);
+        testFloat(Float.MAX_VALUE);
+        testFloat(3.1415926f);
+        testFloat(100);
+        testFloat(1);
+    }
+
+    public void testFloat(float value) {
+        byte[] buffer = new byte[4];
+        IOUtils.writeFloat(value, buffer, 0);
+
+        float result = IOUtils.readFloat(buffer, 0);
+        int valueBits = Float.floatToIntBits(value);
+        int resultBits = Float.floatToIntBits(result);
+
+        assertEquals(valueBits, resultBits);
+    }
 }
