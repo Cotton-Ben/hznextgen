@@ -29,51 +29,6 @@ public class IAtomicLongTest extends HazelcastTestSupport {
     }
 
     @Test
-    public void getAtomicLong_duplicateRetrieval() {
-        String name = randomString();
-        IAtomicLong long1 = hz.getAtomicLong(name);
-        long1.set(20);
-        IAtomicLong long2 = hz.getAtomicLong(name);
-        assertEquals(20, long2.get());
-    }
-
-    @Test
-    public void construction_withConfigAndNullName() {
-        AtomicLongConfig config = new AtomicLongConfig();
-        config.asyncBackupCount = 1;
-        config.backupCount = 0;
-
-        IAtomicLong atomicLong = hz.getAtomicLong(config);
-        assertNotNull(config.name);
-
-        IAtomicLong found = hz.getAtomicLong(config.name);
-        assertEquals(atomicLong.getId(), found.getId());
-    }
-
-    @Test
-    public void destroy_whenNotDestroyed() {
-        IAtomicLong atomicLong = hz.getAtomicLong(randomString());
-        atomicLong.destroy();
-        assertTrue(atomicLong.isDestroyed());
-    }
-
-    @Test
-    public void destroy_whenAlreadyDestroyed() {
-        IAtomicLong atomicLong = hz.getAtomicLong(randomString());
-        atomicLong.destroy();
-
-        atomicLong.destroy();
-
-        assertTrue(atomicLong.isDestroyed());
-    }
-
-    @Test
-    public void isDestroyed_whenNotDestroyed() {
-        IAtomicLong atomicLong = hz.getAtomicLong(randomString());
-        assertFalse(atomicLong.isDestroyed());
-    }
-
-    @Test
     public void get() {
         IAtomicLong atomicLong = hz.getAtomicLong("foo");
 

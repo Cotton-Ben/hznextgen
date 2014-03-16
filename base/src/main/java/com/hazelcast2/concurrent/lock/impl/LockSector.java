@@ -1,6 +1,5 @@
 package com.hazelcast2.concurrent.lock.impl;
 
-import com.hazelcast2.concurrent.atomicreference.impl.ReferenceCell;
 import com.hazelcast2.concurrent.lock.LockConfig;
 import com.hazelcast2.core.IdNotFoundException;
 import com.hazelcast2.spi.IdGenerator;

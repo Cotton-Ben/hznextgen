@@ -27,50 +27,6 @@ public class IAtomicBooleanTest extends HazelcastTestSupport {
         hz.shutdown();
     }
 
-    @Test
-    public void construction_withConfigAndNullName(){
-        AtomicBooleanConfig config = new AtomicBooleanConfig();
-        config.asyncBackupCount=1;
-        config.backupCount=0;
-
-        IAtomicBoolean atomicBoolean = hz.getAtomicBoolean(config);
-        assertNotNull(config.name);
-
-        IAtomicBoolean found = hz.getAtomicBoolean(config.name);
-        assertEquals(atomicBoolean.getId(), found.getId());
-    }
-
-    @Test
-    public void destroy_whenNotDestroyed() {
-        IAtomicBoolean ref = hz.getAtomicBoolean(randomString());
-        ref.destroy();
-        assertTrue(ref.isDestroyed());
-    }
-
-    @Test
-    public void destroy_whenAlreadyDestroyed() {
-        IAtomicBoolean ref = hz.getAtomicBoolean(randomString());
-        ref.destroy();
-
-        ref.destroy();
-
-        assertTrue(ref.isDestroyed());
-    }
-
-    @Test
-    public void isDestroyed_whenNotDestroyed() {
-        IAtomicBoolean ref = hz.getAtomicBoolean(randomString());
-        assertFalse(ref.isDestroyed());
-    }
-
-    @Test
-    public void getAtomicBoolean_duplicateRetrieval(){
-        String  name = randomString();
-        IAtomicBoolean boolean1 = hz.getAtomicBoolean(name);
-        boolean1.set(true);
-        IAtomicBoolean boolean2 = hz.getAtomicBoolean(name);
-        assertTrue(boolean2.get());
-    }
 
     @Test
     public void get() {
