@@ -4,8 +4,6 @@ import com.hazelcast2.spi.*;
 import com.hazelcast2.internal.util.*;
 import com.hazelcast2.internal.nio.*;
 
-import java.util.concurrent.Future;
-
 public final class ${class.name} extends ${class.superName} {
 
 <#list class.methods as method>
@@ -288,7 +286,6 @@ public final class ${class.name} extends ${class.superName} {
     }
 
     private void invoke(final InvocationSlot invocation) {
-
         try{
             switch (invocation.functionId) {
 <#list class.methods as method>
@@ -303,7 +300,6 @@ public final class ${class.name} extends ${class.superName} {
                         invocation.invocationFuture.setResponse(result);
         </#if>
     <#else>
-
         <#if method.voidReturnType>
                         ${method.targetMethod}(${method.invocationToArgs});
                         invocation.invocationFuture.setVoidResponse();
