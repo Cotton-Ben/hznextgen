@@ -1,28 +1,22 @@
 package com.hazelcast2.spi;
 
-import java.util.LinkedList;
-import java.util.List;
-
 public class SectorMethod extends AbstractMethod {
 
     public AsyncMethod asyncMethod;
-
     public String targetMethod;
     public String invocationClassName;
     public boolean readonly = false;
     public boolean cellbased = false;
     public OriginalMethod originalMethod;
+    public int functionId;
 
     public AsyncMethod getAsyncMethod() {
         return asyncMethod;
     }
 
-
     public boolean isReadonly() {
         return readonly;
     }
-
-    public int functionId;
 
     public int getFunctionId() {
         return functionId;
@@ -177,30 +171,15 @@ public class SectorMethod extends AbstractMethod {
         return sb.toString();
     }
 
-    public List<String> getPrimitiveArgs() {
-        List<String> result = new LinkedList<>();
-        for (String arg : getArgs()) {
-            if (isPrimtive(arg)) {
-                result.add(arg);
-            }
-        }
-        return result;
-    }
-
     public String getFunctionConstantName() {
-        return "FUNCTION_" + name + getArgs().size();
+        return "FUNCTION_" + name + formalArguments.size();
     }
 
     public String getUniqueMethodName() {
-        return targetMethod + getArgs().size();
+        return targetMethod + formalArguments.size();
     }
 
-    public String getTrailingComma() {
-        return getArgs().size() == 0 ? "" : ", ";
-    }
-
-
-    public String getReturnTypeAsObject() {
+     public String getReturnTypeAsObject() {
         if ("void".equals(returnType)) {
             return "Void";
         } else if ("long".equals(returnType)) {
@@ -224,19 +203,9 @@ public class SectorMethod extends AbstractMethod {
         }
     }
 
-
-    public List<String> getArgs() {
-        List<String> args = new LinkedList<>();
-        for (FormalArgument arg : formalArguments) {
-            args.add(arg.getType());
-        }
-        return args;
-    }
-
     public boolean isVoidReturnType() {
         return "void".equals(returnType);
     }
-
 
     public String getTargetMethod() {
         return targetMethod;
