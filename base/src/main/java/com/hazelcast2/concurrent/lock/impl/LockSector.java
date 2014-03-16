@@ -1,6 +1,8 @@
 package com.hazelcast2.concurrent.lock.impl;
 
+import com.hazelcast2.concurrent.atomicreference.impl.ReferenceCell;
 import com.hazelcast2.concurrent.lock.LockConfig;
+import com.hazelcast2.core.IdNotFoundException;
 import com.hazelcast2.spi.IdGenerator;
 import com.hazelcast2.spi.Sector;
 import com.hazelcast2.spi.SectorClass;
@@ -37,7 +39,13 @@ public abstract class LockSector extends Sector {
     }
 
     public LockCell loadCell(long id) {
-        return cells.get(id);
+        LockCell cell = cells.get(id);
+        if(cell == null){
+            throw new IdNotFoundException("Can't find LockCell for id:"+id+" partition:"+partitionId+". " +
+                    "It is very likely that the ILock has been destroyed.");
+        }
+
+        return cell;
     }
 
     // ==================================================================================

@@ -1,7 +1,7 @@
 package com.hazelcast2.spi;
 
-import com.hazelcast2.serialization.SerializationService;
 import com.hazelcast2.internal.util.Sequence;
+import com.hazelcast2.serialization.SerializationService;
 
 import java.util.concurrent.Future;
 

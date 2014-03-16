@@ -1,6 +1,7 @@
 package com.hazelcast2.concurrent.atomicboolean.impl;
 
 import com.hazelcast2.concurrent.atomicboolean.AtomicBooleanConfig;
+import com.hazelcast2.core.IdNotFoundException;
 import com.hazelcast2.spi.IdGenerator;
 import com.hazelcast2.spi.Sector;
 import com.hazelcast2.spi.SectorClass;
@@ -38,7 +39,13 @@ public abstract class BooleanSector extends Sector {
     }
 
     public BooleanCell loadCell(long id) {
-        return cells.get(id);
+        BooleanCell cell = cells.get(id);
+        if(cell == null){
+           throw new IdNotFoundException("Can't find BooleanCell for id:"+id+" partition:"+partitionId+". " +
+                   "It is very likely that the IAtomicBoolean has been destroyed.");
+        }
+
+        return cell;
     }
 
     // ==================================================================================

@@ -1,6 +1,8 @@
 package com.hazelcast2.concurrent.atomicreference.impl;
 
+import com.hazelcast2.concurrent.atomiclong.impl.LongCell;
 import com.hazelcast2.concurrent.atomicreference.AtomicReferenceConfig;
+import com.hazelcast2.core.IdNotFoundException;
 import com.hazelcast2.spi.IdGenerator;
 import com.hazelcast2.spi.Sector;
 import com.hazelcast2.spi.SectorClass;
@@ -39,7 +41,13 @@ public abstract class ReferenceSector extends Sector {
     }
 
     public ReferenceCell loadCell(long id) {
-        return cells.get(id);
+        ReferenceCell cell = cells.get(id);
+        if(cell == null){
+            throw new IdNotFoundException("Can't find ReferenceCell for id:"+id+" partition:"+partitionId+". " +
+                    "It is very likely that the IAtomicReference has been destroyed.");
+        }
+
+        return cell;
     }
 
     // ==================================================================================

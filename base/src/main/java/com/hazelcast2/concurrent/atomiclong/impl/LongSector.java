@@ -1,6 +1,7 @@
 package com.hazelcast2.concurrent.atomiclong.impl;
 
 import com.hazelcast2.concurrent.atomiclong.AtomicLongConfig;
+import com.hazelcast2.core.IdNotFoundException;
 import com.hazelcast2.core.LongFunction;
 import com.hazelcast2.spi.IdGenerator;
 import com.hazelcast2.spi.Sector;
@@ -25,7 +26,13 @@ public abstract class LongSector extends Sector {
     }
 
     public LongCell loadCell(long id) {
-        return cells.get(id);
+        LongCell cell = cells.get(id);
+        if(cell == null){
+            throw new IdNotFoundException("Can't find LongCell for id:"+id+" partition:"+partitionId+". " +
+                    "It is very likely that the IAtomicLong has been destroyed.");
+        }
+
+        return cell;
     }
 
     public abstract long doCreateCell(AtomicLongConfig config);
