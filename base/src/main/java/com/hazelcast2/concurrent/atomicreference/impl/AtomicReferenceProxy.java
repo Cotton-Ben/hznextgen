@@ -1,6 +1,7 @@
 package com.hazelcast2.concurrent.atomicreference.impl;
 
 import com.hazelcast2.concurrent.atomicreference.IAtomicReference;
+import com.hazelcast2.core.IFunction;
 
 import java.util.concurrent.Future;
 
@@ -23,6 +24,11 @@ public class AtomicReferenceProxy<E> implements IAtomicReference<E> {
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public long getId() {
+        return id;
     }
 
     @Override
@@ -66,8 +72,13 @@ public class AtomicReferenceProxy<E> implements IAtomicReference<E> {
     }
 
     @Override
-    public long getId() {
-        return id;
+    public <R> R apply(IFunction<E, R> f) {
+        return (R)sector.hz_apply(id,f);
+    }
+
+    @Override
+    public <R> Future<R> asyncApply(IFunction<E, R> f) {
+        return (Future<R>)sector.hz_asyncApply(id,f);
     }
 
     @Override

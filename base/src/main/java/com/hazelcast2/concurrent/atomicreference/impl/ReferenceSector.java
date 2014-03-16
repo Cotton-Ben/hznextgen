@@ -1,6 +1,7 @@
 package com.hazelcast2.concurrent.atomicreference.impl;
 
 import com.hazelcast2.concurrent.atomicreference.AtomicReferenceConfig;
+import com.hazelcast2.core.IFunction;
 import com.hazelcast2.core.IdNotFoundException;
 import com.hazelcast2.spi.IdGenerator;
 import com.hazelcast2.spi.Sector;
@@ -121,5 +122,16 @@ public abstract class ReferenceSector extends Sector {
 
         cell.value = update;
         return true;
+    }
+
+    // ==================== apply =====================================
+
+    public abstract Object hz_apply(long id, IFunction f);
+
+    public abstract Object hz_asyncApply(long id, IFunction f);
+
+    @SectorOperation(cellbased = true, readonly = true)
+    public Object apply(ReferenceCell cell, IFunction f) {
+        return f.apply(cell.value);
     }
 }
