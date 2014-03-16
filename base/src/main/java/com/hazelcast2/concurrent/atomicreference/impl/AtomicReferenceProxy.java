@@ -5,7 +5,7 @@ import com.hazelcast2.core.IFunction;
 
 import java.util.concurrent.Future;
 
-public class AtomicReferenceProxy<E> implements IAtomicReference<E> {
+public final class AtomicReferenceProxy<E> implements IAtomicReference<E> {
 
     private final ReferenceSector sector;
     private final long id;

@@ -5,7 +5,7 @@ import com.hazelcast2.core.LongFunction;
 
 import java.util.concurrent.Future;
 
-public class AtomicLongProxy implements IAtomicLong {
+public final class AtomicLongProxy implements IAtomicLong {
 
     private final LongSector sector;
     private final long id;

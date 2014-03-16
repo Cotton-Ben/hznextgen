@@ -2,7 +2,7 @@ package com.hazelcast2.map.impl;
 
 import com.hazelcast2.map.IMap;
 
-public class MapProxy implements IMap {
+public final class MapProxy implements IMap {
 
     private final MapStore mapStore;
     private final String name;

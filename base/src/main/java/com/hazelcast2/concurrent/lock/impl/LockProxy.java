@@ -2,7 +2,7 @@ package com.hazelcast2.concurrent.lock.impl;
 
 import com.hazelcast2.concurrent.lock.ILock;
 
-public class LockProxy implements ILock {
+public final class LockProxy implements ILock {
 
     private final LockSector sector;
     private final long id;

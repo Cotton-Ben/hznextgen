@@ -4,7 +4,7 @@ import com.hazelcast2.concurrent.atomicboolean.IAtomicBoolean;
 
 import java.util.concurrent.Future;
 
-public class AtomicBooleanProxy implements IAtomicBoolean {
+public final class AtomicBooleanProxy implements IAtomicBoolean {
 
     private final BooleanSector sector;
     private final long id;
