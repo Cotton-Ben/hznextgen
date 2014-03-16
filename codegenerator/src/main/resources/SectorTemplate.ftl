@@ -26,7 +26,6 @@ public final class ${class.name} extends ${class.superName} {
     <@renderDeserializeAndInvoke method/>
 
     <@renderRemoteInvokeMethod method/>
-
 </#list>
 
     @Override
@@ -235,7 +234,6 @@ public final class ${class.name} extends ${class.superName} {
         final ${class.cellName} cell = loadCell(id);
     </#if>
         final long callId = IOUtils.readLong(bytes, 16);
-
     <#if method.hasOneArgOrMore>
         final ByteArrayObjectDataInput in = new ByteArrayObjectDataInput(bytes, 24, serializationService);
     </#if>
@@ -246,77 +244,77 @@ public final class ${class.name} extends ${class.superName} {
     </#if>
 
         final InvocationEndpoint source = invocation.source;
-        if(source != null){
+        if(source == null) return;
+
     <#switch method.returnType>
         <#case "void">
-            final byte[] buffer = new byte[10];
-            IOUtils.writeShort(invocationCompletionService.getServiceId(), buffer, 0);
-            IOUtils.writeLong(callId, buffer, 2);
-            source.send(buffer);
+        final byte[] buffer = new byte[10];
+        IOUtils.writeShort(invocationCompletionService.getServiceId(), buffer, 0);
+        IOUtils.writeLong(callId, buffer, 2);
+        source.send(buffer);
             <#break>
         <#case "boolean">
-            final byte[] buffer = new byte[11];
-            IOUtils.writeShort(invocationCompletionService.getServiceId(), buffer, 0);
-            IOUtils.writeLong(callId, buffer, 2);
-            IOUtils.writeBoolean(result, buffer, 10);
-            source.send(buffer);
+        final byte[] buffer = new byte[11];
+        IOUtils.writeShort(invocationCompletionService.getServiceId(), buffer, 0);
+        IOUtils.writeLong(callId, buffer, 2);
+        IOUtils.writeBoolean(result, buffer, 10);
+        source.send(buffer);
             <#break>
         <#case "byte">
-            final byte[] buffer = new byte[11];
-            IOUtils.writeShort(invocationCompletionService.getServiceId(), buffer, 0);
-            IOUtils.writeLong(callId, buffer, 2);
-            IOUtils.writeByte(result, buffer, 10);
-            source.send(buffer);
+        final byte[] buffer = new byte[11];
+        IOUtils.writeShort(invocationCompletionService.getServiceId(), buffer, 0);
+        IOUtils.writeLong(callId, buffer, 2);
+        IOUtils.writeByte(result, buffer, 10);
+        source.send(buffer);
             <#break>
         <#case "char">
-            final byte[] buffer = new byte[12];
-            IOUtils.writeShort(invocationCompletionService.getServiceId(), buffer, 0);
-            IOUtils.writeLong(callId, buffer, 2);
-            IOUtils.writeChar(result, buffer, 10);
-            source.send(buffer);
+        final byte[] buffer = new byte[12];
+        IOUtils.writeShort(invocationCompletionService.getServiceId(), buffer, 0);
+        IOUtils.writeLong(callId, buffer, 2);
+        IOUtils.writeChar(result, buffer, 10);
+        source.send(buffer);
             <#break>
         <#case "short">
-            final byte[] buffer = new byte[12];
-            IOUtils.writeShort(invocationCompletionService.getServiceId(), buffer, 0);
-            IOUtils.writeLong(callId, buffer, 2);
-            IOUtils.writeShort(result, buffer, 10);
-            source.send(buffer);
+        final byte[] buffer = new byte[12];
+        IOUtils.writeShort(invocationCompletionService.getServiceId(), buffer, 0);
+        IOUtils.writeLong(callId, buffer, 2);
+        IOUtils.writeShort(result, buffer, 10);
+        source.send(buffer);
             <#break>
         <#case "int">
-            final byte[] buffer = new byte[14];
-            IOUtils.writeShort(invocationCompletionService.getServiceId(), buffer, 0);
-            IOUtils.writeLong(callId, buffer, 2);
-            IOUtils.writeInt(result, buffer, 10);
-            source.send(buffer);
+        final byte[] buffer = new byte[14];
+        IOUtils.writeShort(invocationCompletionService.getServiceId(), buffer, 0);
+        IOUtils.writeLong(callId, buffer, 2);
+        IOUtils.writeInt(result, buffer, 10);
+        source.send(buffer);
             <#break>
         <#case "float">
-            final byte[] buffer = new byte[14];
-            IOUtils.writeShort(invocationCompletionService.getServiceId(), buffer, 0);
-            IOUtils.writeLong(callId, buffer, 2);
-            IOUtils.writeFloat(result, buffer, 10);
-            source.send(buffer);
+        final byte[] buffer = new byte[14];
+        IOUtils.writeShort(invocationCompletionService.getServiceId(), buffer, 0);
+        IOUtils.writeLong(callId, buffer, 2);
+        IOUtils.writeFloat(result, buffer, 10);
+        source.send(buffer);
             <#break>
         <#case "long">
-            final byte[] buffer = new byte[18];
-            IOUtils.writeShort(invocationCompletionService.getServiceId(), buffer, 0);
-            IOUtils.writeLong(callId, buffer, 2);
-            IOUtils.writeLong(result, buffer, 10);
-            source.send(buffer);
+        final byte[] buffer = new byte[18];
+        IOUtils.writeShort(invocationCompletionService.getServiceId(), buffer, 0);
+        IOUtils.writeLong(callId, buffer, 2);
+        IOUtils.writeLong(result, buffer, 10);
+        source.send(buffer);
             <#break>
         <#case "double">
-            final byte[] buffer = new byte[18];
-            IOUtils.writeShort(invocationCompletionService.getServiceId(), buffer, 0);
-            IOUtils.writeLong(callId, buffer, 2);
-            IOUtils.writeLong(result, buffer, 10);
-            source.send(buffer);
+        final byte[] buffer = new byte[18];
+        IOUtils.writeShort(invocationCompletionService.getServiceId(), buffer, 0);
+        IOUtils.writeLong(callId, buffer, 2);
+        IOUtils.writeLong(result, buffer, 10);
+        source.send(buffer);
             <#break>
         <#default>
-            final ByteArrayObjectDataOutput out = new ByteArrayObjectDataOutput(serializationService);
-            out.writeShort(invocationCompletionService.getServiceId());
-            out.writeLong(callId);
-            out.writeObject(result);
-            source.send(out.toByteArray());
+        final ByteArrayObjectDataOutput out = new ByteArrayObjectDataOutput(serializationService);
+        out.writeShort(invocationCompletionService.getServiceId());
+        out.writeLong(callId);
+        out.writeObject(result);
+        source.send(out.toByteArray());
     </#switch>
-        }
     }
 </#macro>
