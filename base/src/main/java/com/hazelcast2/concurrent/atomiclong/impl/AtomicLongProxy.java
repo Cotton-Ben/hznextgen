@@ -27,6 +27,11 @@ public class AtomicLongProxy implements IAtomicLong {
     }
 
     @Override
+    public long getId() {
+        return id;
+    }
+
+    @Override
     public long get() {
         return sector.hz_get(id);
     }
@@ -76,12 +81,7 @@ public class AtomicLongProxy implements IAtomicLong {
         return sector.hz_asyncApply(id, f);
     }
 
-    @Override
-    public long getId() {
-        return id;
-    }
-
-    @Override
+     @Override
     public void alter(LongFunction f) {
         sector.hz_alter(id, f);
     }

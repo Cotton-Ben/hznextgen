@@ -198,7 +198,7 @@ public class SectorMethodModel {
     }
 
     public String getUniqueMethodName() {
-        return name + args.size();
+        return targetMethod + args.size();
     }
 
     public String getTrailingComma() {
