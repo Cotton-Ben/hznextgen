@@ -1,11 +1,74 @@
 package com.hazelcast2.spi;
 
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import java.util.LinkedList;
 import java.util.List;
 
 public class SectorMethod extends AbstractMethod {
+
+    public static class Builder {
+        public ExecutableElement methodElement;
+        public SectorClassModel sectorClassModel;
+        public TypeElement classElement;
+
+        public SectorMethod build() {
+            SectorMethod method = new SectorMethod();
+            String methodName = methodElement.getSimpleName().toString();
+            SectorOperation operationAnnotation = methodElement.getAnnotation(SectorOperation.class);
+            if(operationAnnotation==null){
+                return null;
+            }
+
+            int argCount = methodElement.getParameters().size();
+
+            method.cellbased = operationAnnotation.cellbased();
+            method.name = "hz_" + methodName;
+
+            method.returnType = methodElement.getReturnType().toString();
+            method.invocationClassName = CodeGenerationUtils.capitalizeFirstLetter(methodName) + argCount + "Invocation";
+            method.targetMethod = methodName;
+            method.readonly = operationAnnotation.readonly();
+            method.functionId = sectorClassModel.getMethods().size();
+
+            List<FormalArgument> args = new LinkedList<>();
+
+            for (VariableElement variableElement : methodElement.getParameters()) {
+                FormalArgument formalArgument = new FormalArgument();
+                if (method.cellbased && args.isEmpty()) {
+                    formalArgument.name = "id";
+                    formalArgument.type = "long";
+                } else {
+                    formalArgument.name = "arg" + (args.size() + 1);
+                    formalArgument.type = variableElement.asType().toString();
+                }
+                args.add(formalArgument);
+            }
+
+            method.formalArguments = args;
+
+            buildOriginalMethos(method);
+
+            buildAsyncMethod(method);
+
+            return method;
+        }
+
+        private void buildAsyncMethod(SectorMethod sectorMethod) {
+            AsyncMethod.Builder asyncBuilder = new AsyncMethod.Builder();
+            asyncBuilder.methodElement = methodElement;
+            asyncBuilder.sectorMethod = sectorMethod;
+            asyncBuilder.classElement = classElement;
+            sectorMethod.asyncMethod = asyncBuilder.build();
+        }
+
+        private void buildOriginalMethos(SectorMethod sectorMethod) {
+            OriginalMethod.Builder originalBuilder = new OriginalMethod.Builder();
+            originalBuilder.methodElement = methodElement;
+            sectorMethod.originalMethod = originalBuilder.build();
+        }
+    }
 
     public AsyncMethod asyncMethod;
     public String targetMethod;
@@ -14,42 +77,6 @@ public class SectorMethod extends AbstractMethod {
     public boolean cellbased = false;
     public OriginalMethod originalMethod;
     public int functionId;
-
-    public SectorMethod(ExecutableElement methodElement, SectorClassModel sectorClassModel) {
-        String methodName = methodElement.getSimpleName().toString();
-        SectorOperation operationAnnotation = methodElement.getAnnotation(SectorOperation.class);
-
-        int argCount = methodElement.getParameters().size();
-
-        this.cellbased = operationAnnotation.cellbased();
-        this.name = "hz_" + methodName;
-
-        this.originalMethod = OriginalMethod.build(methodElement);
-
-        this.returnType = methodElement.getReturnType().toString();
-        this.invocationClassName = CodeGenerationUtils.capitalizeFirstLetter(methodName) + argCount + "Invocation";
-        this.targetMethod = methodName;
-        this.readonly = operationAnnotation.readonly();
-        this.functionId = sectorClassModel.getMethods().size();
-
-        List<FormalArgument> args = new LinkedList<>();
-
-        for (VariableElement variableElement : methodElement.getParameters()) {
-            FormalArgument formalArgument = new FormalArgument();
-            if (cellbased && args.isEmpty()) {
-                formalArgument.name = "id";
-                formalArgument.type = "long";
-            } else {
-                formalArgument.name = "arg" + (args.size() + 1);
-                formalArgument.type = variableElement.asType().toString();
-            }
-            args.add(formalArgument);
-        }
-
-        this.formalArguments = args;
-
-        this.asyncMethod = new AsyncMethod(methodElement, this);
-    }
 
     public AsyncMethod getAsyncMethod() {
         return asyncMethod;

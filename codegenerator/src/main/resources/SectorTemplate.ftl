@@ -21,7 +21,9 @@ public final class ${class.name} extends ${class.superName} {
 
     <@renderBaseMethod method/>
 
+    <#if method.asyncMethod??>
     <@renderAsyncMethod method method.asyncMethod/>
+    </#if>
 
     <@renderDeserializeAndInvoke method/>
 
