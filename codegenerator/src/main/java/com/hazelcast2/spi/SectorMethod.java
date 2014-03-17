@@ -1,5 +1,10 @@
 package com.hazelcast2.spi;
 
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.VariableElement;
+import java.util.LinkedList;
+import java.util.List;
+
 public class SectorMethod extends AbstractMethod {
 
     public AsyncMethod asyncMethod;
@@ -9,6 +14,42 @@ public class SectorMethod extends AbstractMethod {
     public boolean cellbased = false;
     public OriginalMethod originalMethod;
     public int functionId;
+
+    public SectorMethod(ExecutableElement methodElement, SectorClassModel sectorClassModel) {
+        String methodName = methodElement.getSimpleName().toString();
+        SectorOperation operationAnnotation = methodElement.getAnnotation(SectorOperation.class);
+
+        int argCount = methodElement.getParameters().size();
+
+        this.cellbased = operationAnnotation.cellbased();
+        this.name = "hz_" + methodName;
+
+        this.originalMethod = OriginalMethod.build(methodElement);
+
+        this.returnType = methodElement.getReturnType().toString();
+        this.invocationClassName = CodeGenerationUtils.capitalizeFirstLetter(methodName) + argCount + "Invocation";
+        this.targetMethod = methodName;
+        this.readonly = operationAnnotation.readonly();
+        this.functionId = sectorClassModel.getMethods().size();
+
+        List<FormalArgument> args = new LinkedList<>();
+
+        for (VariableElement variableElement : methodElement.getParameters()) {
+            FormalArgument formalArgument = new FormalArgument();
+            if (cellbased && args.isEmpty()) {
+                formalArgument.name = "id";
+                formalArgument.type = "long";
+            } else {
+                formalArgument.name = "arg" + (args.size() + 1);
+                formalArgument.type = variableElement.asType().toString();
+            }
+            args.add(formalArgument);
+        }
+
+        this.formalArguments = args;
+
+        this.asyncMethod = new AsyncMethod(methodElement, this);
+    }
 
     public AsyncMethod getAsyncMethod() {
         return asyncMethod;
@@ -179,7 +220,7 @@ public class SectorMethod extends AbstractMethod {
         return targetMethod + formalArguments.size();
     }
 
-     public String getReturnTypeAsObject() {
+    public String getReturnTypeAsObject() {
         if ("void".equals(returnType)) {
             return "Void";
         } else if ("long".equals(returnType)) {
