@@ -26,4 +26,8 @@ public interface IAtomicReference<E> extends DistributedObject {
     <R> R apply(IFunction<E,R> f);
 
     <R> Future<R> asyncApply(IFunction<E,R> f);
+
+    void alter(IFunction<E,E> f);
+
+    Future<Void> asyncAlter(IFunction<E,E> f);
 }

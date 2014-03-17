@@ -134,4 +134,15 @@ public abstract class ReferenceSector extends Sector {
     public Object apply(ReferenceCell cell, IFunction f) {
         return f.apply(cell.value);
     }
+
+    // ==================== alter =====================================
+
+    public abstract Future<Void> hz_asyncAlter(long id, IFunction f);
+
+    public abstract void hz_alter(long id, IFunction f);
+
+    @SectorOperation(cellbased = true)
+    public void alter(ReferenceCell cell, IFunction f) {
+        cell.value = f.apply(cell.value);
+    }
 }

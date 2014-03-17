@@ -73,12 +73,22 @@ public final class AtomicReferenceProxy<E> implements IAtomicReference<E> {
 
     @Override
     public <R> R apply(IFunction<E, R> f) {
-        return (R)sector.hz_apply(id,f);
+        return (R) sector.hz_apply(id, f);
     }
 
     @Override
     public <R> Future<R> asyncApply(IFunction<E, R> f) {
-        return (Future<R>)sector.hz_asyncApply(id,f);
+        return (Future<R>) sector.hz_asyncApply(id, f);
+    }
+
+    @Override
+    public void alter(IFunction<E, E> f) {
+        sector.hz_alter(id, f);
+    }
+
+    @Override
+    public Future<Void> asyncAlter(IFunction<E, E> f) {
+        return sector.hz_asyncAlter(id, f);
     }
 
     @Override
